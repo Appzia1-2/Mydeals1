@@ -1,0 +1,399 @@
+{% load static %}
+<style>
+    .about-paragraph{
+        font-family: 'FontStyle6', Arial, sans-serif;
+        color: black;
+        margin-left:-100px;
+        margin-top:-20px;
+        font-size:12px;
+        line-height: 1.2;
+
+
+     
+    }
+</style>
+</div>
+        <!-- main-footer -->
+        <footer class="main-footer">
+            <div class="footer-top" style="background-image: url(assets/images/banner/banner-1.jpg);">
+               
+                    <div class="widget-section">
+                        <div class="row clearfix" style="justify-content: flex-start;"> <!-- Ensures everything aligns left -->
+                            <div class="col-lg-2 col-md-6 col-sm-12 footer-column">
+                                <div class="footer-widget logo-widget">
+                                    <figure class="footer-logo" style="text-align: left;">
+                                        <a href="index.html"><img src="{% static 'assets/images/1-01.png' %}" alt="oman"></a>
+                                    </figure>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-3 col-sm-10 footer-column">
+                                <div class="footer-widget links-widget ml-70" style="text-align: left; padding: 30px;">
+                                    <div class="widget-title">
+                                        <h3>About us</h3>
+                                    </div>
+                                    <p class="about-paragraph text-justify"> 
+                                        Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh 
+                                        euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad 
+                                        minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip 
+                                        ex ea commodo consequat. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh 
+                                        euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad 
+                                        minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip 
+                                        ex ea commodo consequat. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh 
+                                        euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad 
+                                        minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip 
+                                        ex ea commodo consequat. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh 
+                                        euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad 
+                                        minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip 
+                                        ex ea commodo consequat. 
+                                    </p>
+                                </div>
+                                
+                            </div>
+
+                            <div class="col-separator"></div>
+                            
+                            <!-- <div class="col-lg-3 col-md-6 col-sm-12  footer-column "> -->
+                                <div class="footer-widget links-widget ml-70" style="text-align: left; padding: 20px;">
+                                    <div class="widget-title1">
+                                        <h3>Contact us</h3>
+                                    </div>
+                                    <div class="widget-content">
+                                        <ul class="links-list clearfix">
+                                            
+                                            <li><a href="">Flat 20, Reynolds Neck, North Helenaville, FV77 8WS</a></li>
+                                            <li>
+                                                <i></i>
+                                                <a href="tel:23055873407">+2(305) 587-3407</a>
+                                            </li>
+                                            <li style="margin-bottom: 60px;">
+                                                <i></i>
+                                                <a href="mailto:info@example.com">info@example.com</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            <!-- </div> -->
+
+                            <div class="col-separator"></div>
+                            
+                            <div class="col-lg-3 col-md-6 col-sm-12 footer-column" style="padding: 20px;">  
+                                <div class="footer-widget contact-widget" style="text-align: left;">
+                                    <div class="widget-title2">
+                                        <h3 style="margin-top: -95px;">Business Collaboration</h3>
+                                    </div>
+                                    <div class="widget-content">
+                                        <form action="/submit-collaboration" method="post" class="business-form">
+                                            <!-- Name Field -->
+                                            <div class="form-group">
+                                                <input type="text" id="name" name="name" class="form-control" placeholder="Name" required>
+                                            </div>
+                                            <!-- Email Field -->
+                                            <div class="form-group">
+                                                <input type="email" id="email" name="email" class="form-control" placeholder="Email" required>
+                                            </div>
+                                            <!-- Message Field -->
+                                            <div class="form-group">
+                                                <textarea id="message" name="message" class="form-control" placeholder="Message" rows="4" required></textarea>
+                                            </div>
+                                            <div>
+                                                <button type="submit"></i>Submit</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <style>
+                                .business-form {
+                                   
+                                    font-family: 'FontStyle6', Arial, sans-serif;
+                                    margin-top: -30px;
+                                }
+                            
+                                .business-form .form-group {
+                                    {% comment %} margin-bottom: 15px; {% endcomment %}
+                                    font-family: 'FontStyle6', Arial, sans-serif;
+                                }
+                            
+                                .business-form input, 
+                                .business-form textarea {
+                                    width: 350px;
+                                    padding: 20px;
+                                    border: 1px solid transparent;
+                                    border-radius: 20px;
+                                    font-size: 14px;
+                                    outline: none;
+                                    transition: all 0.3s ease;
+                                }
+                            
+                                .business-form input:focus, 
+                                .business-form textarea:focus {
+                                    border-color: #007bff;
+                                    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+                                }
+                            
+                                .business-form button {
+                                    background: linear-gradient(60deg, #F9AD1F, #EB362D);
+                                    font-family: 'FontStyle1', Arial, sans-serif;
+                                    color: white;
+                                    border-radius: 25px;
+                                    padding: 12px 40px;
+                                    text-decoration: none;
+                                    margin-left: 220px;
+                                    font-size: 16px;
+                                }
+                                .business-form button:hover{
+                                    background:rgb(0, 0, 0);
+                                    box-shadow: 0px 10px 30px 0px rgba(13,25,39,0.3);
+                                    text-decoration: none;
+                                  }
+                                  
+                               /* Separator between columns */
+                                .column-separator {
+                                    border-right: 1px solid #ccc; /* Light border */
+                                     padding: 20px;
+                                }
+
+.col-separator {
+    width: 1px; /* Separator width */
+    background-color: #171616; /* Light gray separator */
+    margin: 0 25px; /* Space around separator */
+    display: inline-block;
+    height: 320px; /* Stretch based on content height */
+    margin-top: -49px;
+    margin-left: -5px;
+}
+
+.footer-row {
+    display: flex;
+    align-items: stretch;
+}
+
+                            </style>
+                            
+                        </div>
+                    </div>
+                </div>
+            
+           
+        </footer>
+        
+        <!-- main-footer end -->
+
+<style>
+    .footer-widget {
+    text-align: left; /* Aligns all text in the footer to the left */
+}
+
+.footer-top .row {
+    justify-content: flex-start; /* Ensures all columns align left */
+}
+
+.footer-widget .widget-title h3 {
+    margin-bottom: 10px; /* Adjusts spacing for titles */
+}
+
+.footer-widget ul {
+    padding-left: 0; /* Removes extra padding from lists */
+    
+}
+
+.footer-bottom {
+    text-align: left; /* Aligns the bottom section to the left */
+}
+
+</style>
+
+<style>
+    @media screen and (max-width: 768px) {
+  .main-footer {
+    height: auto;
+    padding-bottom: 20px;
+  }
+  .about-paragraph {
+        margin-left: 0;
+        font-size: 12px;
+    }
+
+.col-separator{
+    display: none;
+}
+
+  .main-footer .footer-top {
+    padding: 60px 20px;
+    background-attachment: scroll;
+  }
+
+  .footer-top .logo-widget {
+    margin-top: -40px;
+    text-align: center;
+    margin-left: 0;
+  }
+
+  .footer-top .logo-widget .footer-logo {
+    width: 80%;
+    margin: 0 auto 20px auto;
+  }
+
+  .footer-top .logo-widget .text {
+    text-align: center;
+  }
+
+  .footer-top .logo-widget .social-links {
+    text-align: center;
+    padding: 0;
+  }
+
+  .footer-top .logo-widget .social-links li {
+    float: none;
+    display: inline-block;
+  }
+
+  .footer-top .footer-widget {
+    text-align: center;
+    margin-top: 20px;
+  }
+
+  .footer-top .footer-widget .widget-title,
+  .footer-top .footer-widget .widget-title1,
+  .footer-top .footer-widget .widget-title2 {
+    margin: 0 auto 20px auto;
+    text-align: center;
+  }
+
+  .footer-top .footer-widget .widget-title h3,
+  .footer-top .footer-widget .widget-title1 h3,
+  .footer-top .footer-widget .widget-title2 h3 {
+    font-size: 22px;
+    margin-left: 0;
+  }
+
+  .footer-top .links-widget .links-list li {
+    margin-left: 0;
+    text-align: center;
+  }
+
+  .footer-top .post-widget {
+    margin-left: 0;
+    text-align: center;
+  }
+
+  .footer-top .post-widget .post-inner .post {
+    padding-left: 0;
+    text-align: center;
+  }
+
+  .footer-top .post-widget .post-inner .post .post-thumb {
+    position: relative;
+    margin: 0 auto 10px auto;
+  }
+
+  .footer-top .contact-widget .info-list li {
+    text-align: center;
+    padding-left: 0;
+  }
+
+  .footer-top .contact-widget .info-list li i {
+    position: relative;
+    display: block;
+    margin: 0 auto 5px auto;
+  }
+
+  .footer-bottom {
+    text-align: center;
+    padding: 20px 10px;
+  }
+
+  .footer-bottom .footer-nav {
+    display: block;
+    text-align: center;
+    padding: 0;
+  }
+
+  .footer-bottom .footer-nav li {
+    display: inline-block;
+    margin: 5px;
+  }
+
+  .footer-bottom .footer-nav li:before {
+    display: none;
+  }
+}
+@media screen and (max-width: 768px) {
+    .business-form {
+        margin-top: 0;
+        text-align: center;
+        padding: 10px;
+    }
+    
+
+    .business-form .form-group {
+        width: 100%;
+    }
+
+    .business-form input,
+    .business-form textarea {
+        width: 100%;
+        max-width: 100%;
+        padding: 15px;
+        font-size: 14px;
+    }
+
+    .business-form button {
+        width: 100%;
+       
+        padding: 12px;
+        font-size: 16px;
+        margin-left: 0;
+        display: block;
+        text-align: center;
+        margin-top: 15px;
+    }
+
+    /* Hide column separator on mobile */
+    .col-separator {
+        display: none;
+    }
+
+    .footer-row {
+        flex-direction: column;
+        align-items: center;
+    }
+
+   
+}
+
+</style>
+
+
+        
+
+        <!--Scroll to top-->
+        {% comment %} <button class="scroll-top scroll-to-target" data-target="html">
+            <span class="far fa-long-arrow-up"></span>
+        </button> {% endcomment %}
+    </div>
+
+   
+    <!-- jequery plugins -->
+    <script src="{% static 'assets/js/jquery.js' %}"></script>
+    <script src="{% static 'assets/js/popper.min.js' %}"></script>
+    <script src="{% static 'assets/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'assets/js/owl.js' %}"></script>
+    <script src="{% static 'assets/js/wow.js' %}"></script>
+    <script src="{% static 'assets/js/validation.js' %}"></script>
+    <script src="{% static 'assets/js/jquery.fancybox.js' %}"></script>
+    <script src="{% static 'assets/js/appear.js' %}"></script>
+    <script src="{% static 'assets/js/scrollbar.js' %}"></script>
+    <script src="{% static 'assets/js/jquery.nice-select.min.js' %}"></script> 
+   
+    
+
+
+
+
+    <!-- main-js -->
+    <script src="{% static 'assets/js/script.js' %}"></script>
+
+</body><!-- End of .page_wrapper -->
+</html>

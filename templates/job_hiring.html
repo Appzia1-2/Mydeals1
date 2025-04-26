@@ -1,0 +1,109 @@
+{% load static %}
+{% include 'header.html' %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>We Are Hiring</title>
+    <link rel="stylesheet" href="path/to/your/css/styles.css">
+</head>
+<style>
+    /* Basic reset */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        color: #333;
+    }
+
+    header {
+        padding: 20px;
+        text-align: center;
+    }
+
+    h1 {
+        font-size: 2.5rem;
+    }
+
+    p {
+        font-size: 1.2rem;
+    }
+
+    .registration-options {
+        display: flex;
+        justify-content: center;
+        gap: 40px;
+        padding: 40px 20px;
+    }
+
+    .option-card {
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        text-align: center;
+        width: 300px;
+    }
+
+    .option-card img {
+        width: 100px;
+        height: auto;
+        margin-bottom: 15px;
+    }
+
+    .option-card h2 {
+        font-size: 1.8rem;
+        color: #007bff;
+        margin-bottom: 15px;
+    }
+
+    .option-card p {
+        font-size: 1.1rem;
+        margin-bottom: 20px;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 12px 20px;
+        background-color: #e95d1c;
+        color: white;
+        font-size: 1rem;
+        text-decoration: none;
+        border-radius: 4px;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn:hover {
+        background-color: #f55a13;
+    }
+
+ 
+</style>
+<body>
+
+    <header>
+        <h1>Join Our Team</h1>
+        <p>We are looking for talented individuals and companies to join our network. Please choose the option that applies to you.</p>
+    </header>
+
+    <section class="registration-options">
+        <!-- <div class="option-card">
+            <img src="{% static 'assets/images/company1.png' %}" alt="Personal Registration">
+            <h2>Personal Registration</h2>
+            <p>If you are an individual looking to join our team, please register with your personal details.</p>
+            <a href="{% url 'personal_registration' %}?user_id={{ user_id }}" class="btn">Personal</a>
+        </div> -->
+
+        <div class="option-card">
+            <img src="{% static 'assets/images/company2.jpg' %}" alt="Company Registration">
+            <h2>Company Registration</h2>
+            <p>If you represent a company that is looking to collaborate with us, please register your company details.</p>
+            <a href="{% url 'company_registration' user_id=user.id %}" class="btn">Company</a>        </div>
+    </section>
+
+    {% include 'footer.html' %}
+</body>

@@ -1,0 +1,261 @@
+{% load static %}
+{% include 'admin1/headeradmin.html' %}
+
+<!--begin::Toolbar-->
+<div class="toolbar py-5 py-lg-15" id="kt_toolbar">
+    <div id="kt_toolbar_container" class="container-xxl d-flex flex-stack flex-wrap">
+        <!--begin::Title-->
+        <h3 class="text-white fw-bolder fs-2qx me-5">Hi! Admin</h3>
+        <!--end::Title-->
+
+        <!--begin::Actions-->
+        <div class="d-flex align-items-center flex-wrap py-2">
+            <!--begin::Search-->
+            <div id="kt_header_search" class="d-flex align-items-center w-200px w-lg-250px my-2 me-4 me-lg-6" data-kt-search-keypress="true" data-kt-search-min-length="2" data-kt-search-enter="enter" data-kt-search-layout="menu" data-kt-menu-trigger="auto" data-kt-menu-permanent="true" data-kt-menu-placement="bottom-end">
+                <form data-kt-search-element="form" class="search w-100 position-relative" autocomplete="off">
+                    <input type="hidden" />
+                    <span class="svg-icon svg-icon-2 svg-icon-lg-1 svg-icon-white position-absolute top-50 translate-middle-y ms-5">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <rect opacity="0.5" x="17.0365" y="15.1223" width="8.15546" height="2" rx="1" transform="rotate(45 17.0365 15.1223)" fill="black" />
+                            <path d="M11 19C6.55556 19 3 15.4444 3 11C3 6.55556 6.55556 3 11 3C15.4444 3 19 6.55556 19 11C19 15.4444 15.4444 19 11 19ZM11 5C7.53333 5 5 7.53333 5 11C5 14.4667 7.53333 17 11 17C14.4667 17 17 14.4667 17 11C17 7.53333 14.4667 5 11 5Z" fill="black" />
+                        </svg>
+                    </span>
+                    <input type="text" class="form-control ps-15" id="searchInputSidebar" placeholder="Search by name">
+                </form>
+            </div>
+            <!--end::Search-->
+        </div>
+        <!--end::Actions-->
+    </div>
+</div>
+<!--end::Toolbar-->
+
+<!--begin::Container-->
+<div id="kt_content_container" class="d-flex flex-column-fluid align-items-start container-xxl">
+    <div class="content flex-row-fluid" id="kt_content">
+        <div class="card card-page">
+            <div class="card-body">
+                <!--begin::Row-->
+                <div class="row">
+                    <!--begin::Sidebar Column-->
+                    <div class="col-md-4 col-lg-3">
+                        <div class="list-group" id="productSidebar">
+                            <div class="search-box mb-3">
+                                <input type="text" class="form-control" placeholder="Search contacts" id="searchInputSidebar">
+                            </div>
+                            {% if chat_list %}
+                                {% for chat in chat_list %}
+                                    <a href="{% url 'admin_chat_view' chat.user.id %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center chat-item">
+                                        <div class="d-flex align-items-center">
+                                            <div class="profile-image me-2">
+                                                <!-- <img src="{{ chat.user.profile_image.url }}" alt="{{ chat.user.username }}" class="rounded-circle" width="40" height="40"> -->
+                                            </div>
+                                            <div>
+                                                <strong>{{ chat.user.username }}</strong>
+                                                <p class="mb-0 text-muted small">{{ chat.last_message.message }}</p>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <small class="text-muted">{{ chat.last_message.timestamp|date:"H:i" }}</small>
+                                        </div>
+                                    </a>
+                                {% endfor %}
+                            {% else %}
+                                <p>No users with messages.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <!--end::Sidebar Column-->
+
+                    <!--begin::Main Content Column-->
+                    <div class="col-md-8 col-lg-9">
+                        <h2>Chats</h2>
+                        {% if chat %}
+                            <div class="chat-container">
+                                <div class="messages" id="messages">
+                                    {% for message in chat.messages %}
+                                        <div class="message {% if message.sender == request.user %}sent{% else %}received{% endif %}">
+                                            <div class="message-header">
+                                                <strong>{{ message.sender.username }}</strong>
+                                            </div>
+                                            <div class="message-content">
+                                                <p>{{ message.message }}</p>
+                                                <small>{{ message.timestamp|date:"H:i" }}</small>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+
+                                <!-- Chat Form -->
+                                <form id="chatForm" method="POST">
+                                    {% csrf_token %}
+                                    <textarea id="message" name="message" placeholder="Type your message..." required></textarea>
+                                    <button type="submit">Send</button>
+                                </form>
+                            </div>
+                        {% else %}
+                            <!-- <p>Select a chat to view messages.</p> -->
+                        {% endif %}
+                    </div>
+                    <!--end::Main Content Column-->
+                </div>
+                <!--end::Row-->
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::Container-->
+
+{% include 'admin1/footeradmin.html' %}
+
+<!-- Add JavaScript -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Handle search input for filtering chat items by username
+        $('#searchInputSidebar').on('keyup', function() {
+            var value = $(this).val().toLowerCase(); // Get the search query
+            $(".chat-item").each(function() {
+                var username = $(this).find('strong').text().toLowerCase(); // Extract the username
+                if (username.indexOf(value) > -1) {
+                    $(this).show(); // Show the item if the username matches
+                } else {
+                    $(this).hide(); // Hide the item if it doesn't match
+                }
+            });
+        });
+
+        // Handle message form submission via AJAX
+        $('#chatForm').on('submit', function(e) {
+            e.preventDefault(); // Prevent form from reloading the page
+            var message = $('#message').val();
+            var user_id = '{{ user.id }}';
+            
+            // Send message via AJAX
+            $.ajax({
+                url: '{% url "admin_chat_view" user_id=user.id %}',
+                method: 'POST',
+                data: {
+                    'message': message,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function(response) {
+                    // Prepend the new message to the chat container (shows at the top)
+                    var newMessage = '<div class="message sent"><div class="message-header"><strong>{{ request.user.username }}</strong></div><div class="message-content"><p>' + message + '</p><small>Just now</small></div></div>';
+                    $('#messages').prepend(newMessage);
+                    $('#message').val(''); // Clear the input
+                    $('#messages').scrollTop(0); // Scroll to the top to show the latest message
+                },
+                error: function() {
+                    alert('Failed to send message.');
+                }
+            });
+        });
+
+        // Scroll to the top when the page loads or new messages are added
+        $('#messages').scrollTop(0);
+    });
+</script>
+
+<style>
+    /* Custom CSS for chat interface */
+    .chat-container {
+        display: flex;
+        flex-direction: column;
+        height: 80vh;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        padding: 10px;
+        background-color: #f7f7f7;
+    }
+
+    .messages {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding: 10px;
+    }
+
+    .message {
+        display: flex;
+        padding: 8px 12px;
+        margin-bottom: 10px;
+        border-radius: 10px;
+        max-width: 70%;
+        flex-direction: column;
+    }
+
+    .sent {
+        background-color: #DCF8C6;
+        margin-left: auto;
+        text-align: right;
+    }
+
+    .received {
+        background-color: #fff;
+        border: 1px solid #ddd;
+    }
+
+    .message-header {
+        font-size: 0.9em;
+        color: #333;
+        margin-bottom: 5px;
+    }
+
+    .profile-image {
+        margin-right: 10px;
+    }
+
+    .profile-image img {
+        border-radius: 50%;
+    }
+
+    textarea {
+        width: 100%;
+        height: 60px;
+        padding: 10px;
+        border-radius: 10px;
+        border: 1px solid #ddd;
+        resize: none;
+        margin-top: 10px;
+    }
+
+    button {
+        background-color: #25D366;
+        color: white;
+        border: none;
+        padding: 10px;
+        border-radius: 10px;
+        cursor: pointer;
+        margin-top: 10px;
+    }
+
+    button:hover {
+        background-color: #128C7E;
+    }
+
+    small {
+        display: block;
+        font-size: 0.8em;
+        color: #999;
+    }
+
+    .list-group-item {
+        border: none;
+        padding: 10px 15px;
+        border-radius: 10px;
+        margin-bottom: 10px;
+        cursor: pointer;
+        background-color: #fff;
+    }
+
+    .list-group-item:hover {
+        background-color: #f1f1f1;
+    }
+
+    .search-box input {
+        width: 100%;
+        border-radius: 20px;
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+    }
+</style>

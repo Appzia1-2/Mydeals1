@@ -1,0 +1,112 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+
+<title>OMAN</title>
+
+<!-- Fav Icon -->
+<link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
+
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,300;1,400;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- Stylesheets -->
+<link href="{% static 'assets/css/font-awesome-all.css' %}" rel="stylesheet">
+<link href="{% static 'assets/css/flaticon.css' %}" rel="stylesheet">
+<link href="{% static 'assets/css/owl.css' %}" rel="stylesheet">
+<link href="{% static 'assets/css/bootstrap.css' %}" rel="stylesheet">
+<link href="{% static 'assets/css/jquery.fancybox.min.css' %}" rel="stylesheet">
+<link href="{% static 'assets/css/animate.css' %}" rel="stylesheet">
+<link href="{% static 'assets/css/nice-select.css' %}" rel="stylesheet">
+<link href="{% static 'assets/css/color.css' %}" rel="stylesheet">
+<link href="{% static 'assets/css/style.css' %}" rel="stylesheet">
+<link href="{% static 'assets/css/responsive.css' %}" rel="stylesheet">
+
+</head>
+
+
+<!-- page wrapper -->
+<body>
+
+    <div class="boxed_wrapper">
+
+
+        <!-- preloader -->
+        <div class="preloader"></div>
+        <!-- preloader -->
+
+
+        <!-- signup-section -->
+        <section class="login-section signup-section bg-color-2">
+			<div class="auto-container">
+				<div class="inner-container">
+					<div class="inner-box">
+						<h2><center>Admin </center></h2>
+						<div class="form-group"><center>
+							<img src="{% static 'assets/images/' %}" style="height: 75px; width: 135px; margin-bottom: 10px;"></center>
+						</div>
+						<form action="{% url 'admin' %}" method="post" class="signup-form contact_form" enctype="multipart/form-data">
+							{% csrf_token %}
+							<div class="form-group">
+								<label>Username</label>
+								<input type="text" id="username" name="username" class="contact_input" placeholder="Username" required>
+							</div>
+							<div class="form-group">
+								<label>Password</label>
+								<input type="password" id="password" name="password" class="contact_input" placeholder="Password" required>
+							</div>
+							{% if messages %}
+							<div class="alert alert-danger" role="alert">
+								{% for message in messages %}
+									{{ message }}
+								{% endfor %}
+							</div>
+							{% endif %}
+							<div class="form-group message-btn">
+								<button type="submit" class="theme-btn-one login100-form-btn">Login</button>
+							</div>
+						</form>
+						<div class="othre-text centred">
+                            <p>Back To <a href="{% url 'index' %}">Home</a></p>
+                        </div>
+						
+					</div>
+				</div>
+			</div>
+		</section>
+		
+                       
+   
+
+
+        
+        <!--Scroll to top-->
+        <button class="scroll-top scroll-to-target" data-target="html">
+            <span class="far fa-long-arrow-up"></span>
+        </button>
+    </div>
+
+
+    <!-- jequery plugins -->
+    <script src="{% static 'assets/js/jquery.js' %}"></script>
+    <script src="{% static 'assets/js/popper.min.js' %}"></script>
+    <script src="{% static 'assets/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'assets/js/owl.js' %}"></script>
+    <script src="{% static 'assets/js/wow.js' %}"></script>
+    <script src="{% static 'assets/js/validation.js' %}"></script>
+    <script src="{% static 'assets/js/jquery.fancybox.js' %}"></script>
+    <script src="{% static 'assets/js/appear.js' %}"></script>
+    <script src="{% static 'assets/js/scrollbar.js' %}"></script>
+    <script src="{% static 'assets/js/jquery.nice-select.min.js' %}"></script>
+
+    <!-- main-js -->
+    <script src="{% static 'assets/js/script.js' %}"></script>
+
+</body><!-- End of .page_wrapper -->
+</html>

@@ -1,0 +1,968 @@
+{% load static %}
+{% include 'header.html' %}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <style>
+        /* General Body Styling */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+    
+        /* Header Styling */
+        .header {
+            text-align: center;
+            margin: 30px 0;
+        }
+    
+        .header img {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 15px;
+        }
+    
+        .header h1 {
+            font-size: 2.5rem;
+            margin: 0;
+            color: #333;
+            letter-spacing: 2px;
+            font-weight: 600;
+        }
+
+        .home-icon-container {
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    align-items: center;    /* Center vertically */
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+    color: #333;
+    cursor: pointer;
+    border-radius: 8px;
+    padding: 10px;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    text-align: center;
+    width: 100%; /* Ensures it spans full width for centering */
+}
+
+/* .home-icon-container:hover {
+    background-color: #f1f1f1;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+} */
+
+    .home-icon-container i {
+        font-size: 1rem;
+        margin-right: 8px;
+    }
+
+    .home-icon-container span {
+        margin-right: 5px;
+    }
+
+    .home-icon-container .fa-arrow-right {
+        margin-left: 5px;
+        font-size: 0.8rem;
+        color: #888;
+    }
+
+
+        /* Category List */
+        .category-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px; /* Space between items */
+        }
+    
+        /* Category List Item Styling */
+        .category-list li {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            width: 90%;
+            max-width: 700px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+        }
+    
+        /* Hover Effect for List Items */
+        .category-list li:hover {
+            background-color: #f9f9f9;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Slightly stronger shadow */
+            transform: translateY(-5px); /* Lift effect */
+        }
+    
+        /* Icon Styling */
+        .category-list li i {
+            font-size: 2rem;
+            margin-right: 15px;
+            color: #e96d15; /* Maintain color consistency */
+            transition: color 0.3s ease;
+        }
+    
+        /* Hover Effect for Icon */
+        .category-list li:hover i {
+            color: #c05a10; /* Darker shade on hover */
+        }
+    
+        /* Category Text Styling */
+        .category-list li span {
+            font-size: 1.3rem;
+            font-weight: 500;
+            color: #333;
+            letter-spacing: 1px;
+        }
+    
+        /* Arrow Icon Styling */
+        .category-list li i.fa-arrow-right {
+            font-size: 1.5rem;
+            color: #999;
+            transition: color 0.3s ease;
+        }
+    
+        /* Hover Effect for Arrow Icon */
+        .category-list li:hover i.fa-arrow-right {
+            color: #333;
+        }
+
+        /* Modal Content */
+        .modal-content {
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            background-color: #fff;
+            transition: transform 0.3s ease;
+        }
+
+        /* Modal Header */
+        .modal-header {
+            padding: 20px;
+            background-color: #e96d15;
+            color: #fff;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .modal-title {
+            font-size: 1.7rem;
+            font-weight: bold;
+        }
+
+        /* Modal Body */
+        .modal-body {
+            padding: 30px;
+        }
+
+        /* Input Field Styling */
+        .form-control {
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            padding: 12px;
+            font-size: 1rem;
+            margin-bottom: 20px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #e96d15;
+            box-shadow: 0 0 8px rgba(227, 143, 6, 0.5);
+        }
+
+        /* Button Styling */
+        .btn-primary {
+            background-color: #e96d15;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 25px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #c05a10;
+            transform: translateY(-2px); /* Subtle lift effect */
+        }
+
+        /* Modal Footer */
+        .modal-footer {
+            border-top: 1px solid #ddd;
+            padding: 15px;
+            background-color: #f8f9fa;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .category-list li {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+    
+            .category-list li i {
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+    
+            .category-list li span {
+                font-size: 1.1rem;
+            }
+    
+            .modal-body {
+                padding: 20px;
+            }
+    
+            .btn-primary {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Home Icon Section -->
+        
+
+        <!-- Header Section -->
+        <div class="header">
+            <img src="/mnt/data/logo.png" alt="Logo">
+            <h3>Choose the right category for your ad</h3>
+        </div>
+
+        <div class="home-icon-container" onclick="window.location.href='/'">
+            <i class="fa-solid fa-house"></i>
+            <span>Home</span>
+            <i class="fa-solid fa-arrow-right">Classified</i>
+        </div>
+
+        <!-- Category List -->
+        <ul class="category-list">
+            <li data-bs-toggle="modal" data-bs-target="#fashionModal">
+                <i class="fa-solid fa-shirt"></i>
+                <span>Fashion</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </li>
+            <li data-bs-toggle="modal" data-bs-target="#toysModal">
+                <i class="fa-solid fa-gamepad"></i>
+                <span>Gaming Toys</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </li>
+            <li data-bs-toggle="modal" data-bs-target="#foodModal">
+                <i class="fa-solid fa-utensils"></i>
+                <span>Food & Supplements</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </li>
+            <li data-bs-toggle="modal" data-bs-target="#fitnessModal">
+                <i class="fa-solid fa-dumbbell"></i>
+                <span>Sport Fitness</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </li>
+            <li data-bs-toggle="modal" data-bs-target="#petModal">
+                <i class="fa-solid fa-paw"></i>
+                <span>Pets</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </li>
+            <li data-bs-toggle="modal" data-bs-target="#bookModal">
+                <i class="fa-solid fa-book-open"></i>
+                <span> Books and Hobby</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </li>
+            <li data-bs-toggle="modal" data-bs-target="#applianceModal">
+                <i class="fa-solid fa-blender"></i>
+                <span>  Home Appliance</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </li>
+        </ul>
+    </div>
+ 
+          
+           
+            <!-- Fashion Modal -->
+        <div class="modal fade" id="fashionModal" tabindex="-1" aria-labelledby="fashionModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="fashionModalLabel">Register Fashion Item</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="POST" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input type="hidden" name="product_type" value="fashion">
+                            <input type="text" name="name" placeholder="Product Name" class="form-control mb-3" required>
+                            <input type="text" name="brand" placeholder="Brand" class="form-control mb-3" required>
+                            <select name="category" class="form-control mb-3" required>
+                                <option value="">-- Category --</option>
+                                <option value="clothing">Clothing</option>
+                                <option value="footwear">Footwear</option>
+                                <option value="accessories">Accessories</option>
+                            </select>
+                            <select name="size" class="form-control mb-3" required>
+                                <option value="">-- Size --</option>
+                                <option value="S">Small</option>
+                                <option value="M">Medium</option>
+                                <option value="L">Large</option>
+                                <option value="XL">XL</option>
+                            </select>
+                            <select name="gender" class="form-control mb-3" required>
+                                <option value="">-- Gender --</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="unisex">Unisex</option>
+                            </select>
+                            <input type="text" name="color" placeholder="Color" class="form-control mb-3" required>
+                            <input type="text" name="material" placeholder="Material" class="form-control mb-3" required>
+                            <select name="condition" class="form-control mb-3" required>
+                                <option value="">-- Condition --</option>
+                                <option value="used">Used</option>
+                                <option value="like_new">Like New</option>
+                            </select>
+                            <input type="number" step="0.01" name="price" placeholder="Price (OMR)" class="form-control mb-3" required>
+                            <input type="text" name="contact_details" placeholder="Contact Details" class="form-control mb-3" required>
+                            <!-- Property Description -->
+                        <textarea name="description" placeholder="Property Description" class="form-control mb-3" rows="3" required></textarea>
+    
+                        <!-- Region Dropdown -->
+                        <select name="regions" class="form-control mb-3" required>
+                            <option value="MS">Muscat</option>
+                            <option value="DH">Dhofar</option>
+                            <option value="BT">Batinah</option>
+                            <option value="DA">Dakhiliyah</option>
+                            <option value="SH">Sharqiyah</option>
+                            <option value="BR">Buraimi</option>
+                            <option value="ZU">Zufar</option>
+                            <option value="MW">Musandam</option>
+                            <option value="WR">Wusta</option>
+                        </select>
+    
+                        <!-- Cities -->
+                        <input type="text" name="cities" placeholder="City" class="form-control mb-3" required>
+    
+                        <input type="number" step="0.000001" name="latitude" placeholder="Latitude" class="form-control mb-3" required>
+                        <input type="number" step="0.000001" name="longitude" placeholder="Longitude" class="form-control mb-3" required>
+                        
+                        
+                        <!-- Location -->
+                        <input type="text" name="location" placeholder="Location Address" class="form-control mb-3" required>
+
+                        <div id="map-fashion" style="height: 300px; width:300px; margin-bottom: 20px;"></div>
+                        
+
+                        <label for="fashion-images">Upload Images (at least one required):</label>
+                        <input type="file" id="fashion-images" name="images" class="form-control mb-3" multiple required>
+
+                         <!-- Upload Videos -->
+                    <label for="fashion-videos">Upload Videos (optional):</label>
+                    <input type="file" id="fashion-videos" name="videos" accept="video/*" multiple>
+
+
+                            
+                            
+                            <button type="submit" class="btn btn-primary w-100">Submit Fashion Item</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toys Modal -->
+        <div class="modal fade" id="toysModal" tabindex="-1" aria-labelledby="toysModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="toysModalLabel">Register Gaming Toy</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="POST" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input type="hidden" name="product_type" value="toys">
+                            
+                            <!-- Product Name -->
+                            <label for="product_name">Product Name:</label>
+                            <input type="text" name="product_name" placeholder="Product Name" class="form-control mb-3" required>
+                            
+                            <!-- Category -->
+                            <label for="category">Category:</label>
+                            <select name="category" id="category" class="form-control mb-3" required>
+                                <option value="video_games">Video Games</option>
+                                <option value="consoles">Consoles</option>
+                                <option value="toys">Toys</option>
+                            </select>
+        
+                            <!-- Brand -->
+                            <label for="brand">Brand:</label>
+                            <input type="text" id="brand" name="brand" placeholder="Brand" class="form-control mb-3" required>
+                            
+                            <!-- Platform -->
+                            <label for="platform">Gaming Platform:</label>
+                            <select name="platform" id="platform" class="form-control mb-3" required>
+                                <option value="ps5">PS5</option>
+                                <option value="xbox">Xbox</option>
+                                <option value="pc">PC</option>
+                            </select>
+        
+                            <!-- Age Group -->
+                            <label for="age_group">Age Group:</label>
+                            <select name="age_group" id="age_group" class="form-control mb-3" required>
+                                <option value="3-5_years">3-5 years</option>
+                                <option value="6-10_years">6-10 years</option>
+                                <option value="11-16_years">11-16 years</option>
+                                <option value="above_16_years">Above 16 years</option>
+                            </select>
+        
+                            <!-- Condition -->
+                            <label for="condition">Condition:</label>
+                            <select name="condition" id="condition" class="form-control mb-3" required>
+                                <option value="new">New</option>
+                                <option value="used">Used</option>
+                                <option value="refurbished">Refurbished</option>
+                            </select>
+        
+                            <!-- Price -->
+                            <label for="price">Price (OMR):</label>
+                            <input type="number" id="price" name="price" step="0.01" placeholder="Price (OMR)" class="form-control mb-3" required>
+        
+                            <!-- Description -->
+                            <label for="description">Description:</label>
+                            <textarea name="description" placeholder="Product Description" class="form-control mb-3" rows="3" required></textarea>
+        
+                            
+        
+                            <!-- Region -->
+                            <label for="regions">Region:</label>
+                            <select name="regions" id="regions" class="form-control mb-3" required>
+                                <option value="MS">Muscat</option>
+                                <option value="DH">Dhofar</option>
+                                <option value="BT">Batinah</option>
+                                <option value="DA">Dakhiliyah</option>
+                                <option value="SH">Sharqiyah</option>
+                                <option value="BR">Buraimi</option>
+                                <option value="ZU">Zufar</option>
+                                <option value="MW">Musandam</option>
+                                <option value="WR">Wusta</option>
+                            </select>
+        
+                            <!-- City -->
+                            <label for="cities">City:</label>
+                            <input type="text" name="cities" placeholder="City" class="form-control mb-3" required>
+        
+                            <!-- Latitude -->
+                            <label for="latitude">Latitude:</label>
+                            <input type="number" step="0.000001" name="latitude" placeholder="Latitude" class="form-control mb-3" required>
+        
+                            <!-- Longitude -->
+                            <label for="longitude">Longitude:</label>
+                            <input type="number" step="0.000001" name="longitude" placeholder="Longitude" class="form-control mb-3" required>
+        
+                            <!-- Location -->
+                            <label for="location">Location Address:</label>
+                            <input type="text" name="location" placeholder="Location Address" class="form-control mb-3" required>
+        
+                            <!-- Map -->
+                            <div id="map-toys" style="height: 300px; width: 300px; margin-bottom: 20px;"></div>
+        
+                     
+                            <!-- Upload Images -->
+                            <label for="toys-images">Upload Images (at least one required):</label>
+                            <input type="file" id="toys-images" name="images" class="form-control mb-3" multiple required>
+                        
+                         <!-- Upload Videos -->
+                    <label for="toys-videos">Upload Videos (optional):</label>
+                    <input type="file" id="toys-videos" name="videos" accept="video/*" multiple>
+        
+                            <!-- Submit Button -->
+                            <button type="submit" class="btn btn-primary w-100">Submit Gaming Toy</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+
+        <!-- Food Modal -->
+        <div class="modal fade" id="foodModal" tabindex="-1" aria-labelledby="foodModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="foodModalLabel">Register Food Supplement</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="POST" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input type="hidden" name="product_type" value="food">
+                            <input type="text" name="product_name" placeholder="Product Name" class="form-control mb-3" required>
+                            <input type="text" name="brand" placeholder="Brand" class="form-control mb-3" required>
+                            <input type="text" name="type" placeholder="Type (e.g., Vitamin, Protein)" class="form-control mb-3" required>
+                            <input type="date" name="expiration_date" placeholder="Expiry Date" class="form-control mb-3" required>
+                            <input type="number" name="quantity" placeholder="Quantity" class="form-control mb-3" required>
+                            <input type="text" name="dietary_info" placeholder="Dietary_info" class="form-control mb-3" required>
+
+                            <input type="number" step="0.01" name="price" placeholder="Price (OMR)" class="form-control mb-3" required>
+                            <input type="text" name="contact_details" placeholder="Contact Details" class="form-control mb-3" required>
+                            <!-- Property Description -->
+                        <textarea name="description" placeholder="Property Description" class="form-control mb-3" rows="3" required></textarea>
+    
+                        <!-- Region Dropdown -->
+                        <select name="regions" class="form-control mb-3" required>
+                            <option value="MS">Muscat</option>
+                            <option value="DH">Dhofar</option>
+                            <option value="BT">Batinah</option>
+                            <option value="DA">Dakhiliyah</option>
+                            <option value="SH">Sharqiyah</option>
+                            <option value="BR">Buraimi</option>
+                            <option value="ZU">Zufar</option>
+                            <option value="MW">Musandam</option>
+                            <option value="WR">Wusta</option>
+                        </select>
+    
+                        <!-- Cities -->
+                        <input type="text" name="cities" placeholder="City" class="form-control mb-3" required>
+    
+                        <input type="number" step="0.000001" name="latitude" placeholder="Latitude" class="form-control mb-3" required>
+                        <input type="number" step="0.000001" name="longitude" placeholder="Longitude" class="form-control mb-3" required>
+                        
+                        
+                        <!-- Location -->
+                        <input type="text" name="location" placeholder="Location Address" class="form-control mb-3" required>
+
+                        <div id="map-food" style="height: 300px; width:300px; margin-bottom: 20px;"></div>
+                            
+
+
+                        <label for="food-images">Upload Images (at least one required):</label>
+                        <input type="file" id="food-images" name="images" class="form-control mb-3" multiple required>
+
+                         <!-- Upload Videos -->
+                    <label for="food-videos">Upload Videos (optional):</label>
+                    <input type="file" id="food-videos" name="videos" accept="video/*" multiple>
+
+                        <button type="submit" class="btn btn-primary w-100">Submit Food Supplement</button>
+                            <!-- <button type="submit" class="btn btn-primary w-100">Submit Food Supplement</button> -->
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fitness Modal -->
+    <div class="modal fade" id="fitnessModal" tabindex="-1" aria-labelledby="fitnessModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="fitnessModalLabel">Register Fitness Product</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <!-- Hidden field to specify product type -->
+                        <input type="hidden" name="product_type" value="fitness">
+                        <input type="text" name="product_name" placeholder="Product Name" class="form-control mb-3" required>
+                        <!-- Category selection (based on the model choices) -->
+                        <label for="category" class="form-label">Category:</label>
+                        <select name="category" class="form-control mb-3" required>
+                            <option value="equipment">Equipment</option>
+                            <option value="apparel">Apparel</option>
+                            <option value="team_sports">Team Sports</option>
+                            <option value="individual_sports">Individual Sports</option>
+                            <option value="athletics">Athletics/Track and Field</option>
+                        </select>
+    
+                        <!-- Brand input -->
+                        <input type="text" name="brand" placeholder="Brand" class="form-control mb-3" required>
+    
+                        <!-- Condition selection -->
+                        <label for="condition" class="form-label">Condition:</label>
+                        <select name="condition" class="form-control mb-3" required>
+                            <option value="new">New</option>
+                            <option value="used">Used</option>
+                        </select>
+    
+                        <!-- Price input -->
+                        <input type="number" step="0.01" name="price" placeholder="Price (OMR)" class="form-control mb-3" required>
+    
+                        <!-- Warranty status selection -->
+                        <label for="warranty_status" class="form-label">Warranty Status:</label>
+                        <select name="warranty_status" class="form-control mb-3" required>
+                            <option value="yes">Yes</option>
+                            <option value="no">No</option>
+                        </select>
+    
+                        <textarea name="description" placeholder="Property Description" class="form-control mb-3" rows="3" required></textarea>
+    
+                        <!-- Region Dropdown -->
+                        <select name="regions" class="form-control mb-3" required>
+                            <option value="MS">Muscat</option>
+                            <option value="DH">Dhofar</option>
+                            <option value="BT">Batinah</option>
+                            <option value="DA">Dakhiliyah</option>
+                            <option value="SH">Sharqiyah</option>
+                            <option value="BR">Buraimi</option>
+                            <option value="ZU">Zufar</option>
+                            <option value="MW">Musandam</option>
+                            <option value="WR">Wusta</option>
+                        </select>
+    
+                        <!-- Cities -->
+                        <input type="text" name="cities" placeholder="City" class="form-control mb-3" required>
+    
+                        <!-- Latitude -->
+                       <input type="number" step="0.000001" name="latitude" placeholder="Latitude" class="form-control mb-3" required>
+
+                         <!-- Longitude -->
+                        <input type="number" step="0.000001" name="longitude" placeholder="Longitude" class="form-control mb-3" required>
+                        
+                        <!-- Location -->
+                        <input type="text" name="location" placeholder="Location Address" class="form-control mb-3" required>
+
+                        <div id="map-fitness" style="height: 300px; width:300px; margin-bottom: 20px;"></div>
+
+    
+                        
+                        <!-- Image upload -->
+
+                         <!-- Image upload -->
+                         <label for="fitness-images" class="form-label">Upload Images (at least one required):</label>
+                         <input type="file" id="fitness-images" name="images" class="form-control mb-3" multiple required>
+
+                          <!-- Upload Videos -->
+                    <label for="fitness-videos">Upload Videos (optional):</label>
+                    <input type="file" id="fitness-videos" name="videos" accept="video/*" multiple>
+                        
+                        <!-- Submit button -->
+                        <button type="submit" class="btn btn-primary w-100">Submit Fitness Product</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="petModal" tabindex="-1" aria-labelledby="petModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="petModalLabel">Register Pet</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="hidden" name="product_type" value="pet">
+                        <!-- Pet Type Dropdown -->
+                        <select name="pet_type" class="form-control mb-3" required>
+                            <option value="">Select Pet Type</option>
+                            <option value="dog">Dog</option>
+                            <option value="cat">Cat</option>
+                            <option value="fish">Fish</option>
+                            <option value="rabbit">Rabbit</option>
+                            <option value="hamster">Hamster</option>
+                            <option value="hedgehog">Hedgehog</option>
+                            <option value="bird">Lovebird</option>
+                            <option value="tortoise">Tortoise</option>
+                        </select>
+                        <input type="text" name="pet_name" placeholder="Pet Name" class="form-control mb-3" required>
+                        <input type="text" name="breed" placeholder="Breed" class="form-control mb-3" required>
+                        <input type="number" name="age" placeholder="Age (Months/Years)" class="form-control mb-3" required>
+                        <input type="number" step="0.01" name="price" placeholder="Price (OMR)" class="form-control mb-3" required>
+                        
+                        <!-- Vaccination Status -->
+                        <select name="vaccinated" class="form-control mb-3" required>
+                            <option value="">Vaccination Status</option>
+                            <option value="yes">Yes</option>
+                            <option value="no">No</option>
+                        </select>
+    
+                        <!-- Property Description -->
+                        <textarea name="description" placeholder="Property Description" class="form-control mb-3" rows="3" required></textarea>
+    
+                        <!-- Region Dropdown -->
+                        <select name="regions" class="form-control mb-3" required>
+                            <option value="MS">Muscat</option>
+                            <option value="DH">Dhofar</option>
+                            <option value="BT">Batinah</option>
+                            <option value="DA">Dakhiliyah</option>
+                            <option value="SH">Sharqiyah</option>
+                            <option value="BR">Buraimi</option>
+                            <option value="ZU">Zufar</option>
+                            <option value="MW">Musandam</option>
+                            <option value="WR">Wusta</option>
+                        </select>
+    
+                        <!-- Cities -->
+                        <input type="text" name="cities" placeholder="City" class="form-control mb-3" required>
+    
+                        <!-- Latitude -->
+<input type="number" step="0.000001" name="latitude" placeholder="Latitude" class="form-control mb-3" required>
+
+<!-- Longitude -->
+<input type="number" step="0.000001" name="longitude" placeholder="Longitude" class="form-control mb-3" required>
+                        
+                        <!-- Location -->
+                        <input type="text" name="location" placeholder="Location Address" class="form-control mb-3" required>
+
+                        <div id="map-pet" style="height: 300px; width:300px; margin-bottom: 20px;"></div>
+    
+                        <label for="pet-images">Upload Images (at least one required):</label>
+                        <input type="file" id="pet-images" name="images" class="form-control mb-3" multiple required>
+
+                         <!-- Upload Videos -->
+                    <label for="pet-videos">Upload Videos (optional):</label>
+                    <input type="file" id="pet-videos" name="videos" accept="video/*" multiple>
+    
+                        <button type="submit" class="btn btn-primary w-100">Submit Pet</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
+    
+    <div class="modal fade" id="bookModal" tabindex="-1" aria-labelledby="bookModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="bookModalLabel">Register Book</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="hidden" name="product_type" value="book">
+                        <input type="text" name="book_name" placeholder="Book Name" class="form-control mb-3" required>
+                        <!-- Category Dropdown -->
+                        <select name="category" class="form-control mb-3" required>
+                            <option value="">Select Category</option>
+                            <option value="fiction">Fiction</option>
+                            <option value="non_fiction">Non-Fiction</option>
+                            <option value="children_books">Children’s Books</option>
+                            <option value="graphic_novels">Graphic Novels and Comics</option>
+                            <option value="poetry">Poetry</option>
+                            <option value="textbooks">Textbooks and Educational Materials</option>
+                            <option value="arts_crafts">Arts and Crafts</option>
+                            <option value="music">Music</option>
+                            <option value="photography">Photography</option>
+                        </select>
+    
+                        <!-- Genre Text Input -->
+                        <input type="text" name="genre" placeholder="Genre" class="form-control mb-3" required>
+    
+                        <!-- Condition Dropdown -->
+                        <select name="condition" class="form-control mb-3" required>
+                            <option value="">Select Condition</option>
+                            <option value="new">New</option>
+                            <option value="used">Used</option>
+                        </select>
+    
+                        <!-- Price Input -->
+                        <input type="number" step="0.01" name="price" placeholder="Price (OMR)" class="form-control mb-3" required>
+    
+                        <textarea name="description" placeholder="Property Description" class="form-control mb-3" rows="3" required></textarea>
+    
+                        <!-- Region Dropdown -->
+                        <select name="regions" class="form-control mb-3" required>
+                            <option value="MS">Muscat</option>
+                            <option value="DH">Dhofar</option>
+                            <option value="BT">Batinah</option>
+                            <option value="DA">Dakhiliyah</option>
+                            <option value="SH">Sharqiyah</option>
+                            <option value="BR">Buraimi</option>
+                            <option value="ZU">Zufar</option>
+                            <option value="MW">Musandam</option>
+                            <option value="WR">Wusta</option>
+                        </select>
+    
+                        <!-- Cities -->
+                        <input type="text" name="cities" placeholder="City" class="form-control mb-3" required>
+    
+                        <!-- Latitude -->
+                       <input type="number" step="0.000001" name="latitude" placeholder="Latitude" class="form-control mb-3" required>
+
+                         <!-- Longitude -->
+                        <input type="number" step="0.000001" name="longitude" placeholder="Longitude" class="form-control mb-3" required>
+                        
+                        <!-- Location -->
+                       <input type="text" name="location" placeholder="Location Address" class="form-control mb-3" required>
+
+                       <div id="map-book" style="height: 300px; width:300px; margin-bottom: 20px;"></div>
+
+    
+                        <!-- Image Upload -->
+                        <label for="book-images">Upload Images (at least one required):</label>
+                        <input type="file" id="book-images" name="images" class="form-control mb-3" multiple required>
+
+                         <!-- Upload Videos -->
+                    <label for="book-videos">Upload Videos (optional):</label>
+                    <input type="file" id="book-videos" name="videos" accept="video/*" multiple>
+    
+                        <!-- Submit Button -->
+                        <button type="submit" class="btn btn-primary w-100">Submit Book</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+    
+    <div class="modal fade" id="applianceModal" tabindex="-1" aria-labelledby="applianceModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="applianceModalLabel">Register Home Appliance</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="hidden" name="product_type" value="appliance">
+                        <input type="text" name="product_name" placeholder="Product Name" class="form-control mb-3" required>
+                        <select name="appliance_type" class="form-control mb-3" required>
+                            <option value="">Appliance Type</option>
+                            <option value="refrigerator">Refrigerator</option>
+                            <option value="washing_machine">Washing Machine</option>
+                            <option value="oven">Oven</option>
+                            <option value="microwave">Microwave</option>
+                            <option value="clothes_dryer">Clothes Dryer</option>
+                            <option value="vacuum_cleaner">Vacuum Cleaner</option>
+                            <option value="air_conditioner">Air Conditioner</option>
+                        </select>
+                        <input type="text" name="brand" placeholder="Brand" class="form-control mb-3" required>
+                        <input type="text" name="model_number" placeholder="Model Number" class="form-control mb-3" required>
+                        <select name="condition" class="form-control mb-3" required>
+                            <option value="">Condition</option>
+                            <option value="new">New</option>
+                            <option value="used">Used</option>
+                            <option value="refurbished">Refurbished</option>
+                        </select>
+                        <select name="warranty_status" class="form-control mb-3" required>
+                            <option value="">Warranty Status</option>
+                            <option value="yes">Yes</option>
+                            <option value="no">No</option>
+                        </select>
+                        <input type="number" step="0.01" name="price" placeholder="Price (OMR)" class="form-control mb-3" required>
+                        <textarea name="description" placeholder="Property Description" class="form-control mb-3" rows="3" required></textarea>
+    
+                        <!-- Region Dropdown -->
+                        <select name="regions" class="form-control mb-3" required>
+                            <option value="MS">Muscat</option>
+                            <option value="DH">Dhofar</option>
+                            <option value="BT">Batinah</option>
+                            <option value="DA">Dakhiliyah</option>
+                            <option value="SH">Sharqiyah</option>
+                            <option value="BR">Buraimi</option>
+                            <option value="ZU">Zufar</option>
+                            <option value="MW">Musandam</option>
+                            <option value="WR">Wusta</option>
+                        </select>
+    
+                        <!-- Cities -->
+                        <input type="text" name="cities" placeholder="City" class="form-control mb-3" required>
+    
+                        <!-- Latitude -->
+                       <input type="number" step="0.000001" name="latitude" placeholder="Latitude" class="form-control mb-3" required>
+
+                         <!-- Longitude -->
+                        <input type="number" step="0.000001" name="longitude" placeholder="Longitude" class="form-control mb-3" required>
+                        
+                        <!-- Location -->
+                        <input type="text" name="location" placeholder="Location Address" class="form-control mb-3" required>
+
+                        <div id="map-appliance" style="height: 300px; width:300px; margin-bottom: 20px;"></div>
+
+                        <label for="appliance-images">Upload Images (at least one required):</label>
+                        <input type="file" id="appliance-images" name="images" class="form-control mb-3" multiple required>
+
+                        <!-- Upload Videos -->
+                        <label for="appliance-videos">Upload Videos (optional):</label>
+                        <input type="file" id="appliance-videos" name="videos" accept="video/*" multiple>
+
+                        <button type="submit" class="btn btn-primary w-100">Submit Appliance</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
+
+   
+</body>
+
+</html>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+<script>
+ // Function to initialize the map
+// Function to initialize the map
+function initializeMap(mapId, modal) {
+    var map = L.map(mapId).setView([23.5880, 58.3829], 5); // Centered on Oman
+
+    // Add OpenStreetMap tile layer
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    // Define regions with their coordinates
+    var regions = {
+        'MS': [23.5880, 58.3829], // Muscat
+        'DH': [17.0079, 54.0927], // Dhofar
+        'BT': [24.6342, 56.0525], // Batinah
+        'DA': [22.5000, 57.0000], // Dakhiliyah
+        'SH': [22.0000, 59.0000], // Sharqiyah
+        'BR': [23.0000, 55.0000], // Buraimi
+        'ZU': [17.0000, 54.0000], // Zufar
+        'MW': [26.0000, 56.0000], // Musandam
+        'WR': [20.0000, 58.0000]  // Wusta
+    };
+
+    // Update map view based on selected region
+    modal.querySelector('select[name="regions"]').addEventListener('change', function() {
+        var region = this.value;
+        if (regions[region]) {
+            map.setView(regions[region], 7); // Zoom in on the selected region
+        }
+    });
+
+    // Add a marker on click and get latitude and longitude
+    map.on('click', function(e) {
+        var lat = e.latlng.lat;
+        var lng = e.latlng.lng;
+
+        // Check if latitude and longitude are within valid ranges
+        if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+            alert("Invalid latitude or longitude values.");
+            return;
+        }
+
+        // Set latitude and longitude input values within the current modal context
+        modal.querySelector('input[name="latitude"]').value = lat.toFixed(6); // Limit to 6 decimal places
+        modal.querySelector('input[name="longitude"]').value = lng.toFixed(6); // Limit to 6 decimal places
+
+        // Add a marker to the map
+        L.marker([lat, lng]).addTo(map).bindPopup("Location: " + lat + ", " + lng).openPopup();
+    });
+}
+
+// Initialize map for each modal when it is shown
+document.querySelectorAll('.modal').forEach(modal => {
+    modal.addEventListener('show.bs.modal', function () {
+        const mapId = this.querySelector('div[id^="map-"]').id; // Get the unique map ID
+        initializeMap(mapId, this); // Pass the modal context to the initializeMap function
+    });
+});
+</script>
+
+
+{% include 'footer.html' %}

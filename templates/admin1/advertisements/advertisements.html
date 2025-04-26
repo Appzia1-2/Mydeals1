@@ -1,0 +1,198 @@
+{% load static %}
+{% include 'admin1/headeradmin.html' %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
+
+<div class="toolbar py-5 py-lg-15" id="kt_toolbar">
+    <div id="kt_toolbar_container" class="container-xxl d-flex flex-stack flex-wrap">
+        <h3 class="text-white fw-bolder fs-2qx me-5">advertisement</h3>
+        <div class="d-flex align-items-center flex-wrap py-2">
+            <div id="kt_header_search" class="d-flex align-items-center w-200px w-lg-250px my-2 me-4 me-lg-6">
+                <form class="search w-100 position-relative" autocomplete="off">
+                    <input type="text" class="form-control ps-15" name="search" placeholder="Search..." />
+                </form>
+            </div>
+            <button type="button" class="btn btn-success my-2" data-bs-toggle="modal" data-bs-target="#addadvertisementModal">
+                Add
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="kt_content_container" class="d-flex flex-column-fluid align-items-start container-xxl">
+    <div class="content flex-row-fluid" id="kt_content">
+        <div class="card">
+            <div class="card-body p-lg-17">
+                <div class="mb-18">
+                    <div class="mb-10">
+                        <div class="text-center mb-15">
+                            <h3 class="fs-2hx text-dark mb-5">Advertisement</h3>
+                            <div class="table-responsive">
+								<table id="reviewTable" class="table table-bordered table-striped table-sm">
+									<thead>
+                                        <tr>
+                                            <th width="50px">Sl No</th>
+                                            <th>Advertisement</th>
+                                            <th>URL</th> <!-- New column -->
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for advertisement in advertisement %}
+                                        <tr>
+                                            <td>{{ forloop.counter }}</td>
+                                            <td>
+                                                <img src="{{ advertisement.image.url }}" alt="Advertisement Image" width="100" height="100">
+                                            </td>
+                                            <td>
+                                                {% if advertisement.url %}
+                                                    <a href="{{ advertisement.url }}" target="_blank">{{ advertisement.url }}</a>
+                                                {% else %}
+                                                    No URL
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-primary btn-sm edit-btn" 
+                                                        data-edit-url="{% url 'edit_advertisements' advertisement.id %}" 
+                                                        data-advertisement-name="{{ advertisement.image }}" 
+                                                        data-advertisement-url="{{ advertisement.url }}" 
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#editadvertisementModal">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-outline-danger btn-sm delete-btn" 
+                                                        data-delete-url="{% url 'delete_advertisements' advertisement.id %}" 
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#deleteadvertisementModal">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>                                    
+								</table>
+							</div>
+							
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add advertisement Modal -->
+<div class="modal fade" id="addadvertisementModal" tabindex="-1" aria-labelledby="addadvertisementModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form id="addadvertisementForm" method="POST" action="{% url 'add_advertisements' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addadvertisementModalLabel">Add Advertisement</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="mb-3">
+                    <label for="advertisementImage" class="form-label">Upload Advertisement Image</label>
+                    <input type="file" class="form-control" id="advertisementImage" name="image" required>
+                </div>
+                <div class="mb-3">
+                    <label for="advertisementUrl" class="form-label">Advertisement URL</label>
+                    <input type="url" class="form-control" id="advertisementUrl" name="url" placeholder="https://example.com">
+                </div>                
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+            
+        </div>
+    </div>
+</div>
+
+<!-- Edit advertisement Modal -->
+<div class="modal fade" id="editadvertisementModal" tabindex="-1" aria-labelledby="editadvertisementModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form id="editadvertisementForm" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editadvertisementModalLabel">Edit Advertisement</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="mb-3">
+                    <label for="editadvertisementImage" class="form-label">Upload New Image</label>
+                    <input type="file" class="form-control" id="editadvertisementImage" name="image">
+                </div>
+                <div class="mb-3">
+                    <label for="editadvertisementUrl" class="form-label">Advertisement URL</label>
+                    <input type="url" class="form-control" id="editadvertisementUrl" name="url">
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+            
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteadvertisementModal" tabindex="-1" aria-labelledby="deleteadvertisementModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form id="deleteadvertisementForm" method="POST">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteadvertisementModalLabel">Delete advertisement</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete this advertisement?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Yes, Delete</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% include 'admin1/footeradmin.html' %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Handle delete modal
+        const deleteButtons = document.querySelectorAll('.delete-btn');
+        const deleteForm = document.getElementById('deleteadvertisementForm');
+
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const deleteUrl = button.getAttribute('data-delete-url');
+                deleteForm.action = deleteUrl; // Update the form's action with the delete URL
+            });
+        });
+
+        // Handle edit modal
+        const editButtons = document.querySelectorAll('.edit-btn');
+        const editForm = document.getElementById('editadvertisementForm');
+        const editadvertisementNameInput = document.getElementById('editadvertisementName');
+        const editadvertisementIconInput = document.getElementById('editadvertisementIcon');
+        const editadvertisementUrlInput = document.getElementById('editadvertisementUrl');
+
+        editButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const editUrl = button.getAttribute('data-edit-url');
+                const advertisementName = button.getAttribute('data-advertisement-name');
+                const advertisementUrl = button.getAttribute('data-advertisement-url');
+
+                editForm.action = editUrl;
+                editadvertisementNameInput.value = advertisementName;
+                editadvertisementUrlInput.value = advertisementUrl; // Set the URL field
+            });
+        });
+    });
+</script>
+

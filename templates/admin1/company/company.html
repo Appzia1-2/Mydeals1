@@ -1,0 +1,116 @@
+
+{% load static %}
+{% include 'admin1/headeradmin.html' %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
+<div class="toolbar py-5 py-lg-15" id="kt_toolbar">
+    <div id="kt_toolbar_container" class="container-xxl d-flex flex-stack flex-wrap">
+        <h3 class="text-white fw-bolder fs-2qx me-5">Company</h3>
+        <div class="d-flex align-items-center flex-wrap py-2">
+            <div id="kt_header_search" class="d-flex align-items-center w-200px w-lg-250px my-2 me-4 me-lg-6">
+                <form class="search w-100 position-relative" autocomplete="off">
+                    <input type="text" class="form-control ps-15" name="search" placeholder="Search..." />
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="kt_content_container" class="d-flex flex-column-fluid align-items-start container-xxl">
+    <div class="content flex-row-fluid" id="kt_content">
+        <div class="card">
+            <div class="card-body p-lg-17">
+                <div class="mb-18">
+                    <div class="mb-10">
+                        <div class="text-center mb-15">
+                            <h3 class="fs-2hx text-dark mb-5">Company</h3>
+                            <div class="table-responsive">
+                                <table id="reviewTable" class="table table-bordered table-striped table-sm">
+                                    <thead>
+                                        <tr class="mb-5">
+                                            <th width="50px" style="font-weight: bold;">Sl No</th>
+                                            <th style="font-weight: bold;">Username</th>
+                                            <th style="font-weight: bold;">Company Name</th>
+                                            <th style="font-weight: bold;">Company Logo</th>
+                                            <th style="font-weight: bold;">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for company in companies %}
+                                            <tr>
+                                                <td>{{ forloop.counter }}</td>
+                                                <td>{{ company.user.username|title }}</td>
+                                                <td>{{ company.company_name|title }}</td>
+                                                <td>
+                                                    <img src="{{ company.logo.url }}" alt="{{ company.company_name }} Logo" style="width: 80px; height: 70px; object-fit: cover;">
+                                                </td>
+                                                <td>
+                                                    <!-- Eye icon button for viewing company details -->
+                                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#companyModal{{ company.pk }}">
+                                                        <i class="fas fa-eye"></i> <!-- Font Awesome eye icon -->
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        {% empty %}
+                                            <tr>
+                                                <td colspan="5" class="text-center">No Companies Available</td> <!-- Adjusted colspan to 5 -->
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for each company -->
+{% for company in companies %}
+<div class="modal fade" id="companyModal{{ company.pk }}" tabindex="-1" aria-labelledby="companyModalLabel{{ company.pk }}" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="companyModalLabel{{ company.pk }}">{{ company.company_name }} Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-4">
+                    <img src="{{ company.logo.url }}" alt="{{ company.company_name }} Logo" style="width: 150px; height: 150px; object-fit: cover;">
+                </div>
+                <p><strong>Username:</strong> {{ company.user.username }}</p>
+                <p><strong>Company Name:</strong> {{ company.company_name }}</p>
+                <p><strong>Company Type:</strong> {{ company.get_company_type_display }}</p>
+                <p><strong>Industry:</strong> {{ company.get_industry_display }}</p>
+                <p><strong>City:</strong> {{ company.city }}</p>
+                <p><strong>Phone:</strong> {{ company.phone }}</p>
+                <p><strong>Email:</strong> {{ company.email }}</p>
+                <p><strong>Website:</strong> <a href="{{ company.website }}" target="_blank">{{ company.website }}</a></p>
+                <p><strong>Description:</strong> {{ company.description }}</p>
+                <p><strong>Social Links:</strong></p>
+                <ul>
+                    {% if company.linkedin %}
+                        <li><a href="{{ company.linkedin }}" target="_blank">LinkedIn</a></li>
+                    {% endif %}
+                    {% if company.facebook %}
+                        <li><a href="{{ company.facebook }}" target="_blank">Facebook</a></li>
+                    {% endif %}
+                    {% if company.instagram %}
+                        <li><a href="{{ company.instagram }}" target="_blank">Instagram</a></li>
+                    {% endif %}
+                    {% if company.youtube %}
+                        <li><a href="{{ company.youtube }}" target="_blank">YouTube</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+{% include 'admin1/footeradmin.html' %}

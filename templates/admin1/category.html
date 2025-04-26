@@ -1,0 +1,221 @@
+{% load static %}
+{% include 'admin1/headeradmin.html' %}
+
+					<!--begin::Toolbar-->
+					<div class="toolbar py-5 py-lg-15" id="kt_toolbar">
+						<!--begin::Container-->
+						<div id="kt_toolbar_container" class="container-xxl d-flex flex-stack flex-wrap">
+							<!--begin::Title-->
+							<h3 class="text-white fw-bolder fs-2qx me-5">Category</h3>
+							<!--begin::Title-->
+							<!--begin::Actions-->
+							<div class="d-flex align-items-center flex-wrap py-2">
+								<!--begin::Search-->
+								<div id="kt_header_search" class="d-flex align-items-center w-200px w-lg-250px my-2 me-4 me-lg-6" data-kt-search-keypress="true" data-kt-search-min-length="2" data-kt-search-enter="enter" data-kt-search-layout="menu" data-kt-menu-trigger="auto" data-kt-menu-permanent="true" data-kt-menu-placement="bottom-end">
+									<!--begin::Form-->
+									<form data-kt-search-element="form" class="search w-100 position-relative" autocomplete="off">
+										<!--begin::Hidden input(Added to disable form autocomplete)-->
+										<input type="hidden" />
+										<!--end::Hidden input-->
+										<!--begin::Icon-->
+										<!--begin::Svg Icon | path: icons/duotune/general/gen021.svg-->
+										<span class="svg-icon svg-icon-2 svg-icon-lg-1 svg-icon-white position-absolute top-50 translate-middle-y ms-5">
+											<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+												<rect opacity="0.5" x="17.0365" y="15.1223" width="8.15546" height="2" rx="1" transform="rotate(45 17.0365 15.1223)" fill="black" />
+												<path d="M11 19C6.55556 19 3 15.4444 3 11C3 6.55556 6.55556 3 11 3C15.4444 3 19 6.55556 19 11C19 15.4444 15.4444 19 11 19ZM11 5C7.53333 5 5 7.53333 5 11C5 14.4667 7.53333 17 11 17C14.4667 17 17 14.4667 17 11C17 7.53333 14.4667 5 11 5Z" fill="black" />
+											</svg>
+										</span>
+										<!--end::Svg Icon-->
+										<!--end::Icon-->
+										<!--begin::Input-->
+										<input type="text" class="form-control ps-15" name="search" value="" placeholder="Search..." >
+										
+										
+									</form>
+									<!--end::Form-->
+									<!--begin::Menu-->
+									<div data-kt-search-element="content" class="menu menu-sub menu-sub-dropdown w-300px w-md-400px py-7 px-7 overflow-hidden">
+										<!--begin::Wrapper-->
+										
+										
+										<!--end::Preferences-->
+									</div>
+									<!--end::Menu-->
+								</div>
+								<!--end::Search-->
+								<!--begin::Action-->
+								<!--end::Action-->
+								<!--begin::Button-->
+								<a href="#" class="btn btn-success my-2" >Add</a>
+								<!--end::Button-->
+							</div>
+							<!--end::Actions-->
+						</div>
+						<!--end::Container-->
+					</div>
+					<!--end::Toolbar-->
+					<!--begin::Container-->
+					<div id="kt_content_container" class="d-flex flex-column-fluid align-items-start container-xxl">
+						<!--begin::Post-->
+						<div class="content flex-row-fluid" id="kt_content">
+							<!--begin::About card-->
+							<div class="card">
+								<!--begin::Body-->
+								<div class="card-body p-lg-17">
+									<!--begin::About-->
+									<div class="mb-18">
+										<!--begin::Wrapper-->
+										<div class="mb-10">
+											<!--begin::Top-->
+											<div class="text-center mb-15">
+												<!--begin::Title-->
+												<h3 class="fs-2hx text-dark mb-5">Category</h3>
+												<!--end::Title-->
+												<!--begin::Text-->
+												
+
+
+
+												<div class="content-wrapper">
+													<section class="content">
+														<div class="container-fluid">
+															<div class="row mb-2">
+																
+															</div>
+															<div class="row">
+																<div class="col-12">
+																	<div class="card">
+																		
+																		<div class="card-body">
+																			<div class="table-responsive">
+																				<table id="reviewTable" class="table table-bordered table-striped table-sm">
+																					<thead>
+																						<tr>
+																							<th width="50px">Sl No</th>
+																							<th>Category</th>
+																							
+																							<th>Actions</th>
+																						</tr>
+																					</thead>
+																					<tbody>
+																						
+																						<tr>
+																							<td></td>                                           
+																							<td></td>
+																							<td>
+																								<a href="#" class="btn btn-primary btn-sm">
+																									<i class="fas fa-edit"></i>
+																								</a>
+																								<a href="#" class="btn btn-primary btn-sm">
+																									<i class="fas fa-trash"></i>
+																								</a>
+																							   
+																							</td>
+																						</tr>
+																						
+																					</tbody>
+																				</table>
+																			</div>
+																		</div>
+																	</div>
+																</div>
+															</div>
+														</div>
+													</section>
+												</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+												<!--end::Text-->
+											</div>
+					
+					<!--begin::Footer-->
+					<div class="footer py-4 d-flex flex-lg-column" id="kt_footer">
+						<!--begin::Container-->
+						
+						<!--end::Container-->
+					</div>
+					<!--end::Footer-->
+				</div>
+				<!--end::Wrapper-->
+			</div>
+			<!--end::Page-->
+		</div>
+		<!--end::Root-->
+		<!--begin::Drawers-->
+		<!--begin::Activities drawer-->
+		<div id="kt_activities" class="bg-body" data-kt-drawer="true" data-kt-drawer-name="activities" data-kt-drawer-activate="true" data-kt-drawer-overlay="true" data-kt-drawer-width="{default:'300px', 'lg': '900px'}" data-kt-drawer-direction="end" data-kt-drawer-toggle="#kt_activities_toggle" data-kt-drawer-close="#kt_activities_close">
+			<div class="card shadow-none rounded-0">
+				<!--begin::Header-->
+				<div class="card-header" id="kt_activities_header">
+					<h3 class="card-title fw-bolder text-dark">Activity Logs</h3>
+					<div class="card-toolbar">
+						<button type="button" class="btn btn-sm btn-icon btn-active-light-primary me-n5" id="kt_activities_close">
+							<!--begin::Svg Icon | path: icons/duotune/arrows/arr061.svg-->
+							<span class="svg-icon svg-icon-1">
+								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+									<rect opacity="0.5" x="6" y="17.3137" width="16" height="2" rx="1" transform="rotate(-45 6 17.3137)" fill="black" />
+									<rect x="7.41422" y="6" width="16" height="2" rx="1" transform="rotate(45 7.41422 6)" fill="black" />
+								</svg>
+							</span>
+							<!--end::Svg Icon-->
+						</button>
+					</div>
+				</div>
+				<!--end::Header-->
+				<!--begin::Body-->
+				<div class="card-body position-relative" id="kt_activities_body">
+					<!--begin::Content-->
+					<div id="kt_activities_scroll" class="position-relative scroll-y me-n5 pe-5" data-kt-scroll="true" data-kt-scroll-height="auto" data-kt-scroll-wrappers="#kt_activities_body" data-kt-scroll-dependencies="#kt_activities_header, #kt_activities_footer" data-kt-scroll-offset="5px">
+						<!--begin::Timeline items-->
+						<div class="timeline">
+							<!--begin::Timeline item-->
+							<div class="timeline-item">
+								<!--begin::Timeline line-->
+								<div class="timeline-line w-40px"></div>
+								<!--end::Timeline line-->
+								<!--begin::Timeline icon-->
+								
+								
+						<!--end::Timeline items-->
+					</div>
+					<!--end::Content-->
+				</div>
+				<!--end::Body-->
+				<!--begin::Footer-->
+				<div class="card-footer py-5 text-center" id="kt_activities_footer">
+					<a href="../dist/account/activity.html" class="btn btn-bg-white text-primary">View All Activities
+					<!--begin::Svg Icon | path: icons/duotune/arrows/arr064.svg-->
+					<span class="svg-icon svg-icon-3 svg-icon-primary">
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+							<rect opacity="0.5" x="18" y="13" width="13" height="2" rx="1" transform="rotate(-180 18 13)" fill="black" />
+							<path d="M15.4343 12.5657L11.25 16.75C10.8358 17.1642 10.8358 17.8358 11.25 18.25C11.6642 18.6642 12.3358 18.6642 12.75 18.25L18.2929 12.7071C18.6834 12.3166 18.6834 11.6834 18.2929 11.2929L12.75 5.75C12.3358 5.33579 11.6642 5.33579 11.25 5.75C10.8358 6.16421 10.8358 6.83579 11.25 7.25L15.4343 11.4343C15.7467 11.7467 15.7467 12.2533 15.4343 12.5657Z" fill="black" />
+						</svg>
+					</span>
+					<!--end::Svg Icon--></a>
+				</div>
+				<!--end::Footer-->
+			</div>
+		</div>
+		<!--end::Activities drawer-->
+		<!--begin::Exolore drawer toggle-->
+		
+		
+
+
+{% include 'admin1/footeradmin.html' %}

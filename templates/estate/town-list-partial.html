@@ -1,0 +1,453 @@
+
+{% load dict_filters %}
+
+<style>
+    #filters-container {
+        margin-top: 1rem;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        margin-bottom: 20px;
+    }
+
+
+.filter-badge {
+    color: black;
+    background-color: rgb(238, 241, 240);
+    padding: 0.6rem 0.9rem;
+    /* border-radius: 20px; */
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem; /* space between text and ✖ */
+    margin-top: 10px;
+    margin-right: 7px;
+    height: 40px;
+    /* font-size: 0.95rem; */
+}
+
+.filter-badge .remove-filter {
+    color: black;
+    margin-left: 5px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: black;
+    transition: background 0.2s ease;
+}
+
+.filter-badge .remove-filter:hover {
+    background: rgba(0, 0, 0, 0.25);
+}
+
+</style>
+
+<nav aria-label="Breadcrumb">
+    <div class="d-flex flex-wrap align-items-center gap-2">
+       <ol class="breadcrumb mb-0">
+            <li><a href="{% url 'index' %}"><i class="fas fa-home"></i></a></li>
+            <li><a href="{% url 'index3' %}">Real Estate</a></li>
+        
+            {% if request.resolver_match.url_name %}
+                <li><a href="#">
+                    {{ formatted_url_name }}
+                    {% if request.GET.listing_type %}
+                        {% if request.GET.listing_type == "sell" %}
+                            <span>for Sale</span>
+                        {% elif request.GET.listing_type == "rent" %}
+                            <span>for Rent</span>
+                        {% endif %}
+                    {% endif %}
+                </a></li>
+            {% endif %}
+        </ol>
+
+        {% if request.GET %}
+        <div id="filters-container" class="w-100">
+            <div class="d-flex flex-wrap gap-2">
+                {% if request.GET|length > 1 %}
+                <a href="{% url request.resolver_match.url_name %}"
+                class="filter-badge"
+                id="clear-all-filters"
+                style="text-decoration: none; color: black;"
+                onmouseover="this.style.color='black';"
+                onmouseout="this.style.color='black';">
+                Clear Filters
+             </a>
+                {% endif %}
+                
+                {# Loop through each filter to display individual badges #}
+                {% for key, values in request.GET.lists %}
+    {% if key != 'page' and key != 'listing_type' %}
+        {% for value in values %}
+            {% for v in value|split:"," %}
+                {% if v and v != 'null' and v != 'None' %}
+                    <span class="filter-badge badge text-bg-primary" style="font-weight: normal;">
+                        {{ key|replace:"_ , "|capfirst }}: {{ v }}
+                        <a href="?{% for k, vals in request.GET.lists %}
+                            {% for item in vals %}
+                                {% for single in item|split:"," %}
+                                    {% if k != key %}
+                                        {{ k }}={{ single }}&
+                                    {% elif single != v %}
+                                        {{ k }}={{ single }}&
+                                    {% endif %}
+                                {% endfor %}
+                            {% endfor %}
+                        {% endfor %}"
+                           class="remove-filter"
+                           data-key="{{ key }}"
+                           data-value="{{ v }}">
+                           ✖
+                        </a>
+                    </span>
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
+    {% endif %}
+{% endfor %}
+
+            </div>
+        </div>
+    {% endif %}
+    </div>
+</nav>
+
+<style>
+    .chat-dropdown {
+        position: relative;
+        display: inline-block;
+        z-index: 1000;
+    }
+    .chat-options {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        background: white;
+        list-style: none;
+        padding: 5px 0;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        z-index: 1001;
+    }
+    .chat-options li {
+        padding: 5px 15px;
+        white-space: nowrap;
+    }
+    .chat-options li a {
+        text-decoration: none;
+        color: black;
+        display: flex;
+        align-items: center;
+    }
+    .chat-options li a i {
+        margin-right: 5px;
+    }
+    .details-icons {
+        display: flex;
+        justify-content: space-between;
+        width: 200%;
+        margin: 10px 0;
+    }
+    
+    /* Added styles for consistent spacing and lighter fonts */
+    .feature-block-one {
+        margin-bottom: 25px;
+    }
+    .lower-content {
+        padding: 15px;
+        font-size: 14px; /* Consistent base font size */
+        margin-left: 120px;
+    }
+    .lower-content h4 {
+        font-weight: 300;
+        margin-bottom: 8px;
+        font-size: 16px; /* Larger font for price */
+        color: #1976d2; /* Blue color for price */
+    }
+    .lower-content p, .lower-content h6 {
+        font-weight: 400;
+        margin: 8px 0;
+        color: #555;
+        font-size: 13px; /* Consistent font size */
+    }
+    
+</style>
+
+
+{% for townhouse in page_obj %}
+
+
+<div class="feature-block-one">
+    <div class="inner-box">
+        <div class="image-box">
+            <figure class="image">
+                <div class="slider" data-current-index="0">
+                    <a href="{% url 'townhouse_details' townhouse.id %}">
+                        <img
+                            class="slide-image"
+                            src="{{ townhouse.images.first.image.url }}"
+                            alt="{{ townhouse.name }}"
+                            data-images='{{ townhouse.images_json|safe }}'
+                        />
+                    </a>
+                    <div class="dots-container"></div>
+                </div>
+            </figure>
+        </div>
+        <div class="lower-content">
+            <h4>
+                <a href="{% url 'townhouse_details' townhouse.id %}" style="text-decoration: none; white-space: nowrap;">
+                    {{ townhouse.price|floatformat:0 }} OMR
+                    {% if townhouse.listing_type == "rent" and townhouse.rental_period %}
+                        - {{ townhouse.rental_period|capfirst }}
+                    {% endif %}
+               
+            </h4>
+            <p>Town House</p>
+            
+            <div class="details-icons" style="color: black;">
+                <span>
+                    <i class="fas fa-bed"></i> 
+                    {{ townhouse.bedrooms }} 
+                    {% if townhouse.bedrooms|floatformat:0|add:0 %} bed {% endif %}
+                </span>
+                
+                <span><i class="fas fa-bath"></i> {{ townhouse.bathrooms }} baths</span>
+                <span><i class="fas fa-ruler-combined"></i> {{ townhouse.plot_area }} sqft</span>
+            </div>
+             
+            <p style="white-space: nowrap;">{{ townhouse.property_title }}</p>
+            <h6 style="color: black; white-space: nowrap;"><i class="fas fa-map-marker-alt"></i> {{ townhouse.cities|truncatechars:15 }}, {{ townhouse.get_regions_display }}</h6>
+        </a>
+           
+        <div class="lower-box">
+            <div class="details-row" style="margin-top: 10px;">
+                <ul class="action-buttons">
+                    <!-- Phone Button -->
+                    <li>
+                        {% if request.user.is_authenticated %}
+                            {% if townhouse.user.phone %}
+                                <a href="tel:{{ townhouse.user.phone }}" class="badge-style" style="background-color: #e3f2fd; padding: 8px 12px; border-radius: 4px;">
+                                    <i class="fas fa-phone-alt"></i> {{ townhouse.user.phone }}
+                                </a>
+                            {% else %}
+                                <a href="tel:#" class="badge-style" style="background-color: #e3f2fd; padding: 8px 12px; border-radius: 4px;">
+                                    <i class="fas fa-phone-alt"></i> Call
+                                </a>
+                            {% endif %}
+                        {% else %}
+                            {% if townhouse.user.phone %}
+                                {% with townhouse.user.phone|slice:":3" as first3 %}
+                                    <a href="{% url 'login' %}?next={{ request.path }}" class="badge-style" style="background-color: #e3f2fd; padding: 8px 12px; border-radius: 4px;">
+                                        <i class="fas fa-phone-alt"></i> {{ first3 }}...
+                                    </a>
+                                {% endwith %}
+                            {% else %}
+                                <a href="{% url 'login' %}?next={{ request.path }}" class="badge-style" style="background-color: #e3f2fd; color: #1976d2;">
+                                    <i class="fas fa-phone-alt"></i> Call
+                                </a>
+                            {% endif %}
+                        {% endif %}
+                    </li>
+                
+                   <!-- Contact Popup Trigger -->
+<li>
+<a href="#" class="contact-toggle" style="background-color: #e8f5e9; padding: 8px 12px; border-radius: 4px;" onclick="showContactPopup('{{ townhouse.id}}', '{{ townhouse.user.id }}', '{{ townhouse.user.whatsapp|default:"" }}', '{{ townhouse.user.phone|default:"" }}', '{{ request.user.is_authenticated|yesno:"true,false" }}')">
+<i class="fas fa-comments" style="color: #388e3c;"></i> Contact
+</a>
+</li>
+
+<!-- Contact Popup Modal (place this at the bottom of your HTML, before closing body tag) -->
+<div id="contactPopup" class="contact-popup" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
+<div style="background-color: white; padding: 20px; border-radius: 8px; max-width: 400px; width: 90%;">
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+<h3 style="margin: 0;">Contact Options</h3>
+<button onclick="hideContactPopup()" style="background: none; border: none; font-size: 20px; cursor: pointer;">&times;</button>
+</div>
+<div id="contactOptions" style="display: flex; flex-direction: column; gap: 10px;">
+<!-- Options will be inserted here by JavaScript -->
+</div>
+</div>
+</div>
+
+<!-- Favorite Button remains the same -->
+<li>
+<a href="#" style="height: 40px; width: 40px; background-color: #ffebee; display: flex; align-items: center; justify-content: center; border-radius: 4px;" class="favorite-link" data-product-id="{{ townhouse.id }}" data-product-type="townhouse" data-is-authenticated="{{ user.is_authenticated|yesno:'true,false' }}">
+<i class="far fa-heart" id="favorite-icon-{{ townhouse.id }}" data-favorite="false" style="color: #d32f2f; margin-left: 5px;"></i>
+</a>
+</li>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<!-- Forward and Backward Navigation Buttons -->
+<div class="btn backward" onclick="navigateSlide(this, -1)">
+<span class="material-icons-outlined"><</span>
+</div>
+<div class="btn forward" onclick="navigateSlide(this, 1)">
+<span class="material-icons-outlined">></span>
+</div>
+</div>
+</div>
+</a>
+{% endfor %}
+
+
+
+<script>
+function showContactPopup(townhouseId, userId, whatsapp, phone, isAuthenticated) {
+event.preventDefault();
+event.stopPropagation();
+
+const popup = document.getElementById('contactPopup');
+const optionsContainer = document.getElementById('contactOptions');
+
+// Clear previous options
+optionsContainer.innerHTML = '';
+
+// Add WhatsApp option if available
+if (whatsapp) {
+const whatsappOption = document.createElement('a');
+whatsappOption.href = `https://wa.me/${whatsapp.trim().replace(/[+\s]/g, '')}?text=Hello,%20I'm%20interested%20in%20your%20townhouse%20listing%20(ID:%20${townhouseId})`;
+whatsappOption.target = '_blank';
+whatsappOption.style.backgroundColor = '#e8f5e9';
+whatsappOption.style.padding = '10px';
+whatsappOption.style.borderRadius = '4px';
+whatsappOption.style.display = 'flex';
+whatsappOption.style.alignItems = 'center';
+whatsappOption.style.gap = '10px';
+whatsappOption.style.textDecoration = 'none';
+whatsappOption.style.color = 'inherit';
+whatsappOption.innerHTML = `<i class="fab fa-whatsapp" style="color: #388e3c;"></i> WhatsApp`;
+whatsappOption.onclick = function() {
+window.open(this.href, '_blank');
+hideContactPopup();
+return false;
+};
+optionsContainer.appendChild(whatsappOption);
+}
+
+// Add SMS option if available
+if (phone) {
+const smsOption = document.createElement('a');
+smsOption.href = `sms:${phone.trim().replace(/\s/g, '')}?body=Hello,%20I'm%20interested%20in%20your%20townhouse%20listing%20(ID:%20${townhouseId})`;
+smsOption.style.backgroundColor = '#fff3e0';
+smsOption.style.padding = '10px';
+smsOption.style.borderRadius = '4px';
+smsOption.style.display = 'flex';
+smsOption.style.alignItems = 'center';
+smsOption.style.gap = '10px';
+smsOption.style.textDecoration = 'none';
+smsOption.style.color = 'inherit';
+smsOption.innerHTML = `<i class="fas fa-sms" style="color: #fb8c00;"></i> SMS`;
+smsOption.onclick = function() {
+window.location.href = `sms:${phone.trim().replace(/\s/g, '')}?body=Hello, I'm interested in your townhouse listing (ID: ${townhouseId})`;
+hideContactPopup();
+return false;
+};
+optionsContainer.appendChild(smsOption);
+}
+
+// Add Chat option
+const chatOption = document.createElement('a');
+if (isAuthenticated === 'true') {
+chatOption.href = `/chat/${userId}/`;
+} else {
+chatOption.href = `/login/?next=/chat/${userId}/`;
+}
+chatOption.style.backgroundColor = '#f3e5f5';
+chatOption.style.padding = '10px';
+chatOption.style.borderRadius = '4px';
+chatOption.style.display = 'flex';
+chatOption.style.alignItems = 'center';
+chatOption.style.gap = '10px';
+chatOption.style.textDecoration = 'none';
+chatOption.style.color = 'inherit';
+chatOption.innerHTML = `<i class="fas fa-comment-alt" style="color: #8e24aa;"></i> Chat`;
+chatOption.onclick = function() {
+hideContactPopup();
+};
+optionsContainer.appendChild(chatOption);
+
+// Show the popup
+popup.style.display = 'flex';
+}
+
+function hideContactPopup() {
+document.getElementById('contactPopup').style.display = 'none';
+}
+
+// Close popup when clicking outside
+document.getElementById('contactPopup').addEventListener('click', function(e) {
+if (e.target === this) {
+hideContactPopup();
+}
+});
+</script>
+
+<!-- Swiper CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
+<!-- Swiper JS -->
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+<!-- Pagination -->
+<div class="pagination-wrapper centred" style="margin-top: 60px;">
+    <ul class="pagination clearfix">
+        {% if page_obj.has_previous %}
+        <li><a href="?page={{ page_obj.previous_page_number }}"><i class="far fa-angle-left"></i> Prev</a></li>
+        {% endif %}
+        {% for num in page_obj.paginator.page_range %}
+        <li>
+            <a href="?page={{ num }}" class="{% if page_obj.number == num %}current{% endif %}">
+                {{ num }}
+            </a>
+        </li>
+        {% endfor %}
+        {% if page_obj.has_next %}
+        <li><a href="?page={{ page_obj.next_page_number }}">Next <i class="far fa-angle-right"></i></a></li>
+        {% endif %}
+    </ul>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Contact dropdown toggle
+    document.querySelectorAll('.contact-toggle').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const dropdown = this.nextElementSibling;
+            
+            // Close all other dropdowns first
+            document.querySelectorAll('.chat-options').forEach(menu => {
+                if (menu !== dropdown) menu.style.display = 'none';
+            });
+            
+            // Toggle current dropdown
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        });
+    });
+    
+    // Close dropdown when clicking elsewhere
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.chat-dropdown')) {
+            document.querySelectorAll('.chat-options').forEach(menu => {
+                menu.style.display = 'none';
+            });
+        }
+    });
+    
+    // Prevent dropdown from closing when clicking inside it
+    document.querySelectorAll('.chat-options').forEach(menu => {
+        menu.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    });
+});
+</script>

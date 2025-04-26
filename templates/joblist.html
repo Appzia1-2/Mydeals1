@@ -1,0 +1,559 @@
+{% load static %}
+{% include 'header.html' %}
+
+<style>
+    
+    .card {
+    border: none;
+    margin-bottom: 30px;
+
+    width: 1000px; /* Set a max-width for larger screens */
+    max-width: 100%; /* Ensure it doesn't overflow on smaller screens */
+    position: relative; /* Ensure the card is positioned relatively for absolute positioning */
+    margin-left: 80px; /* Adjust this value for better centering on smaller screens */
+}
+
+.listing-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.car-info {
+    flex-grow: 1;
+    padding-left: 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+.car-info-header {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px; /* Adjusted gap between h5 and badge */
+}
+
+.car-info h5 {
+    font-weight: bold;
+    margin: 0;
+}
+
+.premium-badge {
+    background-color: #67ace0;
+    color: #fff;
+    padding: 5px 10px;
+    font-weight: bold;
+    border-radius: 30px;
+    font-size: 0.9em;
+    margin-left: 100px; /* You can further reduce the margin if needed */
+}
+
+.car-info p {
+    margin: 10px 0;
+    font-weight: bold;
+    font-size: medium;
+}
+
+.car-icons {
+    display: flex;
+    gap: 25px;
+    flex-wrap: wrap; /* Allow wrapping of icons */
+}
+
+.car-icons i {
+    color: #6c757d;
+    flex: 0 1 calc(50% - 12.5px); /* Adjust icon width to fit two in a row */
+}
+
+.car-location {
+    margin: 10px 0;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #6c757d;
+}
+
+.divider {
+    margin: 15px 0;
+    border-bottom: 3px solid #e0e0e0;
+}
+
+.clickable-card {
+    text-decoration: none;
+    color: inherit;
+}
+
+.clickable-card:hover .card {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Adds a hover effect */
+    transition: box-shadow 0.3s ease-in-out;
+}
+
+.logo {
+    position: absolute;
+    bottom: 10px; /* Adjust the position from the bottom */
+    right: 420px; /* Adjust the position from the right */
+    width: 120px; /* Set the width of the logo */
+    height: auto; /* Maintain the aspect ratio */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .card {
+        width: auto; /* Make card full width on small screens */
+        margin-left: 0; /* Remove left margin for centering */
+    }
+
+    .premium-badge {
+        margin-left: 0; /* Adjust the margin for smaller screens */
+    }
+
+    .car-icons i {
+        flex: 0 1 50%; /* Each icon takes half width on smaller screens */
+    }
+
+    .logo {
+        right: 10px; /* Keep the logo positioned correctly */
+    }
+}
+
+@media (max-width: 480px) {
+    .car-info h5 {
+        font-size: 1em; /* Adjust heading size for smaller screens */
+    }
+
+    .car-info p {
+        font-size: 0.9em; /* Adjust paragraph size for smaller screens */
+    }
+
+    .premium-badge {
+        font-size: 0.8em; /* Smaller badge font size */
+    }
+
+    .icon-link,
+    .btn-outline-light,
+    .btn-primary {
+        display: none; /* Hide these elements */
+    }
+
+    /* Adjust logo positioning for smaller screens */
+    .logo {
+        position: static; /* Make the logo position relative instead of absolute */
+        margin: 20px auto; /* Center the logo and add margin */
+        display: block;
+    }
+}
+
+    </style>
+
+
+
+        <!-- banner-section -->
+        <section class="banner-section style-two centred" style="background-image: url(assets/images/banner/banner-1.jpg);">
+            <div class="auto-container" style="margin-bottom: 130px;">
+                <div class="content-box">
+                    <div class="text">
+                        <h1>Job hunting made easy
+                            with OMAN</h1>
+                        <p>Amet consectetur adipisicing elit sed do eiusmod.</p>
+                    </div>
+                    <div class="form-inner">
+                       
+                        <form action="index.html" method="post">
+                            <div class="input-inner clearfix">
+                                <div class="form-group">
+                                    <i class="icon-2"></i>
+                                    <input type="search" name="name" placeholder="Search Keyword..." required="">
+                                </div>
+                                <div class="form-group">
+                                    <i class="icon-3"></i>
+                                    <select class="wide">
+                                       <option data-display="Select Location">Select Location</option>
+                                       <option value="1">California</option>
+                                       <option value="2">New York</option>
+                                       <option value="3">Sun Francis</option>
+                                       <option value="4">Shicago</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <i class="icon-4"></i>
+                                    <select class="wide">
+                                       <option data-display="Select Category">Select Category</option>
+                                       <option value="1">Education</option>
+                                       <option value="2">Restaurant</option>
+                                       <option value="3">Real Estate</option>
+                                       <option value="4">Home Appliances</option>
+                                    </select>
+                                </div>
+                                <div class="btn-box">
+                                    <button type="submit"><i class="icon-2"></i>Search</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div> 
+            </div>
+        </section>
+        <!-- banner-section end -->
+
+
+        
+
+        <a href="{% url 'jobdetails' %}" class="clickable-card">
+            <div class="container">
+                <div class="card">                        
+                    <div class="car-info">
+                        <div class="car-info-header">
+                            <h5>Receptionist Cum Accountant</h5>
+                            <span class="premium-badge">FEATURED</span>
+                        </div>
+                        <p>Shumoos Calligraphy & Drawing</p>
+                        <p>Negotiable salary</p>
+                        <div class="car-icons">
+                            <span><i class="bi bi-person-fill"></i> Full-time</span>
+                            <span><i class="bi bi-briefcase-fill"></i> Experience</span>
+                            <span><i class="bi bi-graduation-cap"></i> Degree</span>
+                            <span><i class="bi bi-geo-alt"></i> Location</span>
+                        </div>    
+                        <div class="car-location">
+                            <i class="bi bi-geo-alt"></i>
+                            <span>Al Quoz, Dubai</span> &nbsp; &nbsp;
+                            <span>16 Hours ago</span>
+                        </div>    
+                    </div>
+                    <img src="assets/images/logo-2.png" alt="Logo" class="logo">
+                </div>      
+                <div class="divider"></div>            
+                
+            </div>
+        </a>
+        
+    
+        <a href="{% url 'jobdetails' %}" class="clickable-card">
+            <div class="container">
+                <div class="card">                        
+                    <div class="car-info">
+                        <div class="car-info-header">
+                            <h5>Receptionist Cum Accountant</h5>
+                            <span class="premium-badge">FEATURED</span>
+                        </div>
+                        <p>Shumoos Calligraphy & Drawing</p>
+                        <p>Negotiable salary</p>
+                        <div class="car-icons">
+                            <span><i class="bi bi-person-fill"></i> Full-time</span>
+                            <span><i class="bi bi-briefcase-fill"></i> Experience</span>
+                            <span><i class="bi bi-graduation-cap"></i> Degree</span>
+                            <span><i class="bi bi-geo-alt"></i> Location</span>
+                        </div>    
+                        <div class="car-location">
+                            <i class="bi bi-geo-alt"></i>
+                            <span>Al Quoz, Dubai</span> &nbsp; &nbsp;
+                            <span>16 Hours ago</span>
+                        </div>    
+                    </div>
+                    <img src="assets/images/logo.png" alt="Logo" class="logo">
+                </div>      
+                <div class="divider"></div>            
+                
+            </div>
+        </a>
+        
+    
+        <a href="{% url 'jobdetails' %}" class="clickable-card">
+            <div class="container">
+                <div class="card">                        
+                    <div class="car-info">
+                        <div class="car-info-header">
+                            <h5>Receptionist Cum Accountant</h5>
+                            <span class="premium-badge">FEATURED</span>
+                        </div>
+                        <p>Shumoos Calligraphy & Drawing</p>
+                        <p>Negotiable salary</p>
+                        <div class="car-icons">
+                            <span><i class="bi bi-person-fill"></i> Full-time</span>
+                            <span><i class="bi bi-briefcase-fill"></i> Experience</span>
+                            <span><i class="bi bi-graduation-cap"></i> Degree</span>
+                            <span><i class="bi bi-geo-alt"></i> Location</span>
+                        </div>    
+                        <div class="car-location">
+                            <i class="bi bi-geo-alt"></i>
+                            <span>Al Quoz, Dubai</span> &nbsp; &nbsp;
+                            <span>16 Hours ago</span>
+                        </div>    
+                    </div>
+                    <img src="assets/images/logo/logo.svg" alt="Logo" class="logo">
+                </div>      
+                <div class="divider"></div>            
+                
+            </div>
+        </a>
+        
+    
+    
+        
+    
+
+
+        
+
+        <!-- chooseus-section -->
+        <!-- <section class="chooseus-section bg-color-1">
+            <div class="anim-icon">
+                <div class="icon anim-icon-1 rotate-me" style="background-image: url(assets/images/icons/anim-icon-1.png);"></div>
+                <div class="icon anim-icon-2 rotate-me" style="background-image: url(assets/images/icons/anim-icon-2.png);"></div>
+                <div class="icon anim-icon-3 rotate-me" style="background-image: url(assets/images/icons/anim-icon-2.png);"></div>
+                <div class="icon anim-icon-4 rotate-me" style="background-image: url(assets/images/icons/anim-icon-1.png);"></div>
+                <div class="icon anim-icon-5 rotate-me" style="background-image: url(assets/images/icons/anim-icon-2.png);"></div>
+            </div>
+            <div class="pattern-layer">
+                <div class="pattern-1" style="background-image: url(assets/images/shape/shape-4.png);"></div>
+                <div class="pattern-2" style="background-image: url(assets/images/shape/shape-11.png);"></div>
+                <div class="pattern-3" style="background-image: url(assets/images/shape/shape-11.png);"></div>
+            </div>
+            <figure class="image-layer"><img src="assets/images/resource/chooseus-1.png" alt=""></figure>
+            <div class="auto-container">
+                <div class="row clearfix">
+                    <div class="col-xl-6 col-lg-12 col-md-12 offset-xl-6 content-column">
+                        <div class="content_block_2">
+                            <div class="content-box">
+                                <div class="sec-title light">
+                                    <span>Testimonials</span>
+                                    <h2>Why Choose Oman</h2>
+                                </div>
+                                <div class="inner-box">
+                                    <div class="single-item">
+                                        <div class="icon-box"><i class="icon-26"></i></div>
+                                        <h3>Sell Your Product Safely</h3>
+                                        <p>Lorem ipsum dolor sit amet consectur adipisicing sed do eiusmod tempor.</p>
+                                    </div>
+                                    <div class="single-item">
+                                        <div class="icon-box"><i class="icon-27"></i></div>
+                                        <h3>Meet seller at a safe location</h3>
+                                        <p>Lorem ipsum dolor sit amet consectur adipisicing sed do eiusmod tempor.</p>
+                                    </div>
+                                    <div class="single-item">
+                                        <div class="icon-box"><i class="icon-28"></i></div>
+                                        <h3>Pay only after collecting item</h3>
+                                        <p>Lorem ipsum dolor sit amet consectur adipisicing sed do eiusmod tempor.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section> -->
+        <!-- chooseus-section end -->
+
+
+        <!-- place-section -->
+        <!-- <section class="place-section centred">
+            <div class="auto-container">
+                <div class="inner-content border-bottom">
+                    <div class="sec-title centred">
+                        <span>Top Places</span>
+                        <h2>Most Popular Places</h2>
+                        <p>Lorem ipsum dolor sit amet consectetur adipisicing sed do eiusmod tempor incididunt labore <br />dolore magna aliqua enim.</p>
+                    </div>
+                    <div class="row clearfix">
+                        <div class="col-lg-4 col-md-6 col-sm-12 place-block">
+                            <div class="place-block-one wow fadeInDown animated animated" data-wow-delay="00ms" data-wow-duration="1500ms">
+                                <div class="inner-box">
+                                    <figure class="image-box"><img src="assets/images/resource/place-1.jpg" alt=""></figure>
+                                    <div class="lower-content">
+                                        <div class="inner">
+                                            <h3><a href="index.html">Dubai</a></h3>
+                                            <span>10 Listing</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-6 col-sm-12 place-block">
+                            <div class="place-block-one wow fadeInDown animated animated" data-wow-delay="200ms" data-wow-duration="1500ms">
+                                <div class="inner-box">
+                                    <figure class="image-box"><img src="assets/images/resource/place-2.jpg" alt=""></figure>
+                                    <div class="lower-content">
+                                        <div class="inner">
+                                            <h3><a href="index.html">Abu Dhabi</a></h3>
+                                            <span>15 Listing</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-6 col-sm-12 place-block">
+                            <div class="place-block-one wow fadeInDown animated animated" data-wow-delay="400ms" data-wow-duration="1500ms">
+                                <div class="inner-box">
+                                    <figure class="image-box"><img src="assets/images/resource/place-3.jpg" alt=""></figure>
+                                    <div class="lower-content">
+                                        <div class="inner">
+                                            <h3><a href="index.html">Ras al khaimah</a></h3>
+                                            <span>08 Listing</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-12 place-block">
+                            <div class="place-block-one wow fadeInUp animated animated" data-wow-delay="00ms" data-wow-duration="1500ms">
+                                <div class="inner-box">
+                                    <figure class="image-box"><img src="assets/images/resource/place-3.jpg" alt=""></figure>
+                                    <div class="lower-content">
+                                        <div class="inner">
+                                            <h3><a href="index.html">umm al quwain</a></h3>
+                                            <span>05 Listing</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-12 place-block">
+                            <div class="place-block-one wow fadeInUp animated animated" data-wow-delay="300ms" data-wow-duration="1500ms">
+                                <div class="inner-box">
+                                    <figure class="image-box"><img src="assets/images/resource/place-1.jpg" alt=""></figure>
+                                    <div class="lower-content">
+                                        <div class="inner">
+                                            <h3><a href="index.html">Al Ain</a></h3>
+                                            <span>02 Listing</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section> -->
+        <!-- place-section end -->
+
+
+        <!-- download-section -->
+        <section class="download-section">
+            <div class="pattern-layer" style="background-image: url(assets/images/shape/shape-8.png);"></div>
+            <div class="auto-container">
+                <div class="row align-items-center clearfix">
+                    <div class="col-lg-6 col-md-6 col-sm-12 image-column">
+                        <div class="image-box">
+                            <figure class="image image-1"><img src="assets/images/resource/laptop-1.png" alt=""></figure>
+                            <figure class="image image-2 rotate-me"><img src="assets/images/resource/ball-1.png" alt=""></figure>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-12 content-column">
+                        <div class="content_block_1">
+                            <div class="content-box">
+                                <span class="upper-text">Download</span>
+                                <h2>Download Our Android and IOS App for Experience</h2>
+                                <div class="download-btn">
+                                    <a href="index.html" class="app-store">
+                                        <i class="icon-23"></i>
+                                        <span>Download on</span>
+                                        <h4>App Store</h4>
+                                    </a>
+                                    <a href="index.html" class="play-store">
+                                        <i class="icon-24"></i>
+                                        <span>Get It On</span>
+                                        <h4>Google Play</h4>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- download-section end -->
+
+
+        <!-- news-section -->
+        <!-- <section class="news-section sec-pad">
+            <div class="auto-container">
+                <div class="sec-title centred">
+                    <span>News & Article</span>
+                    <h2>Stay Update with Docpro</h2>
+                </div>
+                <div class="row clearfix">
+                    <div class="col-lg-4 col-md-6 col-sm-12 news-block">
+                        <div class="news-block-one wow fadeInUp animated animated" data-wow-delay="00ms" data-wow-duration="1500ms">
+                            <div class="inner-box">
+                                <figure class="image-box">
+                                    <img src="assets/images/news/news-1.jpg" alt="">
+                                    <a href="blog-details.html"><i class="fas fa-link"></i></a>
+                                </figure>
+                                <div class="lower-content">
+                                    <figure class="admin-thumb"><img src="assets/images/news/admin-1.png" alt=""></figure>
+                                    <span class="category">Electronics</span>
+                                    <h3><a href="blog-details.html">Including animation in your design system</a></h3>
+                                    <p>Lorem ipsum dolor sit amet consectur adipisicing sed do eiusmod tempor incididunt labore.</p>
+                                    <span class="post-info">By <a href="blog-details.html">Eva Green</a> - October 13, 2020</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-sm-12 news-block">
+                        <div class="news-block-one wow fadeInDown animated animated" data-wow-delay="00ms" data-wow-duration="1500ms">
+                            <div class="inner-box">
+                                <figure class="image-box">
+                                    <img src="assets/images/news/news-2.jpg" alt="">
+                                    <a href="blog-details.html"><i class="fas fa-link"></i></a>
+                                </figure>
+                                <div class="lower-content">
+                                    <figure class="admin-thumb"><img src="assets/images/news/admin-2.png" alt=""></figure>
+                                    <span class="category">Electronics</span>
+                                    <h3><a href="blog-details.html">A digital prescription for the industry.</a></h3>
+                                    <p>Lorem ipsum dolor sit amet consectur adipisicing sed do eiusmod tempor incididunt labore.</p>
+                                    <span class="post-info">By <a href="blog-details.html">Eva Green</a> - October 13, 2020</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-sm-12 news-block">
+                        <div class="news-block-one wow fadeInUp animated animated" data-wow-delay="00ms" data-wow-duration="1500ms">
+                            <div class="inner-box">
+                                <figure class="image-box">
+                                    <img src="assets/images/news/news-3.jpg" alt="">
+                                    <a href="blog-details.html"><i class="fas fa-link"></i></a>
+                                </figure>
+                                <div class="lower-content">
+                                    <figure class="admin-thumb"><img src="assets/images/news/admin-3.png" alt=""></figure>
+                                    <span class="category">Electronics</span>
+                                    <h3><a href="blog-details.html">Strategic & commercial approach with issues.</a></h3>
+                                    <p>Lorem ipsum dolor sit amet consectur adipisicing sed do eiusmod tempor incididunt labore.</p>
+                                    <span class="post-info">By <a href="blog-details.html">Eva Green</a> - October 13, 2020</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section> -->
+        <!-- news-section end -->
+
+
+        <!-- subscribe-section -->
+        <!-- <section class="subscribe-section">
+            <div class="pattern-layer" style="background-image: url(assets/images/shape/shape-9.png);"></div>
+            <div class="auto-container">
+                <div class="row clearfix">
+                    <div class="col-lg-6 col-md-6 col-sm-12 text-column">
+                        <div class="text">
+                            <div class="icon-box"><i class="icon-25"></i></div>
+                            <h2>Subscribe to Newsletter</h2>
+                            <p>and receive new ads in inbox</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-12 form-column">
+                        <form action="contact.html" method="post" class="subscribe-form">
+                            <div class="form-group">
+                                <input type="email" name="email" placeholder="Inout your email address" required="">
+                                <button type="submit" class="theme-btn-one">Subscribe Now</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section> -->
+        <!-- subscribe-section end -->
+
+
+
+        {% include 'footer.html' %}

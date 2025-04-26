@@ -1,0 +1,89 @@
+{% load static %}
+{% include 'header.html' %}
+{% load socialaccount %}
+
+
+        <!-- Page Title -->
+        <section class="page-title style-two" style="background-image: url(assets/images/banner/log.jpg);">
+            <div class="auto-container">
+                <div class="content-box centred mr-0">
+                    <div class="title">
+                        <h1>Log in</h1>
+                    </div>
+                    <ul class="bread-crumb clearfix">
+                        <li><a href="index.html">Home</a></li>
+                        <li>Log in</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+        <!-- End Page Title -->
+
+
+        <!-- login-section -->
+        <section class="login-section bg-color-2">
+            <div class="auto-container">
+                <div class="inner-container">
+                    <div class="inner-box">
+                        <h2>Log in</h2>
+                        
+                        <form action="{% url 'login1' %}" method="post" class="login-form">
+                            {% csrf_token %}
+                            
+                            <!-- Display error messages -->
+                            {% if messages %}
+                                <div class="messages text-danger">
+                                    {% for message in messages %}
+                                        <div class="alert {{ message.tags }}">{{ message }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            
+                            <div class="form-group">
+                                <label for="id_username">Username</label>
+                                <input type="text" name="username" id="id_username" required class="form-control" value="{{ request.POST.username }}">
+                                {% if form.username.errors %}
+                                    <div class="error text-danger">{{ form.username.errors }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="id_password">Password</label>
+                                <input type="password" name="password" id="id_password" required class="form-control">
+                                {% if form.password.errors %}
+                                    <div class="error text-danger">{{ form.password.errors }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="form-group">
+                                <div class="text">
+                                    <a href="{% url 'password_reset' %}">Forgot Password?</a>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group message-btn">
+                                <button type="submit" class="theme-btn-one">Login Now</button>
+                            </div>
+                        </form>
+                        
+                        
+                        <div class="other-content centred">
+                            <div class="text"><span>or</span></div>
+                            <ul class="social-links clearfix">
+                                <li><a href="login.html"><i class="fab fa-facebook-f"></i>Login with Facebook</a></li>
+                                <li><a href="{% provider_login_url 'google' process='login' auth_params='prompt=select_account' %}">
+                                    <i class="fab fa-google"></i> Login with Google
+                                </a></li>
+                                                            </ul>
+                            <div class="othre-text">
+                                <p>Don’t have an account? <a href="{% url 'sign' %}">Register Now</a></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- login-section end -->
+
+
+        {% include 'footer.html' %}

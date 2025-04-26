@@ -1,0 +1,1571 @@
+{% load static %}
+{% include 'header.html' %}
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+
+</head>
+<style>
+    a{
+        text-decoration: none;
+    }
+    .image-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.8);
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+    /* Corrected image overlay hover effect */
+.image-overlay img {
+    transition: transform 0.3s ease; /* Smooth transition */
+}
+
+.image-overlay:hover img {
+    transform: scale(1.2); /* Apply scaling effect on hover */
+}
+
+
+    .image-overlay img {
+        max-width: 95%; /* Increased width for larger image */
+        max-height: 95%; /* Increased height for larger image */
+        border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3); /* Optional: add shadow for better focus */
+        object-fit: contain; /* Ensure image scales properly without distortion */
+    }
+
+    .image-overlay .close-btn {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        font-size: 2.5rem; /* Larger close button */
+        color: white;
+        cursor: pointer;
+        background: transparent;
+        border: none;
+    }
+    .property-video{
+        height:300px;
+        width:300px;
+    }
+</style>
+<div class="product-detail-container">
+    <h1>{{ product.property_title|title }}</h1>
+    <p><strong>Price:</strong> {{ product.price }}</p>
+
+    {% if product_type == "land" %}
+        <p><strong>Plot Area:</strong> {{ product.plot_area }} sqm</p>
+        <p><strong>Region:</strong> {{ product.get_region_display }}</p>
+        <p><strong>City:</strong> {{ product.cities }}</p>
+        <p><strong>Property Type:</strong> {{ product.zoned_for }}</p>
+        <p><strong>Listing Type:</strong> {{ product.listing_type }}</p>
+        {% if product.listing_type == 'rent' %}
+            <p><strong>Rental Period:</strong> {{ product.rental_period }}</p>
+        {% endif %}
+        <p><strong>Approval Status:</strong> {{ product.get_status_display }}</p>
+        <p><strong>Listed By:</strong> {{ product.lister_type }}</p>
+        <p><strong>Property Mortgage:</strong> {{ product.property_mortgage }}</p>
+        <p><strong>Facade:</strong> {{ product.facade }}</p>
+        <p><strong>Nearby Locations:</strong></p>
+<ul>
+    {% for location in product.nearby_location.all %}
+        <li>{{ location.name }}</li>
+    {% empty %}
+        <li>No nearby locations listed.</li>
+    {% endfor %}
+</ul>
+
+        <p><strong>Description:</strong> {{ product.description }}</p>
+
+    <!-- Video Section -->
+    {% if product.videos.exists %}
+        <div class="video-section">
+                        <!-- <h4>Property Videos:</h4> -->
+
+            {% for video in product.videos.all %}
+                <video controls class="property-video" width="100%">
+                    <source src="{{ video.video.url }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            {% endfor %}
+        </div>
+    {% else %}
+           <!-- <p>No videos available for this property.</p> -->
+    {% endif %}
+
+    {% elif product_type == "villa" %}
+
+    <p><strong>Region:</strong> {{ product.get_regions_display }}</p>
+    <p><strong>City:</strong> {{ product.cities }}</p>
+    <p><strong>Plot Area:</strong> {{ product.plot_area }} sqm</p>
+    <p><strong>Surface Area:</strong> {{ product.surface_area }} sqm</p>
+    <p><strong>Number of Floors:</strong> {{ product.get_floors_display }}</p>
+    <p><strong>Number of Bedrooms:</strong> {{ product.get_bedrooms_display }}</p>
+    <p><strong>Number of Bathrooms:</strong> {{ product.get_bathrooms_display }}</p>
+    <p><strong>Furnished:</strong> {{ product.get_furnished_display }}</p>
+    <p><strong>Building Age:</strong> {{ product.get_building_display }}</p>
+    <p><strong>Listing Type:</strong> {{ product.get_listing_type_display }}</p>
+{% if product.listing_type == "rent" %}
+    <p><strong>Rental Period:</strong> {{ product.get_rental_period_display }}</p>
+{% endif %}
+
+    <p><strong>Property Mortgage:</strong> {{ product.get_property_mortgage_display }}</p>
+    <p><strong>Facade:</strong> {{ product.get_facade_display }}</p>
+    <p><strong>Listing By:</strong> {{ product.get_lister_type_display }}</p>
+    <p>Description:{{ product.description }}</p>
+    <h5>Main Amenities:</h5>
+    <ul>
+        {% for amenity in product.main_amenities.all %}
+            <li>{{ amenity.name }}</li>
+        {% empty %}
+            <li>No amenities listed.</li>
+        {% endfor %}
+    </ul>
+    
+    <h5>Additional Amenities:</h5>
+    <ul>
+        {% for amenity in product.additional_amenities.all %}
+            <li>{{ amenity.name }}</li>
+        {% empty %}
+            <li>No additional amenities listed.</li>
+        {% endfor %}
+    </ul>
+    
+    <h5>Nearby Locations:</h5>
+    <ul>
+        {% for location in product.nearby_location.all %}
+            <li>{{ location.name }}</li>
+        {% empty %}
+            <li>No nearby locations listed.</li>
+        {% endfor %}
+    </ul>
+    
+    
+   
+    
+        <!-- Video Section -->
+    {% if product.videos.exists %}
+    <div class="video-section">
+                    <!-- <h4>Property Videos:</h4> -->
+
+        {% for video in product.videos.all %}
+            <video controls class="property-video" width="100%">
+                <source src="{{ video.video.url }}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        {% endfor %}
+    </div>
+{% else %}
+       <!-- <p>No videos available for this property.</p> -->
+{% endif %}
+
+    {% elif product_type == "automobile" %}
+        <p><strong>Make:</strong> {{ product.make }}</p>
+        <p><strong>Year:</strong> {{ product.year }}</p>
+        <p><strong>Body Type:</strong> {{ product.body_type }}</p>
+        <p><strong>Fuel Type:</strong> {{ product.fuel_type }}</p>
+        <p><strong>Engine Capacity:</strong> {{ product.engine_capacity }}</p>
+        <p><strong>Transmission:</strong> {{ product.transmission }}</p>
+        <p><strong>Exterior Color:</strong> {{ product.exterior_color }}</p>
+        <p><strong>Warranty:</strong> {{ product.warranty_status }}</p>
+        {% if product.videos.exists %}
+        <div class="video-section">
+                        <!-- <h4>Property Videos:</h4> -->
+
+            {% for video in product.videos.all %}
+                <video controls class="property-video" width="100%">
+                    <source src="{{ video.video.url }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            {% endfor %}
+        </div>
+    {% else %}
+           <!-- <p>No videos available for this property.</p> -->
+    {% endif %}
+
+    {% elif product_type == "fashion" %}
+        <p><strong>Category:</strong> {{ product.category }}</p>
+        <p><strong>Brand:</strong> {{ product.brand }}</p>
+        <p><strong>Size:</strong> {{ product.size }}</p>
+        <p><strong>Gender:</strong> {{ product.gender }}</p>
+        <p><strong>Color:</strong> {{ product.color }}</p>
+        <p><strong>Material:</strong> {{ product.material }}</p>
+        <p><strong>Condition:</strong> {{ product.condition }}</p>
+        <p><strong>Contact Details:</strong> {{ product.contact_details }}</p>
+        {% if product.videos.exists %}
+        <div class="video-section">
+                        <!-- <h4>Property Videos:</h4> -->
+
+            {% for video in product.videos.all %}
+                <video controls class="property-video" width="100%">
+                    <source src="{{ video.video.url }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            {% endfor %}
+        </div>
+    {% else %}
+           <!-- <p>No videos available for this property.</p> -->
+    {% endif %}
+    {% elif product_type == 'motorcycle' %}
+    <div class="product-details">
+        <p><strong>Make:</strong> {{ product.make }}</p>
+        <p><strong>Name:</strong> {{ product.name }}</p>
+        <p><strong>Model:</strong> {{ product.model }}</p>
+        <p><strong>Year:</strong> {{ product.year }}</p>
+        <p><strong>Body Type:</strong> {{ product.body_type }}</p>
+        <p><strong>Engine Capacity:</strong> {{ product.engine_capacity }} cc</p>
+        <p><strong>Region:</strong> {{ product.regions }}</p>
+        <p><strong>Location:</strong> {{ product.location }}</p>
+        <p><strong>Listing Type:</strong> {{ product.listing_type }}</p>
+        <p><strong>Price:</strong> {{ product.price }} OMR</p>
+        <p><strong>Condition:</strong> {{ product.condition }}</p>
+        <div class="video-section">
+            <!-- <h4>Property Videos:</h4> -->
+
+{% for video in product.videos.all %}
+    <video controls class="property-video" width="100%">
+        <source src="{{ video.video.url }}" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+{% endfor %}
+</div>
+    </div>
+    {% elif product_type == "toy" %}
+        <p><strong>Category:</strong> {{ product.category }}</p>
+        <p><strong>Brand:</strong> {{ product.brand }}</p>
+        <p><strong>Platform:</strong> {{ product.platform }}</p>
+        <p><strong>Age Group:</strong> {{ product.age_group }}</p>
+        <p><strong>Condition:</strong> {{ product.condition }}</p>
+        {% if product.videos.exists %}
+        <div class="video-section">
+                        <!-- <h4>Property Videos:</h4> -->
+
+            {% for video in product.videos.all %}
+                <video controls class="property-video" width="100%">
+                    <source src="{{ video.video.url }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            {% endfor %}
+        </div>
+    {% else %}
+           <!-- <p>No videos available for this property.</p> -->
+    {% endif %}
+    {% elif product_type == "autoaccessorypart" %}
+    <p><strong>Name:</strong> {{ product.name }}</p>
+    <p><strong>Description:</strong> {{ product.description }}</p>
+    <p><strong>Region:</strong> {{ product.get_regions_display }}</p>
+    <p><strong>City:</strong> {{ product.cities }}</p>
+    <p><strong>Latitude:</strong> {{ product.latitude }}</p>
+    <p><strong>Longitude:</strong> {{ product.longitude }}</p>
+    <p><strong>Listing Type:</strong> {{ product.get_listing_type_display }}</p>
+    {% if product.videos.exists %}
+    <div class="video-section">
+                    <!-- <h4>Property Videos:</h4> -->
+
+        {% for video in product.videos.all %}
+            <video controls class="property-video" width="100%">
+                <source src="{{ video.video.url }}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        {% endfor %}
+    </div>
+{% else %}
+       <!-- <p>No videos available for this property.</p> -->
+{% endif %}
+    {% elif product_type == "heavyvehicle" %}
+    <p><strong>Vehicle Name:</strong> {{ product.name }}</p>
+    <p><strong>Description:</strong> {{ product.description }}</p>
+    <p><strong>Region:</strong> {{ product.get_regions_display }}</p>
+    <p><strong>City:</strong> {{ product.cities }}</p>
+    <p><strong>Latitude:</strong> {{ product.latitude }}</p>
+    <p><strong>Longitude:</strong> {{ product.longitude }}</p>
+    <p><strong>Listing Type:</strong> {{ product.get_listing_type_display }}</p>
+    <p><strong>Manufacturer:</strong> {{ product.manufacturer }}</p>
+    <p><strong>Year of Manufacture:</strong> {{ product.year }}</p>
+    <p><strong>Fuel Type:</strong> {{ product.get_fuel_type_display }}</p>
+    <p><strong>Engine Capacity (cc):</strong> {{ product.engine_capacity }}</p>
+    <p><strong>Transmission Type:</strong> {{ product.get_transmission_display }}</p>
+    <p><strong>Mileage (km):</strong> {{ product.mileage|default:"N/A" }}</p>
+    <p><strong>Load Capacity (tons):</strong> {{ product.load_capacity|default:"N/A" }}</p>
+    <p><strong>Condition:</strong> {{ product.get_condition_display }}</p>
+  
+    {% if product.videos.exists %}
+    <div class="video-section">
+        <h4>Videos:</h4>
+        {% for video in product.videos.all %}
+            <video controls class="product-video" width="70%">
+                <source src="{{ video.video.url }}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        {% endfor %}
+    </div>
+   
+    {% endif %}
+    {% elif product_type == "boat" %}
+    <p><strong>Boat Name:</strong> {{ product.name }}</p>
+    <p><strong>Description:</strong> {{ product.description }}</p>
+    <p><strong>Region:</strong> {{ product.get_regions_display }}</p>
+    <p><strong>City:</strong> {{ product.cities }}</p>
+    <p><strong>Latitude:</strong> {{ product.latitude }}</p>
+    <p><strong>Longitude:</strong> {{ product.longitude }}</p>
+    <p><strong>Listing Type:</strong> {{ product.get_listing_type_display }}</p>
+    <p><strong>Manufacturer:</strong> {{ product.manufacturer }}</p>
+    <p><strong>Year of Manufacture:</strong> {{ product.year }}</p>
+    <p><strong>Engine Type:</strong> {{ product.get_engine_type_display }}</p>
+    <p><strong>Engine Power (HP):</strong> {{ product.engine_power|default:"N/A" }}</p>
+    <p><strong>Fuel Type:</strong> {{ product.get_fuel_type_display }}</p>
+    <p><strong>Condition:</strong> {{ product.get_condition_display }}</p>
+   
+    {% if product.videos.exists %}
+    <div class="video-section">
+        <h4>Videos:</h4>
+        {% for video in product.videos.all %}
+            <video controls class="product-video" width="70%">
+                <source src="{{ video.video.url }}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        {% endfor %}
+    </div>
+    
+{% endif %}
+
+
+{% elif product_type == "numberplate" %}
+    <p><strong>Plate Number:</strong> {{ product.number }}</p>
+    <p><strong>Description:</strong> {{ product.description }}</p>
+    <p><strong>Region:</strong> {{ product.get_regions_display }}</p>
+    <p><strong>City:</strong> {{ product.cities }}</p>
+    <p><strong>Latitude:</strong> {{ product.latitude }}</p>
+    <p><strong>Longitude:</strong> {{ product.longitude }}</p>
+    <p><strong>Listing Type:</strong> {{ product.get_listing_type_display }}</p>
+
+
+    {% if product.videos.exists %}
+    <div class="video-section">
+        <h4>Videos:</h4>
+        {% for video in product.videos.all %}
+            <video controls class="product-video" width="70%">
+                <source src="{{ video.video.url }}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        {% endfor %}
+    </div>
+
+{% endif %}
+
+    {% elif product_type == "food" %}
+        <p><strong>Product Type:</strong> {{ product.product_type }}</p>
+        <p><strong>Brand:</strong> {{ product.brand }}</p>
+        <p><strong>Quantity:</strong> {{ product.quantity }}</p>
+        <p><strong>Expiration Date:</strong> {{ product.expiration_date }}</p>
+        <p><strong>Dietary Information:</strong> {{ product.dietary_info }}</p>
+        {% if product.videos.exists %}
+        <div class="video-section">
+                        <!-- <h4>Property Videos:</h4> -->
+
+            {% for video in product.videos.all %}
+                <video controls class="property-video" width="100%">
+                    <source src="{{ video.video.url }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            {% endfor %}
+        </div>
+    {% else %}
+           <!-- <p>No videos available for this property.</p> -->
+    {% endif %}
+    {% elif product_type == "fitness" %}
+        <p><strong>Category:</strong> {{ product.category }}</p>
+        <p><strong>Brand:</strong> {{ product.brand }}</p>
+        <p><strong>Condition:</strong> {{ product.condition }}</p>
+        <p><strong>Warranty Status:</strong> {{ product.warranty_status }}</p>
+        {% if product.videos.exists %}
+        <div class="video-section">
+                        <!-- <h4>Property Videos:</h4> -->
+
+            {% for video in product.videos.all %}
+                <video controls class="property-video" width="100%">
+                    <source src="{{ video.video.url }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            {% endfor %}
+        </div>
+    {% else %}
+           <!-- <p>No videos available for this property.</p> -->
+    {% endif %}
+    {% elif product_type == "pet" %}
+        <p><strong>Pet Type:</strong> {{ product.pet_type }}</p>
+        <p><strong>Breed:</strong> {{ product.breed }}</p>
+        <p><strong>Age:</strong> {{ product.age }}</p>
+        <p><strong>Vaccination Status:</strong> {{ product.vaccinated }}</p>
+        {% if product.videos.exists %}
+        <div class="video-section">
+                        <!-- <h4>Property Videos:</h4> -->
+
+            {% for video in product.videos.all %}
+                <video controls class="property-video" width="100%">
+                    <source src="{{ video.video.url }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            {% endfor %}
+        </div>
+    {% else %}
+           <!-- <p>No videos available for this property.</p> -->
+    {% endif %}
+    {% elif product_type == "mobile" %}
+        <p><strong>Brand:</strong> {{ product.brand }}</p>
+        <p><strong>Model:</strong> {{ product.model_number }}</p>
+        <p><strong>Storage:</strong> {{ product.storage_capacity }}</p>
+        <p><strong>Condition:</strong> {{ product.condition }}</p>
+        {% if product.videos.exists %}
+        <div class="video-section">
+                        <!-- <h4>Property Videos:</h4> -->
+
+            {% for video in product.videos.all %}
+                <video controls class="property-video" width="100%">
+                    <source src="{{ video.video.url }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            {% endfor %}
+        </div>
+    {% else %}
+           <!-- <p>No videos available for this property.</p> -->
+    {% endif %}
+
+    {% elif product_type == "computer" %}
+        <p><strong>Brand:</strong> {{ product.brand }}</p>
+        <p><strong>Processor:</strong> {{ product.processor }}</p>
+        <p><strong>RAM:</strong> {{ product.ram_size }}</p>
+        <p><strong>Storage:</strong> {{ product.storage_capacity }}</p>
+        <p><strong>Graphics Card:</strong> {{ product.graphics_card }}</p>
+        <p><strong>Condition:</strong> {{ product.condition }}</p>
+        {% if product.videos.exists %}
+        <div class="video-section">
+                        <!-- <h4>Property Videos:</h4> -->
+
+            {% for video in product.videos.all %}
+                <video controls class="property-video" width="100%">
+                    <source src="{{ video.video.url }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            {% endfor %}
+        </div>
+    {% else %}
+           <!-- <p>No videos available for this property.</p> -->
+    {% endif %}
+    {% elif product_type == "sound" %}
+        <p><strong>Model:</strong> {{ product.model_number }}</p>
+        <p><strong>Brand:</strong> {{ product.brand }}</p>
+        <p><strong>Condition:</strong> {{ product.condition }}</p>
+        {% if product.videos.exists %}
+        <div class="video-section">
+                        <!-- <h4>Property Videos:</h4> -->
+
+            {% for video in product.videos.all %}
+                <video controls class="property-video" width="100%">
+                    <source src="{{ video.video.url }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            {% endfor %}
+        </div>
+    {% else %}
+           <!-- <p>No videos available for this property.</p> -->
+    {% endif %}
+    {% elif product_type == 'education' %}
+        <p><strong>Course Type:</strong> {{ product.course_type }}</p>
+        <p><strong>Subject:</strong> {{ product.subject }}</p>
+        <p><strong>Duration:</strong> {{ product.duration }} months</p>
+        <p><strong>Instructor:</strong> {{ product.instructor_name }}</p>
+        <p><strong>Instructor Qualification:</strong> {{ product.qualification }}</p>
+        <p><strong>Instructor Experience:</strong> {{ product.experience }}</p>
+
+        {% if product.videos.exists %}
+    <div class="video-section">
+                    <!-- <h4>Property Videos:</h4> -->
+
+        {% for video in product.videos.all %}
+            <video controls class="property-video" width="100%">
+                <source src="{{ video.video.url }}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        {% endfor %}
+    </div>
+{% else %}
+       <!-- <p>No videos available for this property.</p> -->
+{% endif %}
+    {% elif product_type == 'business' %}
+        <p><strong>Category:</strong> {{ product.category }}</p>
+        <p><strong>Brand:</strong> {{ product.brand }}</p>
+        <p><strong>Condition:</strong> {{ product.condition }}</p>
+        <p><strong>Warranty Status:</strong> {{ product.warranty_status }}</p>
+        {% if product.videos.exists %}
+    <div class="video-section">
+                    <!-- <h4>Property Videos:</h4> -->
+
+        {% for video in product.videos.all %}
+            <video controls class="property-video" width="100%">
+                <source src="{{ video.video.url }}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        {% endfor %}
+    </div>
+{% else %}
+       <!-- <p>No videos available for this property.</p> -->
+{% endif %}
+    {% elif product_type == 'service' %}
+        <p><strong>Service Type:</strong> {{ product.service_type }}</p>
+        <p><strong>Provider Name:</strong> {{ product.provider_name }}</p>
+        <p><strong>Price Range:</strong> {{ product.price_range }} OMR</p>
+        <p><strong>Contact Info:</strong> {{ product.contact_info }}</p>
+        {% if product.videos.exists %}
+    <div class="video-section">
+                    <!-- <h4>Property Videos:</h4> -->
+
+        {% for video in product.videos.all %}
+            <video controls class="property-video" width="100%">
+                <source src="{{ video.video.url }}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        {% endfor %}
+    </div>
+{% else %}
+       <!-- <p>No videos available for this property.</p> -->
+{% endif %}
+    {% elif product_type == 'appliance' %}
+        <p><strong>Brand:</strong> {{ product.brand }}</p>
+        <p><strong>Condition:</strong> {{ product.condition }}</p>
+        <p><strong>Warranty:</strong> {{ product.warranty }} years</p>
+        <p><strong>Power Consumption:</strong> {{ product.power_consumption }} W</p>
+        {% if product.videos.exists %}
+        <div class="video-section">
+                        <!-- <h4>Property Videos:</h4> -->
+
+            {% for video in product.videos.all %}
+                <video controls class="property-video" width="100%">
+                    <source src="{{ video.video.url }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            {% endfor %}
+        </div>
+        {% else %}
+           <!-- <p>No videos available for this property.</p> -->
+        {% endif %}
+        
+        {% elif product_type == 'book' %}
+        <p><strong>Category:</strong> {{ product.category }}</p>
+        <p><strong>Genre:</strong> {{ product.genre }}</p>
+        <p><strong>Condition:</strong> {{ product.condition }}</p>
+        {% if product.videos.exists %}
+        <div class="video-section">
+                        <!-- <h4>Property Videos:</h4> -->
+
+            {% for video in product.videos.all %}
+                <video controls class="property-video" width="100%">
+                    <source src="{{ video.video.url }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            {% endfor %}
+        </div>
+        {% else %}
+           <!-- <p>No videos available for this property.</p> -->
+        {% endif %}
+        
+        {% elif product_type == 'apartment' %}
+
+        <div class="product-details">
+
+            <p><strong>Property Title:</strong> {{ product.property_title }}</p>
+            <p><strong>Region:</strong> {{ product.get_regions_display }}</p>
+            <p><strong>City:</strong> {{ product.cities }}</p>
+            <p><strong>Plot Area:</strong> {{ product.plot_area }} sqm</p>
+            <p><strong>Number of Bedrooms:</strong> {{ product.get_bedrooms_display }}</p>
+            <p><strong>Number of Bathrooms:</strong> {{ product.get_bathrooms_display }}</p>
+            <p><strong>Furnished:</strong> {{ product.get_furnished_display }}</p>
+            <p><strong>Building Age:</strong> {{ product.get_building_display }}</p>
+            <p><strong>Number of Floors:</strong> {{ product.get_floors_display }}</p>
+            <p><strong>Listing Type:</strong> {{ product.get_listing_type_display }}</p>
+        
+            {% if product.listing_type == "rent" %}
+                <p><strong>Rental Period:</strong> {{ product.get_rental_period_display }}</p>
+            {% endif %}
+        
+            <p><strong>Property Mortgage:</strong> {{ product.get_property_mortgage_display }}</p>
+            <p><strong>Facade:</strong> {{ product.get_facade_display }}</p>
+            <p><strong>Listing By:</strong> {{ product.get_lister_type_display }}</p>
+            <p><strong>Approval Status:</strong> {{ product.get_status_display }}</p>
+            <p><strong>Price:</strong> {{ product.price }} OMR</p>
+            <p><strong>Description:</strong> {{ product.description }}</p>
+        
+            <h5>Main Amenities:</h5>
+            <ul>
+                {% for amenity in product.main_amenities.all %}
+                    <li>{{ amenity.name }}</li>
+                {% empty %}
+                    <li>No amenities listed.</li>
+                {% endfor %}
+            </ul>
+        
+            <h5>Additional Amenities:</h5>
+            <ul>
+                {% for amenity in product.additional_amenities.all %}
+                    <li>{{ amenity.name }}</li>
+                {% empty %}
+                    <li>No additional amenities listed.</li>
+                {% endfor %}
+            </ul>
+        
+            <h5>Nearby Locations:</h5>
+            <ul>
+                {% for location in product.nearby_location.all %}
+                    <li>{{ location.name }}</li>
+                {% empty %}
+                    <li>No nearby locations listed.</li>
+                {% endfor %}
+            </ul>
+         
+        </div>
+    
+    
+        {% elif product_type == 'factory' %}
+
+    <div class="product-details">
+        <p><strong>Property Title:</strong> {{ product.property_title }}</p>
+    <p><strong>Region:</strong> {{ product.get_regions_display }}</p>
+    <p><strong>City:</strong> {{ product.cities }}</p>
+    <p><strong>Plot Area:</strong> {{ product.plot_area }} sqm</p>
+    <p><strong>Listing Type:</strong> {{ product.get_listing_type_display }}</p>
+
+    {% if product.listing_type == "rent" %}
+        <p><strong>Rental Period:</strong> {{ product.get_rental_period_display }}</p>
+    {% endif %}
+
+    <p><strong>Property Mortgage:</strong> {{ product.get_property_mortgage_display }}</p>
+    <p><strong>Listing By:</strong> {{ product.get_lister_type_display }}</p>
+    <p><strong>Description:</strong> {{ product.description }}</p>
+
+    <h5>Main Amenities:</h5>
+    <ul>
+        {% for amenity in product.main_amenities.all %}
+            <li>{{ amenity.name }}</li>
+        {% empty %}
+            <li>No amenities listed.</li>
+        {% endfor %}
+    </ul>
+    
+    <h5>Additional Amenities:</h5>
+    <ul>
+        {% for amenity in product.additional_amenities.all %}
+            <li>{{ amenity.name }}</li>
+        {% empty %}
+            <li>No additional amenities listed.</li>
+        {% endfor %}
+    </ul>
+    
+    <h5>Nearby Locations:</h5>
+    <ul>
+        {% for location in product.nearby_location.all %}
+            <li>{{ location.name }}</li>
+        {% empty %}
+            <li>No nearby locations listed.</li>
+        {% endfor %}
+    </ul>
+    </div>
+
+    {% elif product_type == 'complex' %}
+
+    <div class="product-details">
+
+    <p><strong>Property Title:</strong> {{ product.property_title }}</p>
+    <p><strong>Region:</strong> {{ product.get_regions_display }}</p>
+    <p><strong>City:</strong> {{ product.cities }}</p>
+    <p><strong>Plot Area:</strong> {{ product.plot_area }} sqm</p>
+    <p><strong>Floors:</strong> {{ product.get_floors_display }}</p>
+    <p><strong>Listing Type:</strong> {{ product.get_listing_type_display }}</p>
+
+    {% if product.listing_type == "rent" %}
+        <p><strong>Rental Period:</strong> {{ product.get_rental_period_display }}</p>
+    {% endif %}
+
+    <p><strong>Property Mortgage:</strong> {{ product.get_property_mortgage_display }}</p>
+    <p><strong>Listing By:</strong> {{ product.get_lister_type_display }}</p>
+    <p><strong>Property Status:</strong> {{ product.get_property_display }}</p>
+    <p><strong>Description:</strong> {{ product.description }}</p>
+
+    <h5>Main Amenities:</h5>
+    <ul>
+        {% for amenity in product.main_amenities.all %}
+            <li>{{ amenity.name }}</li>
+        {% empty %}
+            <li>No amenities listed.</li>
+        {% endfor %}
+    </ul>
+    
+    <h5>Additional Amenities:</h5>
+    <ul>
+        {% for amenity in product.additional_amenities.all %}
+            <li>{{ amenity.name }}</li>
+        {% empty %}
+            <li>No additional amenities listed.</li>
+        {% endfor %}
+    </ul>
+    
+    <h5>Nearby Locations:</h5>
+    <ul>
+        {% for location in product.nearby_location.all %}
+            <li>{{ location.name }}</li>
+        {% empty %}
+            <li>No nearby locations listed.</li>
+        {% endfor %}
+    </ul>
+       
+    </div>
+    {% elif product_type == 'clinic' %}
+
+    <div class="product-details">
+
+        <p><strong>Property Title:</strong> {{ product.property_title }}</p>
+        <p><strong>Region:</strong> {{ product.get_regions_display }}</p>
+        <p><strong>City:</strong> {{ product.cities }}</p>
+        <p><strong>Plot Area:</strong> {{ product.plot_area }} sqm</p>
+        <p><strong>Floors:</strong> {{ product.get_floors_display }}</p>
+        <p><strong>Listing Type:</strong> {{ product.get_listing_type_display }}</p>
+    
+        {% if product.listing_type == "rent" %}
+            <p><strong>Rental Period:</strong> {{ product.get_rental_period_display }}</p>
+        {% endif %}
+    
+        <p><strong>Property Mortgage:</strong> {{ product.get_property_mortgage_display }}</p>
+        <p><strong>Listing By:</strong> {{ product.get_lister_type_display }}</p>
+        <p><strong>Property Status:</strong> {{ product.get_property_display }}</p>
+        <p><strong>Description:</strong> {{ product.description }}</p>
+    
+        <h5>Main Amenities:</h5>
+        <ul>
+            {% for amenity in product.main_amenities.all %}
+                <li>{{ amenity.name }}</li>
+            {% empty %}
+                <li>No amenities listed.</li>
+            {% endfor %}
+        </ul>
+        
+        <h5>Additional Amenities:</h5>
+        <ul>
+            {% for amenity in product.additional_amenities.all %}
+                <li>{{ amenity.name }}</li>
+            {% empty %}
+                <li>No additional amenities listed.</li>
+            {% endfor %}
+        </ul>
+        
+        <h5>Nearby Locations:</h5>
+        <ul>
+            {% for location in product.nearby_location.all %}
+                <li>{{ location.name }}</li>
+            {% empty %}
+                <li>No nearby locations listed.</li>
+            {% endfor %}
+        </ul>
+    
+       
+    </div>
+    {% elif product_type == 'hostel' %}
+
+    <div class="product-details">
+        <p><strong>Property Title:</strong> {{ product.property_title }}</p>
+    <p><strong>Region:</strong> {{ product.get_regions_display }}</p>
+    <p><strong>City:</strong> {{ product.cities }}</p>
+    <p><strong>Plot Area:</strong> {{ product.plot_area }} sqm</p>
+    <p><strong>Floors:</strong> {{ product.get_floors_display }}</p>
+    <p><strong>Listing Type:</strong> {{ product.get_listing_type_display }}</p>
+    <p><strong>Furnished:</strong> {{ product.get_furnished_display }}</p>
+    <p><strong>Bedrooms:</strong> {{ product.get_bedrooms_display }}</p>
+    
+    {% if product.listing_type == "rent" %}
+        <p><strong>Rental Period:</strong> {{ product.get_rental_period_display }}</p>
+    {% endif %}
+
+    <p><strong>Property Mortgage:</strong> {{ product.get_property_mortgage_display }}</p>
+    <p><strong>Listing By:</strong> {{ product.get_lister_type_display }}</p>
+    <p><strong>Property Status:</strong> {{ product.get_property_display }}</p>
+    <p><strong>Description:</strong> {{ product.description }}</p>
+
+    <h5>Main Amenities:</h5>
+    <ul>
+        {% for amenity in product.main_amenities.all %}
+            <li>{{ amenity.name }}</li>
+        {% empty %}
+            <li>No amenities listed.</li>
+        {% endfor %}
+    </ul>
+    
+    <h5>Additional Amenities:</h5>
+    <ul>
+        {% for amenity in product.additional_amenities.all %}
+            <li>{{ amenity.name }}</li>
+        {% empty %}
+            <li>No additional amenities listed.</li>
+        {% endfor %}
+    </ul>
+    
+    <h5>Nearby Locations:</h5>
+    <ul>
+        {% for location in product.nearby_location.all %}
+            <li>{{ location.name }}</li>
+        {% empty %}
+            <li>No nearby locations listed.</li>
+        {% endfor %}
+    </ul>
+    
+        
+    </div>
+            
+    {% elif product_type == 'office' %}
+
+    <div class="product-details">
+        <p><strong>Property Title:</strong> {{ product.property_title }}</p>
+        <p><strong>Region:</strong> {{ product.get_regions_display }}</p>
+        <p><strong>City:</strong> {{ product.cities }}</p>
+        <p><strong>Plot Area:</strong> {{ product.plot_area }} sqm</p>
+        <p><strong>Floors:</strong> {{ product.get_floors_display }}</p>
+        <p><strong>Listing Type:</strong> {{ product.get_listing_type_display }}</p>
+        <p><strong>Furnished:</strong> {{ product.get_furnished_display }}</p>
+        
+        {% if product.listing_type == "rent" %}
+            <p><strong>Rental Period:</strong> {{ product.get_rental_period_display }}</p>
+        {% endif %}
+        
+        <p><strong>Property Mortgage:</strong> {{ product.get_property_mortgage_display }}</p>
+        <p><strong>Listing By:</strong> {{ product.get_lister_type_display }}</p>
+        <p><strong>Property Status:</strong> {{ product.get_property_display }}</p>
+        <p><strong>Description:</strong> {{ product.description }}</p>
+        
+        <h5>Main Amenities:</h5>
+        <ul>
+            {% for amenity in product.main_amenities.all %}
+                <li>{{ amenity.name }}</li>
+            {% empty %}
+                <li>No amenities listed.</li>
+            {% endfor %}
+        </ul>
+        
+        <h5>Additional Amenities:</h5>
+        <ul>
+            {% for amenity in product.additional_amenities.all %}
+                <li>{{ amenity.name }}</li>
+            {% empty %}
+                <li>No additional amenities listed.</li>
+            {% endfor %}
+        </ul>
+        
+        <h5>Nearby Locations:</h5>
+        <ul>
+            {% for location in product.nearby_location.all %}
+                <li>{{ location.name }}</li>
+            {% empty %}
+                <li>No nearby locations listed.</li>
+            {% endfor %}
+        </ul>
+        
+    </div> 
+    {% elif product_type == 'shop' %}
+
+    <div class="product-details">
+        <p><strong>Property Title:</strong> {{ product.property_title }}</p>
+    <p><strong>Region:</strong> {{ product.get_regions_display }}</p>
+    <p><strong>City:</strong> {{ product.cities }}</p>
+    <p><strong>Surface Area:</strong> {{ product.plot_area }} sqm</p>
+    <p><strong>Description:</strong> {{ product.description }}</p>
+    <p><strong>Listing Type:</strong> {{ product.get_listing_type_display }}</p>
+    
+    {% if product.listing_type == "rent" %}
+        <p><strong>Rental Period:</strong> {{ product.get_rental_period_display }}</p>
+    {% endif %}
+
+    <p><strong>Status:</strong> {{ product.get_status_display }}</p>
+    <p><strong>Property Mortgage:</strong> {{ product.get_property_mortgage_display }}</p>
+    <p><strong>Lister Type:</strong> {{ product.get_lister_type_display }}</p>
+    <p><strong>Created At:</strong> {{ product.created_at }}</p>
+
+    <p><strong>Nearby Locations:</strong></p>
+<ul>
+    {% for location in product.nearby_location.all %}
+        <li>{{ location.name }}</li>
+    {% empty %}
+        <li>No nearby locations listed.</li>
+    {% endfor %}
+</ul>
+
+<p><strong>Main Amenities:</strong></p>
+<ul>
+    {% for amenity in product.main_amenities.all %}
+        <li>{{ amenity.name }}</li>
+    {% empty %}
+        <li>No main amenities listed.</li>
+    {% endfor %}
+</ul>
+
+<p><strong>Additional Amenities:</strong></p>
+<ul>
+    {% for amenity in product.additional_amenities.all %}
+        <li>{{ amenity.name }}</li>
+    {% empty %}
+        <li>No additional amenities listed.</li>
+    {% endfor %}
+</ul>
+
+    
+        
+    </div> 
+    {% elif product_type == 'cafe' %}
+
+    <div class="product-details">
+<p><strong>Region:</strong> {{ product.get_region_display }}</p>
+<p><strong>City:</strong> {{ product.cities }}</p>
+<p><strong>Surface Area:</strong> {{ product.plot_area }} sqm</p>
+<p><strong>Description:</strong> {{ product.description }}</p>
+<p><strong>Listing Type:</strong> {{ product.get_listing_type_display }}</p>
+{% if product.rental_period %}
+<p><strong>Rental Period:</strong> {{ product.get_rental_period_display }}</p>
+{% endif %}
+
+<p><strong>Property Mortgage:</strong> {{ product.get_property_mortgage_display }}</p>
+<p><strong>Lister Type:</strong> {{ product.get_lister_type_display }}</p>
+<p><strong>Property Status:</strong> {{ product.get_property_display }}</p>
+
+<p><strong>Nearby Locations:</strong></p>
+<ul>
+    {% for location in product.nearby_location.all %}
+        <li>{{ location.name }}</li>
+    {% empty %}
+        <li>No nearby locations listed.</li>
+    {% endfor %}
+</ul>
+
+<p><strong>Main Amenities:</strong></p>
+<ul>
+    {% for amenity in product.main_amenities.all %}
+        <li>{{ amenity.name }}</li>
+    {% empty %}
+        <li>No main amenities listed.</li>
+    {% endfor %}
+</ul>
+
+<p><strong>Additional Amenities:</strong></p>
+<ul>
+    {% for amenity in product.additional_amenities.all %}
+        <li>{{ amenity.name }}</li>
+    {% empty %}
+        <li>No additional amenities listed.</li>
+    {% endfor %}
+</ul>
+
+   
+        
+    </div> 
+
+    {% elif product_type == 'staff' %}
+
+    <div class="product-details">
+        <p><strong>Region:</strong> {{ product.get_region_display }}</p>
+        <p><strong>City:</strong> {{ product.cities }}</p>
+        <p><strong>Surface Area:</strong> {{ product.plot_area }} sqm</p>
+        <p><strong>Description:</strong> {{ product.description }}</p>
+        <p><strong>Listing Type:</strong> {{ product.get_listing_type_display }}</p>
+        {% if product.rental_period %}
+<p><strong>Rental Period:</strong> {{ product.get_rental_period_display }}</p>
+{% endif %}
+
+        <p><strong>Status:</strong> {{ product.get_status_display }}</p>
+        <p><strong>Property Mortgage:</strong> {{ product.get_property_mortgage_display }}</p>
+        <p><strong>Lister Type:</strong> {{ product.get_lister_type_display }}</p>
+        <p><strong>Nearby Locations:</strong></p>
+<ul>
+    {% for location in product.nearby_location.all %}
+        <li>{{ location.name }}</li>
+    {% empty %}
+        <li>No nearby locations available.</li>
+    {% endfor %}
+</ul>
+
+<p><strong>Main Amenities:</strong></p>
+<ul>
+    {% for amenity in product.main_amenities.all %}
+        <li>{{ amenity.name }}</li>
+    {% empty %}
+        <li>No main amenities available.</li>
+    {% endfor %}
+</ul>
+
+<p><strong>Additional Amenities:</strong></p>
+<ul>
+    {% for amenity in product.additional_amenities.all %}
+        <li>{{ amenity.name }}</li>
+    {% empty %}
+        <li>No additional amenities available.</li>
+    {% endfor %}
+</ul>
+
+    </div> 
+
+    {% elif product_type == 'warehouse' %}
+
+    <div class="product-details">
+        <p><strong>Region:</strong> {{ product.get_region_display }}</p>
+        <p><strong>City:</strong> {{ product.cities }}</p>
+        <p><strong>Surface Area:</strong> {{ product.plot_area }} sqm</p>
+        <p><strong>Description:</strong> {{ product.description }}</p>
+        <p><strong>Listing Type:</strong> {{ product.get_listing_type_display }}</p>
+        {% if product.rental_period %}
+        <p><strong>Rental Period:</strong> {{ product.get_rental_period_display }}</p>
+        {% endif %}
+        <p><strong>Property Mortgage:</strong> {{ product.get_property_mortgage_display }}</p>
+        <p><strong>Lister Type:</strong> {{ product.get_lister_type_display }}</p>
+        <p><strong>Nearby Locations:</strong></p>
+<ul>
+    {% for location in product.nearby_location.all %}
+        <li>{{ location.name }}</li>
+    {% empty %}
+        <li>No nearby locations available.</li>
+    {% endfor %}
+</ul>
+
+<p><strong>Main Amenities:</strong></p>
+<ul>
+    {% for amenity in product.main_amenities.all %}
+        <li>{{ amenity.name }}</li>
+    {% empty %}
+        <li>No main amenities available.</li>
+    {% endfor %}
+</ul>
+
+<p><strong>Additional Amenities:</strong></p>
+<ul>
+    {% for amenity in product.additional_amenities.all %}
+        <li>{{ amenity.name }}</li>
+    {% empty %}
+        <li>No additional amenities available.</li>
+    {% endfor %}
+</ul>
+
+    
+        
+    
+        
+    </div> 
+
+    {% elif product_type == 'townhouse' %}
+
+    <div class="product-details">
+        <p><strong>Region:</strong> {{ product.get_region_display }}</p>
+        <p><strong>City:</strong> {{ product.cities }}</p>
+        <p><strong>Surface Area:</strong> {{ product.plot_area }} sqm</p>
+        <p><strong>Description:</strong> {{ product.description }}</p>
+        <p><strong>Listing Type:</strong> {{ product.get_listing_type_display }}</p>
+        {% if product.rental_period %}
+        <p><strong>Rental Period:</strong> {{ product.get_rental_period_display }}</p>
+        {% endif %}
+        <p><strong>Property Mortgage:</strong> {{ product.get_property_mortgage_display }}</p>
+        <p><strong>Lister Type:</strong> {{ product.get_lister_type_display }}</p>
+        <p><strong>Nearby Locations:</strong></p>
+        <ul>
+            {% for location in product.nearby_location.all %}
+                <li>{{ location.name }}</li>
+            {% empty %}
+                <li>No nearby locations available.</li>
+            {% endfor %}
+        </ul>
+        
+        <p><strong>Main Amenities:</strong></p>
+        <ul>
+            {% for amenity in product.main_amenities.all %}
+                <li>{{ amenity.name }}</li>
+            {% empty %}
+                <li>No main amenities available.</li>
+            {% endfor %}
+        </ul>
+        
+        <p><strong>Additional Amenities:</strong></p>
+        <ul>
+            {% for amenity in product.additional_amenities.all %}
+                <li>{{ amenity.name }}</li>
+            {% empty %}
+                <li>No additional amenities available.</li>
+            {% endfor %}
+        </ul>
+        
+        
+    </div> 
+    {% elif product_type == 'fullfloors' %}
+
+    <div class="product-details">
+        <p><strong>Region:</strong> {{ product.get_region_display }}</p>
+        <p><strong>City:</strong> {{ product.cities }}</p>
+        <p><strong>Surface Area:</strong> {{ product.plot_area }} sqm</p>
+        <p><strong>Description:</strong> {{ product.description }}</p>
+        <p><strong>Listing Type:</strong> {{ product.get_listing_type_display }}</p>
+        {% if product.rental_period %}
+        <p><strong>Rental Period:</strong> {{ product.get_rental_period_display }}</p>
+        {% endif %}
+        <p><strong>Property Mortgage:</strong> {{ product.get_property_mortgage_display }}</p>
+        <p><strong>Lister Type:</strong> {{ product.get_lister_type_display }}</p>
+        <p><strong>Nearby Locations:</strong></p>
+        <ul>
+            {% for location in product.nearby_location.all %}
+                <li>{{ location.name }}</li>
+            {% empty %}
+                <li>No nearby locations available.</li>
+            {% endfor %}
+        </ul>
+        
+        <p><strong>Main Amenities:</strong></p>
+        <ul>
+            {% for amenity in product.main_amenities.all %}
+                <li>{{ amenity.name }}</li>
+            {% empty %}
+                <li>No main amenities available.</li>
+            {% endfor %}
+        </ul>
+        
+        <p><strong>Additional Amenities:</strong></p>
+        <ul>
+            {% for amenity in product.additional_amenities.all %}
+                <li>{{ amenity.name }}</li>
+            {% empty %}
+                <li>No additional amenities available.</li>
+            {% endfor %}
+        </ul>
+        
+        
+    </div> 
+
+    {% elif product_type == 'showrooms' %}
+
+    <div class="product-details">
+        <p><strong>Region:</strong> {{ product.get_region_display }}</p>
+        <p><strong>City:</strong> {{ product.cities }}</p>
+        <p><strong>Surface Area:</strong> {{ product.plot_area }} sqm</p>
+        <p><strong>Description:</strong> {{ product.description }}</p>
+        <p><strong>Listing Type:</strong> {{ product.get_listing_type_display }}</p>
+        {% if product.rental_period %}
+        <p><strong>Rental Period:</strong> {{ product.get_rental_period_display }}</p>
+        {% endif %}
+        <p><strong>Property Mortgage:</strong> {{ product.get_property_mortgage_display }}</p>
+        <p><strong>Lister Type:</strong> {{ product.get_lister_type_display }}</p>
+        <p><strong>Nearby Locations:</strong></p>
+        <ul>
+            {% for location in product.nearby_location.all %}
+                <li>{{ location.name }}</li>
+            {% empty %}
+                <li>No nearby locations available.</li>
+            {% endfor %}
+        </ul>
+        
+        <p><strong>Main Amenities:</strong></p>
+        <ul>
+            {% for amenity in product.main_amenities.all %}
+                <li>{{ amenity.name }}</li>
+            {% empty %}
+                <li>No main amenities available.</li>
+            {% endfor %}
+        </ul>
+        
+        <p><strong>Additional Amenities:</strong></p>
+        <ul>
+            {% for amenity in product.additional_amenities.all %}
+                <li>{{ amenity.name }}</li>
+            {% empty %}
+                <li>No additional amenities available.</li>
+            {% endfor %}
+        </ul>
+        
+        
+    </div> 
+
+    {% elif product_type == 'wholebuilding' %}
+
+    <div class="product-details">
+        <p><strong>Region:</strong> {{ product.get_region_display }}</p>
+        <p><strong>City:</strong> {{ product.cities }}</p>
+        <p><strong>Surface Area:</strong> {{ product.plot_area }} sqm</p>
+        <p><strong>Description:</strong> {{ product.description }}</p>
+        <p><strong>Listing Type:</strong> {{ product.get_listing_type_display }}</p>
+        {% if product.rental_period %}
+        <p><strong>Rental Period:</strong> {{ product.get_rental_period_display }}</p>
+        {% endif %}
+        <p><strong>Property Mortgage:</strong> {{ product.get_property_mortgage_display }}</p>
+        <p><strong>Lister Type:</strong> {{ product.get_lister_type_display }}</p>
+        <p><strong>Nearby Locations:</strong></p>
+<ul>
+    {% for location in product.nearby_location.all %}
+        <li>{{ location.name }}</li>
+    {% empty %}
+        <li>No nearby locations available.</li>
+    {% endfor %}
+</ul>
+
+<p><strong>Main Amenities:</strong></p>
+<ul>
+    {% for amenity in product.main_amenities.all %}
+        <li>{{ amenity.name }}</li>
+    {% empty %}
+        <li>No main amenities available.</li>
+    {% endfor %}
+</ul>
+
+<p><strong>Additional Amenities:</strong></p>
+<ul>
+    {% for amenity in product.additional_amenities.all %}
+        <li>{{ amenity.name }}</li>
+    {% empty %}
+        <li>No additional amenities available.</li>
+    {% endfor %}
+</ul>
+ 
+    </div>
+    
+    {% elif product_type == 'supermarket' %}
+
+    <div class="product-details">
+        <p><strong>Region:</strong> {{ product.get_region_display }}</p>
+        <p><strong>City:</strong> {{ product.cities }}</p>
+        <p><strong>Surface Area:</strong> {{ product.plot_area }} sqm</p>
+        <p><strong>Description:</strong> {{ product.description }}</p>
+        <p><strong>Listing Type:</strong> {{ product.get_listing_type_display }}</p>
+        {% if product.rental_period %}
+        <p><strong>Rental Period:</strong> {{ product.get_rental_period_display }}</p>
+        {% endif %}
+        <p><strong>Property Mortgage:</strong> {{ product.get_property_mortgage_display }}</p>
+        <p><strong>Lister Type:</strong> {{ product.get_lister_type_display }}</p>
+        <p><strong>Nearby Locations:</strong></p>
+<ul>
+    {% for location in product.nearby_location.all %}
+        <li>{{ location.name }}</li>
+    {% empty %}
+        <li>No nearby locations available.</li>
+    {% endfor %}
+</ul>
+
+<p><strong>Main Amenities:</strong></p>
+<ul>
+    {% for amenity in product.main_amenities.all %}
+        <li>{{ amenity.name }}</li>
+    {% empty %}
+        <li>No main amenities available.</li>
+    {% endfor %}
+</ul>
+
+<p><strong>Additional Amenities:</strong></p>
+<ul>
+    {% for amenity in product.additional_amenities.all %}
+        <li>{{ amenity.name }}</li>
+    {% empty %}
+        <li>No additional amenities available.</li>
+    {% endfor %}
+</ul>
+
+        
+    </div> 
+
+    {% elif product_type == 'foreign' %}
+
+    <div class="product-details">
+        <p><strong>Region:</strong> {{ product.get_region_display }}</p>
+        <p><strong>City:</strong> {{ product.cities }}</p>
+        <p><strong>Surface Area:</strong> {{ product.plot_area }} sqm</p>
+        <p><strong>Description:</strong> {{ product.description }}</p>
+        <p><strong>Listing Type:</strong> {{ product.get_listing_type_display }}</p>
+        {% if product.rental_period %}
+        <p><strong>Rental Period:</strong> {{ product.get_rental_period_display }}</p>
+        {% endif %}
+        <p><strong>Property Mortgage:</strong> {{ product.get_property_mortgage_display }}</p>
+        <p><strong>Lister Type:</strong> {{ product.get_lister_type_display }}</p>
+        <p><strong>Nearby Locations:</strong></p>
+        <ul>
+            {% for location in product.nearby_location.all %}
+                <li>{{ location.name }}</li>
+            {% empty %}
+                <li>No nearby locations available.</li>
+            {% endfor %}
+        </ul>
+        
+        <p><strong>Main Amenities:</strong></p>
+        <ul>
+            {% for amenity in product.main_amenities.all %}
+                <li>{{ amenity.name }}</li>
+            {% empty %}
+                <li>No main amenities available.</li>
+            {% endfor %}
+        </ul>
+        
+        <p><strong>Additional Amenities:</strong></p>
+        <ul>
+            {% for amenity in product.additional_amenities.all %}
+                <li>{{ amenity.name }}</li>
+            {% empty %}
+                <li>No additional amenities available.</li>
+            {% endfor %}
+        </ul>
+        
+    
+        
+    </div> 
+    {% elif product_type == 'farm' %}
+    <p><strong>Region:</strong> {{ product.get_regions_display }}</p>
+    <p><strong>City:</strong> {{ product.cities }}</p>
+    <p><strong>Plot Area:</strong> {{ product.plot_area }} sqm</p>
+    <p><strong>Surface Area:</strong> {{ product.surface_area }} sqm</p>
+    <p><strong>Number of Bedrooms:</strong> {{ product.get_bedrooms_display }}</p>
+    <p><strong>Number of Bathrooms:</strong> {{ product.get_bathrooms_display }}</p>
+    <p><strong>Furnished:</strong> {{ product.get_furnished_display }}</p>
+    <p><strong>Building Age:</strong> {{ product.get_building_display }}</p>
+    <p><strong>Listing Type:</strong> {{ product.get_listing_type_display }}</p>
+    
+    {% if product.listing_type == "rent" %}
+        <p><strong>Rental Period:</strong> {{ product.get_rental_period_display }}</p>
+    {% endif %}
+
+    <p><strong>Property Mortgage:</strong> {{ product.get_property_mortgage_display }}</p>
+    <p><strong>Facade:</strong> {{ product.get_facade_display }}</p>
+    <p><strong>Listing By:</strong> {{ product.get_lister_type_display }}</p>
+    <p><strong>Description:</strong> {{ product.description }}</p>
+
+    <h5>Main Amenities:</h5>
+    <ul>
+        {% for amenity in product.main_amenities.all %}
+            <li>{{ amenity.name }}</li>
+        {% empty %}
+            <li>No amenities listed.</li>
+        {% endfor %}
+    </ul>
+    
+    <h5>Additional Amenities:</h5>
+    <ul>
+        {% for amenity in product.additional_amenities.all %}
+            <li>{{ amenity.name }}</li>
+        {% empty %}
+            <li>No additional amenities listed.</li>
+        {% endfor %}
+    </ul>
+    
+    <h5>Nearby Locations:</h5>
+    <ul>
+        {% for location in product.nearby_location.all %}
+            <li>{{ location.name }}</li>
+        {% empty %}
+            <li>No nearby locations listed.</li>
+        {% endfor %}
+    </ul>
+        <!-- Video Section -->
+    {% if product.videos.exists %}
+    <div class="video-section">
+                    <!-- <h4>Property Videos:</h4> -->
+
+        {% for video in product.videos.all %}
+            <video controls class="property-video" width="100%">
+                <source src="{{ video.video.url }}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        {% endfor %}
+    </div>
+{% else %}
+       <!-- <p>No videos available for this property.</p> -->
+{% endif %}
+
+{% elif product_type == "commercial" %}
+
+<p><strong>Property Title:</strong> {{ product.property_title }}</p>
+<p><strong>Region:</strong> {{ product.get_regions_display }}</p>
+<p><strong>City:</strong> {{ product.cities }}</p>
+<p><strong>Plot Area:</strong> {{ product.plot_area }} sq ft/m²</p>
+<p><strong>Surface Area:</strong> {{ product.surface_area }} sq ft/m²</p>
+<p><strong>Number of Floors:</strong> {{ product.get_floors_display }}</p>
+<p><strong>Listing Type:</strong> {{ product.get_listing_type_display }}</p>
+
+{% if product.listing_type == "rent" %}
+<p><strong>Rental Period:</strong> {{ product.get_rental_period_display }}</p>
+{% endif %}
+
+<p><strong>Property Mortgage:</strong> {{ product.get_property_mortgage_display }}</p>
+<p><strong>Listing By:</strong> {{ product.get_lister_type_display }}</p>
+<p><strong>Description:</strong> {{ product.description }}</p>
+
+<h5>Main Amenities:</h5>
+<ul>
+    {% for amenity in product.main_amenities.all %}
+        <li>{{ amenity.name }}</li>
+    {% empty %}
+        <li>No main amenities listed.</li>
+    {% endfor %}
+</ul>
+
+<h5>Additional Amenities:</h5>
+<ul>
+    {% for amenity in product.additional_amenities.all %}
+        <li>{{ amenity.name }}</li>
+    {% empty %}
+        <li>No additional amenities listed.</li>
+    {% endfor %}
+</ul>
+
+<h5>Nearby Locations:</h5>
+<ul>
+    {% for location in product.nearby_location.all %}
+        <li>{{ location.name }}</li>
+    {% empty %}
+        <li>No nearby locations listed.</li>
+    {% endfor %}
+</ul>
+
+
+    {% if product.videos.exists %}
+    <div class="video-section">
+                    <!-- <h4>Property Videos:</h4> -->
+
+        {% for video in product.videos.all %}
+            <video controls class="property-video" width="100%">
+                <source src="{{ video.video.url }}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        {% endfor %}
+    </div>
+{% else %}
+       <!-- <p>No videos available for this property.</p> -->
+{% endif %}
+
+                
+    {% endif %}
+    
+    <p><strong>Status:</strong> {{ product.status }}</p>
+
+    <div class="product-images">
+        <h2>Images</h2>
+        {% if images %}
+            <div class="product-image-thumbnails">
+                {% for image in images %}
+                    <a href="javascript:void(0)" onclick="showImage('{{ image.image.url }}')">
+                        <img src="{{ image.image.url }}" alt="Product Image" class="product-image-detail" height="250px" width="400px">
+                    </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>No images available.</p>
+        {% endif %}
+    </div>
+<!-- Image Overlay -->
+<div class="image-overlay" id="imageOverlay">
+    <button class="close-btn" onclick="closeOverlay()">
+        <i class="fas fa-times"></i>
+    </button>
+    <img id="overlayImage" src="" alt="Full Image">
+</div>
+   <!-- Back Button -->
+<a href="javascript:history.back()" class="btn btn-primary mt-3 me-2">Back</a>
+
+<!-- Delete Button (Triggers Modal) -->
+<button type="button" class="btn btn-danger mt-3 me-2" data-bs-toggle="modal" data-bs-target="#deleteModal">Delete</button>
+
+<!-- Other product details -->
+{% if product.status != 'soldout' and product.status == 'approved' %}
+<form action="{% url 'mark_sold_out' product_type product.id %}" method="POST" class="d-inline">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger mt-3 me-2">Mark as Sold Out</button>
+</form>
+{% endif %}
+
+    
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete this product?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form action="{% url 'delete_product' product_type=product_type product_id=product.id %}" method="POST" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    function showImage(imageUrl) {
+        // Display the image in the overlay
+        document.getElementById('overlayImage').src = imageUrl;
+        document.getElementById('imageOverlay').style.display = 'flex';
+    }
+
+    function closeOverlay() {
+        // Close the overlay
+        document.getElementById('imageOverlay').style.display = 'none';
+    }
+</script>
+
+<style>
+    .product-detail-container {
+        width: 80%;
+        margin: 20px auto;
+        font-family: Arial, sans-serif;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .product-detail-container h1 {
+        font-size: 2rem;
+        color: #333;
+    }
+    .product-detail-container p {
+        font-size: 1rem;
+        color: #555;
+        margin: 10px 0;
+    }
+    .product-images {
+        margin-top: 20px;
+    }
+    .product-image-detail {
+        width: 100%;
+        max-width: 300px;
+        margin: 10px;
+        border-radius: 5px;
+        object-fit: cover;
+    }
+    .product-image-detail {
+    transition: transform 0.3s ease; /* Smooth transition for scaling */
+}
+
+.product-image-detail:hover {
+    transform: scale(1.1); /* Apply scaling effect on hover */
+}
+
+    .back-link {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+    }
+    .back-link:hover {
+        background-color: #0056b3;
+    }
+</style>
+
+{% include 'footer.html' %}

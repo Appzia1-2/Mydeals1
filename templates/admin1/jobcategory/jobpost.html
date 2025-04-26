@@ -1,0 +1,69 @@
+{% load static %}
+{% include 'admin1/headeradmin.html' %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
+
+<div class="toolbar py-5 py-lg-15" id="kt_toolbar">
+    <div id="kt_toolbar_container" class="container-xxl d-flex flex-stack flex-wrap">
+        <h3 class="text-white fw-bolder fs-2qx me-5">Job Post</h3>
+        <div class="d-flex align-items-center flex-wrap py-2">
+            <div id="kt_header_search" class="d-flex align-items-center w-200px w-lg-250px my-2 me-4 me-lg-6">
+                <form class="search w-100 position-relative" autocomplete="off">
+                    <input type="text" class="form-control ps-15" name="search" placeholder="Search..." />
+                </form>
+            </div>
+          
+        </div>
+    </div>
+</div>
+
+<div id="kt_content_container" class="d-flex flex-column-fluid align-items-start container-xxl">
+    <div class="content flex-row-fluid" id="kt_content">
+        <div class="card">
+            <div class="card-body p-lg-17">
+                <div class="mb-18">
+                    <div class="mb-10">
+                        <div class="text-center mb-15">
+                            <h3 class="fs-2hx text-dark mb-5">Job Post</h3>
+                            <div class="table-responsive">
+								<table id="reviewTable" class="table table-bordered table-striped table-sm">
+									<thead>
+                                        <tr class="mb-5">
+                                            <th width="50px" style="font-weight: bold;">Sl No</th>
+                                            <th style="font-weight: bold;">Job Post Name</th>
+                                            <th style="font-weight: bold;">Job Category</th>
+                                            <th style="font-weight: bold;">Company Name</th>
+                                            <th style="font-weight: bold;">Username</th>
+                                        </tr>
+                                        
+                                    </thead>
+                                    <tbody>
+                                        {% for job in job_posts %}
+                                            <tr>
+                                                <td>{{ forloop.counter }}</td>
+                                                <td>{{ job.title|title }}</td>
+                                                <td>{{ job.job_category.name|title }}</td>
+                                                <td>{{ job.company_name|title }}</td>
+                                                <td>{{ job.user.username|title }}</td>
+                                            </tr>
+                                        {% empty %}
+                                            <tr>
+                                                <td colspan="4" class="text-center">No Job Posts Available</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+								</table>
+							</div>
+							
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+{% include 'admin1/footeradmin.html' %}
+

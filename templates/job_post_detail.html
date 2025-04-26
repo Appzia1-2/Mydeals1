@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Post Details</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Arial', sans-serif;
+        }
+        .job-post-detail {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            transition: box-shadow 0.3s ease-in-out;
+        }
+        .job-post-detail:hover {
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+        }
+        .job-post-detail h2 {
+          
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .job-post-detail h3 {
+            color: #333;
+            font-size: 1.5rem;
+            margin-top: 20px;
+        }
+        .job-post-detail p {
+            font-size: 1.1rem;
+            margin: 8px 0;
+            color: #555;
+        }
+        .details-label {
+            font-weight: bold;
+            color: #333;
+        }
+        .details-label a {
+            color: #e95d1c;
+            text-decoration: none;
+        }
+        .details-label a:hover {
+            text-decoration: underline;
+        }
+        .row .col-md-6 {
+            padding: 15px;
+        }
+        .back-btn {
+            margin-top: 30px;
+            text-align: center;
+        }
+        .back-btn button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            background-color: #e95d1c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .back-btn button:hover {
+            background-color: #e95d1c;
+        }
+        @media (max-width: 768px) {
+            .job-post-detail {
+                padding: 15px;
+            }
+            .back-btn button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container mt-4">
+    <div class="job-post-detail">
+        <h2 class="mb-4">Job Post Details: {{ job_post.title }}</h2>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <p><span class="details-label">Company:</span> {{ job_post.company_name }}</p>
+                <p><span class="details-label">Category:</span> {{ job_post.job_category.name }}</p>
+                <p><span class="details-label">Job Type:</span> {{ job_post.job_type|title }}</p>
+                <p><span class="details-label">Location:</span> {{ job_post.work_location }}</p>
+                <p><span class="details-label">Posted On:</span> {{ job_post.posted_on|date:"d/m/Y" }}</p>
+                <p><span class="details-label">Application Deadline:</span> {{ job_post.application_deadline|date:"d/m/Y" }}</p>
+                <!-- <p><span class="details-label">Status:</span> {{ job_post.get_status_display|title }}</p> -->
+            </div>
+            <div class="col-md-6">
+                <p><span class="details-label">Contact Email:</span> <a href="mailto:{{ job_post.contact_email }}">{{ job_post.contact_email }}</a></p>
+                <p><span class="details-label">Salary Range:</span> {{ job_post.salary_range }}</p>
+                <p><span class="details-label">Qualifications:</span> {{ job_post.qualifications }}</p>
+                <p><span class="details-label">Skills Required:</span> {{ job_post.skills_required }}</p>
+                <p><span class="details-label">Experience Required:</span> {{ job_post.experience_required }}</p>
+                <p><span class="details-label">Working Hours:</span> {{ job_post.working_hours }}</p>
+            </div>
+        </div>
+
+        <p><span class="details-label">Description:</span> {{ job_post.description }}</p>
+        
+        <div class="back-btn">
+            <!-- Back to the previous page using browser history -->
+            <button onclick="window.history.back();" class="btn btn-secondary">Back</button>
+        </div>
+        
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

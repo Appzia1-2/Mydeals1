@@ -1,0 +1,2081 @@
+{% load static %}
+{% include 'header.html' %}
+<head>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+        }
+
+        .products-container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-title {
+            font-size: 2rem;
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .filter-buttons a {
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .product-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 250px;
+            padding:10px;
+            object-fit: cover;
+        }
+
+        .product-details {
+            padding: 15px;
+        }
+
+        .product-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .product-price,
+        .product-location {
+            font-size: 1rem;
+            color: #555;
+            margin: 5px 0;
+        }
+
+        .product-status {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #ff9800;
+            color: white;
+            padding: 5px 10px;
+            font-size: 0.9rem;
+            border-radius: 5px;
+        }
+
+        .product-status.approved {
+            background-color: #28a745;
+        }
+
+        .product-status.pending {
+            background-color: #ff9800;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+        .modal-header {
+            background-color: #f8f9fa;
+        }
+
+        .modal-footer {
+            justify-content: space-between;
+        }
+        a {
+      text-decoration: none;
+    }
+    </style>
+</head>
+
+<body>
+    <div class="products-container">
+        <h1 class="user-title">Your Products</h1>
+
+        <!-- Filter Buttons -->
+        <div class="filter-buttons mb-4">
+            <a href="?status=pending" class="btn btn-warning {% if status_filter == 'pending' %}active{% endif %}">
+                Pending ({{ aggregated_counts.pending }})
+            </a>
+            <a href="?status=approved" class="btn btn-success {% if status_filter == 'approved' %}active{% endif %}">
+                Approved ({{ aggregated_counts.approved }})
+            </a>
+            <a href="?status=rejected" class="btn btn-danger {% if status_filter == 'rejected' %}active{% endif %}">
+                Rejected ({{ aggregated_counts.rejected }})
+            </a>
+            <a href="?status=soldout" class="btn btn-secondary {% if status_filter == 'soldout' %}active{% endif %}">
+                Sold Out ({{ aggregated_counts.soldout }})
+            </a>
+        </div>
+
+
+        <div class="row">
+            {% if drivingtraining_list %}
+                {% for training in drivingtraining_list %}
+                    <div class="col-md-4 mb-4">
+                        <div class="product-card position-relative">
+                            <span class="product-status {{ training.status|lower }}">{{ training.status }}</span>
+        
+                            {% with training.images.all|first as training_image %}
+                            {% if training_image and training_image.image.url %}
+                                <img src="{{ training_image.image.url }}" alt="Training Image" class="product-image">
+                            {% else %}
+                                <img src="{% static 'images/default-training.jpg' %}" alt="Default Image" class="product-image">
+                            {% endif %}
+                        {% endwith %}
+        
+                            <div class="product-details">
+                                <strong class="product-title">
+                                    Training - {{ training.trainer_name|default_if_none:"N/A" }}
+                                </strong>
+                                <p>Price: <span class="product-price">{{ training.price|default_if_none:"N/A" }}</span></p>
+                                <p>Location: <span class="product-location">{{ training.location|default_if_none:"N/A" }}</span></p>
+                                <a href="" class="btn btn-primary">View Details</a>
+                                
+                                <!-- Delete Button -->
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ training.id }}">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+        
+                        <!-- Delete Confirmation Modal -->
+                        <div class="modal fade" id="deleteModal{{ training.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ training.id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteModalLabel{{ training.id }}">Confirm Deletion</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete this training course?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <form action="{% url 'delete_product' product_type='training' product_id=training.id %}" method="POST" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <!-- <p class="text-center text-muted">No driving training courses found.</p> -->
+            {% endif %}
+        </div>
+        
+        
+
+        <div class="row">
+            {% if land_list %}
+                {% for land in land_list %}
+                    <div class="col-md-4 mb-4">
+                        <div class="product-card position-relative">
+                            <span class="product-status {{ land.status|lower }}">{{ land.status }}</span>
+                            <img src="{{ land.images.first.image.url }}" alt="Land Image" class="product-image">
+                            <div class="product-details">
+                                <strong class="product-title">Land - {{ land.property_title|default_if_none:"N/A" }}</strong>
+                                <p>Price: <span class="product-price">{{ land.price|default_if_none:"N/A" }}</span></p>
+                                <p>Location: <span class="product-location">{{ land.location|default_if_none:"N/A" }}</span></p>
+                                <a href="{% url 'product_detail' product_type='land' product_id=land.id %}" class="btn btn-primary">View Details</a>
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ land.id }}">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Delete Confirmation Modal -->
+                        <div class="modal fade" id="deleteModal{{ land.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ land.id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteModalLabel{{ land.id }}">Confirm Deletion</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete this product?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <form action="{% url 'delete_product' product_type='land' product_id=land.id %}" method="POST" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div class="row">
+            {% if villa_list %}
+                {% for villa in villa_list %}
+                    <div class="col-md-4 mb-4">
+                        <div class="product-card position-relative">
+                            <span class="product-status {{ villa.status|lower }}">{{ villa.status }}</span>
+                            <img src="{{ villa.images.first.image.url }}" alt="Villa Image" class="product-image">
+                            <div class="product-details">
+                                <strong class="product-title">
+                                    Villa - {{ villa.property_title|default_if_none:"N/A" }} - {{ villa.listing_type }}
+                                    {% if villa.listing_type == "rent" and villa.rental_period %}
+                                        - {{ villa.rental_period }}
+                                    {% endif %}
+                                </strong>
+                                
+                                <p>Price: <span class="product-price">{{ villa.price|default_if_none:"N/A" }}</span></p>
+                                <p>Location: <span class="product-location">{{ villa.location|default_if_none:"N/A" }}</span></p>
+                                <a href="{% url 'product_detail' product_type='villa' product_id=villa.id %}" class="btn btn-primary">View Details</a>
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ villa.id }}">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Delete Confirmation Modal -->
+                        <div class="modal fade" id="deleteModal{{ villa.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ villa.id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteModalLabel{{ villa.id }}">Confirm Deletion</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete this product?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <form action="{% url 'delete_product' product_type='villa' product_id=villa.id %}" method="POST" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div class="row">
+            {% if commercial_list %}
+                {% for commercial in commercial_list %}
+                    <div class="col-md-4 mb-4">
+                        <div class="product-card position-relative">
+                            <span class="product-status {{ commercial.status|lower }}">{{ commercial.status }}</span>
+                            <img src="{{ commercial.images.first.image.url }}" alt="Commercial Image" class="product-image">
+                            <div class="product-details">
+                                <strong class="product-title">Commercial - {{ commercial.property_title|default_if_none:"N/A" }}</strong>
+                                <p>Price: <span class="product-price">{{ commercial.price|default_if_none:"N/A" }}</span></p>
+                                <p>Location: <span class="product-location">{{ commercial.location|default_if_none:"N/A" }}</span></p>
+                                <a href="{% url 'product_detail' product_type='commercial' product_id=commercial.id %}" class="btn btn-primary">View Details</a>
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ commercial.id }}">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Delete Confirmation Modal -->
+                        <div class="modal fade" id="deleteModal{{ commercial.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ commercial.id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteModalLabel{{ commercial.id }}">Confirm Deletion</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete this product?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <form action="{% url 'delete_product' product_type='commercial' product_id=commercial.id %}" method="POST" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div class="row">
+            {% if farm_list %}
+                {% for farm in farm_list %}
+                    <div class="col-md-4 mb-4">
+                        <div class="product-card position-relative">
+                            <span class="product-status {{ farm.status|lower }}">{{ farm.status }}</span>
+                            <img src="{{ farm.images.first.image.url }}" alt="Farm Image" class="product-image">
+                            <div class="product-details">
+                                <strong class="product-title">Farm - {{ farm.property_title|default_if_none:"N/A" }}</strong>
+                                <p>Price: <span class="product-price">{{ farm.price|default_if_none:"N/A" }}</span></p>
+                                <p>Location: <span class="product-location">{{ farm.location|default_if_none:"N/A" }}</span></p>
+                                <a href="{% url 'product_detail' product_type='farm' product_id=farm.id %}" class="btn btn-primary">View Details</a>
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ farm.id }}">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Delete Confirmation Modal -->
+                        <div class="modal fade" id="deleteModal{{ farm.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ farm.id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteModalLabel{{ farm.id }}">Confirm Deletion</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete this product?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <form action="{% url 'delete_product' product_type='farm' product_id=farm.id %}" method="POST" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div class="row">
+            {% if chalet_list %}
+                {% for chalet in chalet_list %}
+                    <div class="col-md-4 mb-4">
+                        <div class="product-card position-relative">
+                            <span class="product-status {{ chalet.status|lower }}">{{ chalet.status }}</span>
+                            <img src="{{ chalet.images.first.image.url }}" alt="Chalet Image" class="product-image">
+                            <div class="product-details">
+                                <strong class="product-title">Chalet - {{ chalet.property_title|default_if_none:"N/A" }}</strong>
+                                <p>Price: <span class="product-price">{{ chalet.price|default_if_none:"N/A" }}</span></p>
+                                <p>Location: <span class="product-location">{{ chalet.location|default_if_none:"N/A" }}</span></p>
+                                <a href="{% url 'product_detail' product_type='chalet' product_id=chalet.id %}" class="btn btn-primary">View Details</a>
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ chalet.id }}">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Delete Confirmation Modal -->
+                        <div class="modal fade" id="deleteModal{{ chalet.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ chalet.id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteModalLabel{{ chalet.id }}">Confirm Deletion</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete this product?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <form action="{% url 'delete_product' product_type='chalet' product_id=chalet.id %}" method="POST" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div class="row">
+            {% if automobile_list %}
+                {% for automobile in automobile_list %}
+                    <div class="col-md-4 mb-4">
+                        <div class="product-card position-relative">
+                            <span class="product-status {{ automobile.status|lower }}">{{ automobile.status }}</span>
+                            <img src="{{ automobile.images.first.image.url }}" alt="Automobile Image" class="product-image">
+                            <div class="product-details">
+                                <strong class="product-title">Cars - {{ automobile.make|default_if_none:"N/A" }}</strong>
+                                <p>Price: <span class="product-price">{{ automobile.price|default_if_none:"N/A" }}</span></p>
+                                <p>Location: <span class="product-location">{{ automobile.location|default_if_none:"N/A" }}</span></p>
+                                <a href="{% url 'product_detail' product_type='automobile' product_id=automobile.id %}" class="btn btn-primary">View Details</a>
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ automobile.id }}">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Delete Confirmation Modal -->
+                        <div class="modal fade" id="deleteModal{{ automobile.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ automobile.id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteModalLabel{{ automobile.id }}">Confirm Deletion</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete this product?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <form action="{% url 'delete_product' product_type='automobile' product_id=automobile.id %}" method="POST" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div class="row">
+            {% if motorcycle_list %}
+                {% for motorcycle in motorcycle_list %}
+                    <div class="col-md-4 mb-4">
+                        <div class="product-card position-relative">
+                            <span class="product-status {{ motorcycle.status|lower }}">{{ motorcycle.status }}</span>
+                            <img src="{{ motorcycle.images.first.image.url }}" alt="motorcycle Image" class="product-image">
+                            <div class="product-details">
+                                <strong class="product-title">motorcycle - {{ motorcycle.make|default_if_none:"N/A" }}</strong>
+                                <p>Price: <span class="product-price">{{ motorcycle.price|default_if_none:"N/A" }}</span></p>
+                                <p>Location: <span class="product-location">{{ motorcycle.location|default_if_none:"N/A" }}</span></p>
+                                <a href="{% url 'product_detail' product_type='motorcycle' product_id=motorcycle.id %}" class="btn btn-primary">View Details</a>
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ motorcycle.id }}">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Delete Confirmation Modal -->
+                        <div class="modal fade" id="deleteModal{{ motorcycle.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ motorcycle.id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteModalLabel{{ motorcycle.id }}">Confirm Deletion</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete this product?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <form action="{% url 'delete_product' product_type='motorcycle' product_id=motorcycle.id %}" method="POST" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div class="row">
+            {% if autoaccessorypart_list %}
+                {% for autoaccessorypart in autoaccessorypart_list %}
+                    <div class="col-md-4 mb-4">
+                        <div class="product-card position-relative">
+                            <span class="product-status {{ autoaccessorypart.status|lower }}">{{ autoaccessorypart.status }}</span>
+        
+                            <!-- Check if the autoaccessorypart has an image -->
+                            {% if autoaccessorypart.images.first %}
+                                <img src="{{ autoaccessorypart.images.first.image.url }}" alt="autoaccessorypart Image" class="product-image">
+                            {% else %}
+                                <img src="path/to/default-image.jpg" alt="Default Image" class="product-image">
+                            {% endif %}
+        
+                            <div class="product-details">
+                                <strong class="product-title">autoaccessorypart - {{ autoaccessorypart.name|default_if_none:"N/A" }}</strong>
+                                <p>Price: <span class="product-price">{{ autoaccessorypart.price|default_if_none:"N/A" }}</span></p>
+                                <p>Location: <span class="product-location">{{ autoaccessorypart.location|default_if_none:"N/A" }}</span></p>
+                                <a href="{% url 'product_detail' product_type='autoaccessorypart' product_id=autoaccessorypart.id %}" class="btn btn-primary">View Details</a>
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ autoaccessorypart.id }}">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+        
+                        <!-- Delete Confirmation Modal -->
+                        <div class="modal fade" id="deleteModal{{ autoaccessorypart.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ autoaccessorypart.id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteModalLabel{{ autoaccessorypart.id }}">Confirm Deletion</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete this product?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <form action="{% url 'delete_product' product_type='autoaccessorypart' product_id=autoaccessorypart.id %}" method="POST" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div class="row">
+            {% if heavyvehicle_list %}
+                {% for heavyvehicle in heavyvehicle_list %}
+                    <div class="col-md-4 mb-4">
+                        <div class="product-card position-relative">
+                            <span class="product-status {{ heavyvehicle.status|lower }}">{{ heavyvehicle.status }}</span>
+        
+                            <!-- Check if the heavyvehicle has an image -->
+                            {% if heavyvehicle.images.first %}
+                                <img src="{{ heavyvehicle.images.first.image.url }}" alt="heavyvehicle Image" class="product-image">
+                            {% else %}
+                                <img src="path/to/default-image.jpg" alt="Default Image" class="product-image">
+                            {% endif %}
+        
+                            <div class="product-details">
+                                <strong class="product-title">heavyvehicle - {{ heavyvehicle.name|default_if_none:"N/A" }}</strong>
+                                <p>Price: <span class="product-price">{{ heavyvehicle.price|default_if_none:"N/A" }}</span></p>
+                                <p>Location: <span class="product-location">{{ heavyvehicle.location|default_if_none:"N/A" }}</span></p>
+                                <a href="{% url 'product_detail' product_type='heavyvehicle' product_id=heavyvehicle.id %}" class="btn btn-primary">View Details</a>
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ heavyvehicle.id }}">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+        
+                        <!-- Delete Confirmation Modal -->
+                        <div class="modal fade" id="deleteModal{{ heavyvehicle.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ heavyvehicle.id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteModalLabel{{ heavyvehicle.id }}">Confirm Deletion</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete this product?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <form action="{% url 'delete_product' product_type='heavyvehicle' product_id=heavyvehicle.id %}" method="POST" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        
+        <div class="row">
+            {% if foreign_list %}
+                {% for foreign in foreign_list %}
+                    <div class="col-md-4 mb-4">
+                        <div class="product-card position-relative">
+                            <span class="product-status {{ foreign.status|lower }}">{{ foreign.status }}</span>
+                            <img src="{{ foreign.images.first.image.url }}" alt="foreign Image" class="product-image">
+                            <div class="product-details">
+                                <strong class="product-title">foreign - {{ foreign.property_title|default_if_none:"N/A" }}</strong>
+                                <p>Price: <span class="product-price">{{ foreign.price|default_if_none:"N/A" }}</span></p>
+                                <p>Location: <span class="product-location">{{ foreign.location|default_if_none:"N/A" }}</span></p>
+                                <a href="{% url 'product_detail' product_type='foreign' product_id=foreign.id %}" class="btn btn-primary">View Details</a>
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ foreign.id }}">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Delete Confirmation Modal -->
+                        <div class="modal fade" id="deleteModal{{ foreign.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ foreign.id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteModalLabel{{ foreign.id }}">Confirm Deletion</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete this product?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <form action="{% url 'delete_product' product_type='foreign' product_id=foreign.id %}" method="POST" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+        
+        <div class="row">
+            {% if boat_list %}
+                {% for boat in boat_list %}
+                    <div class="col-md-4 mb-4">
+                        <div class="product-card position-relative">
+                            <span class="product-status {{ boat.status|lower }}">{{ boat.status }}</span>
+        
+                            <!-- Check if the boat has an image -->
+                            {% if boat.images.first %}
+                                <img src="{{ boat.images.first.image.url }}" alt="boat Image" class="product-image">
+                            {% else %}
+                                <img src="path/to/default-image.jpg" alt="Default Image" class="product-image">
+                            {% endif %}
+        
+                            <div class="product-details">
+                                <strong class="product-title">boat - {{ boat.name|default_if_none:"N/A" }}</strong>
+                                <p>Price: <span class="product-price">{{ boat.price|default_if_none:"N/A" }}</span></p>
+                                <p>Location: <span class="product-location">{{ boat.location|default_if_none:"N/A" }}</span></p>
+                                <a href="{% url 'product_detail' product_type='boat' product_id=boat.id %}" class="btn btn-primary">View Details</a>
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ boat.id }}">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+        
+                        <!-- Delete Confirmation Modal -->
+                        <div class="modal fade" id="deleteModal{{ boat.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ boat.id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteModalLabel{{ boat.id }}">Confirm Deletion</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete this product?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <form action="{% url 'delete_product' product_type='boat' product_id=boat.id %}" method="POST" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div class="row">
+            {% if numberplate_list %}
+                {% for numberplate in numberplate_list %}
+                    <div class="col-md-4 mb-4">
+                        <div class="product-card position-relative">
+                            <span class="product-status {{ numberplate.status|lower }}">{{ numberplate.status }}</span>
+        
+                            <!-- Check if the numberplate has an image -->
+                            {% if numberplate.images.first %}
+                                <img src="{{ numberplate.images.first.image.url }}" alt="numberplate Image" class="product-image">
+                            {% else %}
+                                <img src="path/to/default-image.jpg" alt="Default Image" class="product-image">
+                            {% endif %}
+        
+                            <div class="product-details">
+                                <strong class="product-title">numberplate - {{ numberplate.number|default_if_none:"N/A" }}</strong>
+                                <p>Price: <span class="product-price">{{ numberplate.price|default_if_none:"N/A" }}</span></p>
+                                <p>Location: <span class="product-location">{{ numberplate.location|default_if_none:"N/A" }}</span></p>
+                                <a href="{% url 'product_detail' product_type='numberplate' product_id=numberplate.id %}" class="btn btn-primary">View Details</a>
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ numberplate.id }}">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+        
+                        <!-- Delete Confirmation Modal -->
+                        <div class="modal fade" id="deleteModal{{ numberplate.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ numberplate.id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteModalLabel{{ numberplate.id }}">Confirm Deletion</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete this product?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <form action="{% url 'delete_product' product_type='numberplate' product_id=numberplate.id %}" method="POST" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div class="row">
+            {% if fashion_list %}
+                {% for fashion in fashion_list %}
+                    <div class="col-md-4 mb-4">
+                        <div class="product-card position-relative">
+                            <span class="product-status {{ fashion.status|lower }}">{{ fashion.status }}</span>
+                            <img src="{{ fashion.images.first.image.url }}" alt="Fashion Image" class="product-image">
+
+                            <div class="product-details">
+                                <strong class="product-title">Fashion - {{ fashion.category|default_if_none:"N/A" }}</strong>
+                                <p>Price: <span class="product-price">{{ fashion.price|default_if_none:"N/A" }}</span></p>
+                                <p>Location: <span class="product-location">{{ fashion.location|default_if_none:"N/A" }}</span></p>
+                                <a href="{% url 'product_detail' product_type='fashion' product_id=fashion.id %}" class="btn btn-primary">View Details</a>
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ fashion.id }}">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Delete Confirmation Modal -->
+                        <div class="modal fade" id="deleteModal{{ fashion.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ fashion.id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteModalLabel{{ fashion.id }}">Confirm Deletion</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete this product?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <form action="{% url 'delete_product' product_type='fashion' product_id=fashion.id %}" method="POST" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div class="row">
+            {% if toys_list %}
+                {% for toy in toys_list %}
+                    <div class="col-md-4 mb-4">
+                        <div class="product-card position-relative">
+                            <span class="product-status {{ toy.status|lower }}">{{ toy.status }}</span>
+                            <img src="{{ toy.images.first.image.url }}" alt="Toy Image" class="product-image">
+        
+                            <div class="product-details">
+                                <strong class="product-title">Toy - {{ toy.category|default_if_none:"N/A" }}</strong>
+                                <p>Price: <span class="product-price">{{ toy.price|default_if_none:"N/A" }}</span></p>
+                                <p>Location: <span class="product-location">{{ toy.location|default_if_none:"N/A" }}</span></p>
+                                <a href="{% url 'product_detail' product_type='toy' product_id=toy.id %}" class="btn btn-primary">View Details</a>
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ toy.id }}">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+        
+                        <!-- Delete Confirmation Modal -->
+                        <div class="modal fade" id="deleteModal{{ toy.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ toy.id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteModalLabel{{ toy.id }}">Confirm Deletion</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete this product?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <form action="{% url 'delete_product' product_type='toy' product_id=toy.id %}" method="POST" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+        
+
+        <div class="row">
+            {% if food_list %}
+                {% for food in food_list %}
+                    <div class="col-md-4 mb-4">
+                        <div class="product-card position-relative">
+                            <span class="product-status {{ food.status|lower }}">{{ food.status }}</span>
+                            <img src="{{ food.images.first.image.url }}" alt="Food Image" class="product-image">
+                            <div class="product-details">
+                                <strong class="product-title">Food - {{ food.product_type|default_if_none:"N/A" }}</strong>
+                                <p>Price: <span class="product-price">{{ food.price|default_if_none:"N/A" }}</span></p>
+                                <p>Location: <span class="product-location">{{ food.location|default_if_none:"N/A" }}</span></p>
+                                <a href="{% url 'product_detail' product_type='food' product_id=food.id %}" class="btn btn-primary">View Details</a>
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ food.id }}">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Delete Confirmation Modal -->
+                        <div class="modal fade" id="deleteModal{{ food.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ food.id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteModalLabel{{ food.id }}">Confirm Deletion</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete this product?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <form action="{% url 'delete_product' product_type='food' product_id=food.id %}" method="POST" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div class="row">
+            {% if fitness_list %}
+                {% for fitness in fitness_list %}
+                    <div class="col-md-4 mb-4">
+                        <div class="product-card position-relative">
+                            <span class="product-status {{ fitness.status|lower }}">{{ fitness.status }}</span>
+                            <img src="{{ fitness.images.first.image.url }}" alt="Fitness Image" class="product-image">
+                            <div class="product-details">
+                                <strong class="product-title">Fitness - {{ fitness.category|default_if_none:"N/A" }}</strong>
+                                <p>Price: <span class="product-price">{{ fitness.price|default_if_none:"N/A" }}</span></p>
+                                <p>Location: <span class="product-location">{{ fitness.location|default_if_none:"N/A" }}</span></p>
+                                <a href="{% url 'product_detail' product_type='fitness' product_id=fitness.id %}" class="btn btn-primary">View Details</a>
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ fitness.id }}">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Delete Confirmation Modal -->
+                        <div class="modal fade" id="deleteModal{{ fitness.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ fitness.id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteModalLabel{{ fitness.id }}">Confirm Deletion</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete this product?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <form action="{% url 'delete_product' product_type='fitness' product_id=fitness.id %}" method="POST" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div class="row">
+            {% if pet_list %}
+                {% for pet in pet_list %}
+                    <div class="col-md-4 mb-4">
+                        <div class="product-card position-relative">
+                            <span class="product-status {{ pet.status|lower }}">{{ pet.status }}</span>
+                            <img src="{{ pet.images.first.image.url }}" alt="Pet Image" class="product-image">
+                            <div class="product-details">
+                                <strong class="product-title">Pet - {{ pet.pet_type|default_if_none:"N/A" }}</strong>
+                                <p>Price: <span class="product-price">{{ pet.price|default_if_none:"N/A" }}</span></p>
+                                <p>Location: <span class="product-location">{{ pet.location|default_if_none:"N/A" }}</span></p>
+                                <a href="{% url 'product_detail' product_type='pet' product_id=pet.id %}" class="btn btn-primary">View Details</a>
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ pet.id }}">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Delete Confirmation Modal -->
+                        <div class="modal fade" id="deleteModal{{ pet.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ pet.id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteModalLabel{{ pet.id }}">Confirm Deletion</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete this product?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <form action="{% url 'delete_product' product_type='pet' product_id=pet.id %}" method="POST" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div class="row">
+            {% if book_list %}
+                {% for book in book_list %}
+                    <div class="col-md-4 mb-4">
+                        <div class="product-card position-relative">
+                            <span class="product-status {{ book.status|lower }}">{{ book.status }}</span>
+                            <img src="{{ book.images.first.image.url }}" alt="Book Image" class="product-image">
+                            <div class="product-details">
+                                <strong class="product-title">Book - {{ book.property_title|default_if_none:"N/A" }}</strong>
+                                <p>Price: <span class="product-price">{{ book.price|default_if_none:"N/A" }}</span></p>
+                                <p>Location: <span class="product-location">{{ book.location|default_if_none:"N/A" }}</span></p>
+                                <a href="{% url 'product_detail' product_type='book' product_id=book.id %}" class="btn btn-primary">View Details</a>
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ book.id }}">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Delete Confirmation Modal -->
+                        <div class="modal fade" id="deleteModal{{ book.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ book.id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteModalLabel{{ book.id }}">Confirm Deletion</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete this product?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <form action="{% url 'delete_product' product_type='book ' product_id=book.id %}" method="POST" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div class="row">
+            {% if appliance_list %}
+                {% for appliance in appliance_list %}
+                    <div class="col-md-4 mb-4">
+                        <div class="product-card position-relative">
+                            <span class="product-status {{ appliance.status|lower }}">{{ appliance.status }}</span>
+                            <img src="{{ appliance.images.first.image.url }}" alt="Appliance Image" class="product-image">
+                            <div class="product-details">
+                                <strong class="product-title">Appliance - {{ appliance.appliance_type|default_if_none:"N/A" }}</strong>
+                                <p>Price: <span class="product-price">{{ appliance.price|default_if_none:"N/A" }}</span></p>
+                                <p>Location: <span class="product-location">{{ appliance.location|default_if_none:"N/A" }}</span></p>
+                                <a href="{% url 'product_detail' product_type='appliance' product_id=appliance.id %}" class="btn btn-primary">View Details</a>
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ appliance.id }}">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Delete Confirmation Modal -->
+                        <div class="modal fade" id="deleteModal{{ appliance.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ appliance.id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteModalLabel{{ appliance.id }}">Confirm Deletion</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete this product?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <form action="{% url 'delete_product' product_type='appliance' product_id=appliance.id %}" method="POST" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div class="row">
+            {% if business_list %}
+                {% for business in business_list %}
+                    <div class="col-md-4 mb-4">
+                        <div class="product-card position-relative">
+                            <span class="product-status {{ business.status|lower }}">{{ business.status }}</span>
+                            <img src="{{ business.images.first.image.url }}" alt="Business Image" class="product-image">
+                            <div class="product-details">
+                                <strong class="product-title">Business - {{ business.category|default_if_none:"N/A" }}</strong>
+                                <p>Price: <span class="product-price">{{ business.price|default_if_none:"N/A" }}</span></p>
+                                <p>Location: <span class="product-location">{{ business.location|default_if_none:"N/A" }}</span></p>
+                                <a href="{% url 'product_detail' product_type='business' product_id=business.id %}" class="btn btn-primary">View Details</a>
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ business.id }}">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Delete Confirmation Modal -->
+                        <div class="modal fade" id="deleteModal{{ business.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ business.id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteModalLabel{{ business.id }}">Confirm Deletion</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete this product?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <form action="{% url 'delete_product' product_type='business' product_id=business.id %}" method="POST" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div class="row">
+            {% if education_list %}
+                {% for education in education_list %}
+                    <div class="col-md-4 mb-4">
+                        <div class="product-card position-relative">
+                            <span class="product-status {{ education.status|lower }}">{{ education.status }}</span>
+                            <img src="{{ education.images.first.image.url }}" alt="Education Image" class="product-image">
+                            <div class="product-details">
+                                <strong class="product-title">Education - {{ education.course_type|default_if_none:"N/A" }}</strong>
+                                <p>Price: <span class="product-price">{{ education.price|default_if_none:"N/A" }}</span></p>
+                                <p>Location: <span class="product-location">{{ education.location|default_if_none:"N/A" }}</span></p>
+                                <a href="{% url 'product_detail' product_type='education' product_id=education.id %}" class="btn btn-primary">View Details</a>
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ education.id }}">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Delete Confirmation Modal -->
+                        <div class="modal fade" id="deleteModal{{ education.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ education.id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteModalLabel{{ education.id }}">Confirm Deletion</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete this product?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <form action="{% url 'delete_product' product_type='education' product_id=education.id %}" method="POST" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div class="row">
+            {% if service_list %}
+                {% for service in service_list %}
+                    <div class="col-md-4 mb-4">
+                        <div class="product-card position-relative">
+                            <span class="product-status {{ service.status|lower }}">{{ service.status }}</span>
+                            <img src="{{ service.images.first.image.url }}" alt="Service Image" class="product-image">
+                            <div class="product-details">
+                                <strong class="product-title">Service - {{ service.service_type|default_if_none:"N/A" }}</strong>
+                                <p>Price: <span class="product-price">{{ service.price|default_if_none:"N/A" }}</span></p>
+                                <p>Location: <span class="product-location">{{ service.location|default_if_none:"N/A" }}</span></p>
+                                <a href="{% url 'product_detail' product_type='service' product_id=service.id %}" class="btn btn-primary">View Details</a>
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ service.id }}">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Delete Confirmation Modal -->
+                        <div class="modal fade" id="deleteModal{{ service.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ service.id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteModalLabel{{ service.id }}">Confirm Deletion</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete this product?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <form action="{% url 'delete_product' product_type='service' product_id=service.id %}" method="POST" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div class="row">
+            {% if sound_list %}
+                {% for sound in sound_list %}
+                    <div class="col-md-4 mb-4">
+                        <div class="product-card position-relative">
+                            <span class="product-status {{ sound.status|lower }}">{{ sound.status }}</span>
+                            <img src="{{ sound.images.first.image.url }}" alt="Sound Image" class="product-image">
+                            <div class="product-details">
+                                <strong class="product-title">Sound - {{ sound.brand|default_if_none:"N/A" }}</strong>
+                                <p>Price: <span class="product-price">{{ sound.price|default_if_none:"N/A" }}</span></p>
+                                <p>Location: <span class="product-location">{{ sound.location|default_if_none:"N/A" }}</span></p>
+                                <a href="{% url 'product_detail' product_type='sound' product_id=sound.id %}" class="btn btn-primary">View Details</a>
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ sound.id }}">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+        
+                        <!-- Delete Confirmation Modal -->
+                        <div class="modal fade" id="deleteModal{{ sound.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ sound.id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteModalLabel{{ sound.id }}">Confirm Deletion</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete this product?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <form action="{% url 'delete_product' product_type='sound' product_id=sound.id %}" method="POST" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div class="row">
+            {% if mobile_list %}
+                {% for mobile in mobile_list %}
+                    <div class="col-md-4 mb-4">
+                        <div class="product-card position-relative">
+                            <span class="product-status {{ mobile.status|lower }}">{{ mobile.status }}</span>
+                            <img src="{{ mobile.images.first.image.url }}" alt="Mobile Image" class="product-image">
+                            <div class="product-details">
+                                <strong class="product-title">Mobile - {{ mobile.brand|default_if_none:"N/A" }}</strong>
+                                <p>Price: <span class="product-price">{{ mobile.price|default_if_none:"N/A" }}</span></p>
+                                <p>Location: <span class="product-location">{{ mobile.location|default_if_none:"N/A" }}</span></p>
+                                <a href="{% url 'product_detail' product_type='mobile' product_id=mobile.id %}" class="btn btn-primary">View Details</a>
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ mobile.id }}">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+        
+                        <!-- Delete Confirmation Modal -->
+                        <div class="modal fade" id="deleteModal{{ mobile.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ mobile.id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteModalLabel{{ mobile.id }}">Confirm Deletion</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete this product?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <form action="{% url 'delete_product' product_type='mobile' product_id=mobile.id %}" method="POST" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+        <div class="row">
+            {% if computer_list %}
+                {% for computer in computer_list %}
+                    <div class="col-md-4 mb-4">
+                        <div class="product-card position-relative">
+                            <span class="product-status {{ computer.status|lower }}">{{ computer.status }}</span>
+                            <img src="{{ computer.images.first.image.url }}" alt="Computer Image" class="product-image">
+                            <div class="product-details">
+                                <strong class="product-title">Computer - {{ computer.brand|default_if_none:"N/A" }}</strong>
+                                <p>Price: <span class="product-price">{{ computer.price|default_if_none:"N/A" }}</span></p>
+                                <p>Location: <span class="product-location">{{ computer.location|default_if_none:"N/A" }}</span></p>
+                                <a href="{% url 'product_detail' product_type='computer' product_id=computer.id %}" class="btn btn-primary">View Details</a>
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ computer.id }}">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+        
+                        <!-- Delete Confirmation Modal -->
+                        <div class="modal fade" id="deleteModal{{ computer.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ computer.id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteModalLabel{{ computer.id }}">Confirm Deletion</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete this product?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <form action="{% url 'delete_product' product_type='computer' product_id=computer.id %}" method="POST" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+
+        <div class="row">
+            {% if factory_list %}
+                {% for factory in factory_list %}
+                    <div class="col-md-4 mb-4">
+                        <div class="product-card position-relative">
+                            <span class="product-status {{ factory.status|lower }}">{{ factory.status }}</span>
+                            <img src="{{ factory.images.first.image.url }}" alt="factory Image" class="product-image">
+                            <div class="product-details">
+                                <strong class="product-title">
+                                    factory - {{ factory.property_title|default_if_none:"N/A" }} - {{ factory.listing_type }}
+                                    {% if factory.listing_type == "rent" and factory.rental_period %}
+                                        - {{ factory.rental_period }}
+                                    {% endif %}
+                                </strong>
+                                
+                                <p>Price: <span class="product-price">{{ factory.price|default_if_none:"N/A" }}</span></p>
+                                <p>Location: <span class="product-location">{{ factory.location|default_if_none:"N/A" }}</span></p>
+                                <a href="{% url 'product_detail' product_type='factory' product_id=factory.id %}" class="btn btn-primary">View Details</a>
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ factory.id }}">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Delete Confirmation Modal -->
+                        <div class="modal fade" id="deleteModal{{ factory.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ factory.id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteModalLabel{{ factory.id }}">Confirm Deletion</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete this product?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <form action="{% url 'delete_product' product_type='factory' product_id=factory.id %}" method="POST" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div class="row">
+            {% if complex_list %}
+                {% for complex in complex_list %}
+                    <div class="col-md-4 mb-4">
+                        <div class="product-card position-relative">
+                            <span class="product-status {{ complex.status|lower }}">{{ complex.status }}</span>
+                            <img src="{{ complex.images.first.image.url }}" alt="complex Image" class="product-image">
+                            <div class="product-details">
+                                <strong class="product-title">
+                                    complex - {{ complex.property_title|default_if_none:"N/A" }} - {{ complex.listing_type }}
+                                    {% if complex.listing_type == "rent" and complex.rental_period %}
+                                        - {{ complex.rental_period }}
+                                    {% endif %}
+                                </strong>
+                                
+                                <p>Price: <span class="product-price">{{ complex.price|default_if_none:"N/A" }}</span></p>
+                                <p>Location: <span class="product-location">{{ complex.location|default_if_none:"N/A" }}</span></p>
+                                <a href="{% url 'product_detail' product_type='complex' product_id=complex.id %}" class="btn btn-primary">View Details</a>
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ complex.id }}">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Delete Confirmation Modal -->
+                        <div class="modal fade" id="deleteModal{{ complex.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ complex.id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteModalLabel{{ complex.id }}">Confirm Deletion</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete this product?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <form action="{% url 'delete_product' product_type='complex' product_id=complex.id %}" method="POST" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+        <div class="row">
+            {% if hostel_list %}
+                {% for hostel in hostel_list %}
+                    <div class="col-md-4 mb-4">
+                        <div class="product-card position-relative">
+                            <span class="product-status {{ hostel.status|lower }}">{{ hostel.status }}</span>
+                            <img src="{{ hostel.images.first.image.url }}" alt="hostel Image" class="product-image">
+                            <div class="product-details">
+                                <strong class="product-title">
+                                    hostel - {{ hostel.property_title|default_if_none:"N/A" }} - {{ hostel.listing_type }}
+                                    {% if hostel.listing_type == "rent" and hostel.rental_period %}
+                                        - {{ hostel.rental_period }}
+                                    {% endif %}
+                                </strong>
+                                
+                                <p>Price: <span class="product-price">{{ hostel.price|default_if_none:"N/A" }}</span></p>
+                                <p>Location: <span class="product-location">{{ hostel.location|default_if_none:"N/A" }}</span></p>
+                                <a href="{% url 'product_detail' product_type='hostel' product_id=hostel.id %}" class="btn btn-primary">View Details</a>
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ hostel.id }}">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Delete Confirmation Modal -->
+                        <div class="modal fade" id="deleteModal{{ hostel.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ hostel.id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteModalLabel{{ hostel.id }}">Confirm Deletion</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete this product?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <form action="{% url 'delete_product' product_type='hostel' product_id=hostel.id %}" method="POST" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div class="row">
+            {% if clinic_list %}
+                {% for clinic in clinic_list %}
+                    <div class="col-md-4 mb-4">
+                        <div class="product-card position-relative">
+                            <span class="product-status {{ clinic.status|lower }}">{{ clinic.status }}</span>
+                            <img src="{{ clinic.images.first.image.url }}" alt="clinic Image" class="product-image">
+                            <div class="product-details">
+                                <strong class="product-title">
+                                    clinic - {{ clinic.property_title|default_if_none:"N/A" }} - {{ clinic.listing_type }}
+                                    {% if clinic.listing_type == "rent" and clinic.rental_period %}
+                                        - {{ clinic.rental_period }}
+                                    {% endif %}
+                                </strong>
+                                
+                                <p>Price: <span class="product-price">{{ clinic.price|default_if_none:"N/A" }}</span></p>
+                                <p>Location: <span class="product-location">{{ clinic.location|default_if_none:"N/A" }}</span></p>
+                                <a href="{% url 'product_detail' product_type='clinic' product_id=clinic.id %}" class="btn btn-primary">View Details</a>
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ clinic.id }}">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Delete Confirmation Modal -->
+                        <div class="modal fade" id="deleteModal{{ clinic.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ clinic.id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteModalLabel{{ clinic.id }}">Confirm Deletion</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete this product?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <form action="{% url 'delete_product' product_type='clinic' product_id=clinic.id %}" method="POST" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+        <div class="row">
+            {% if apartment_list %}
+                {% for apartment in apartment_list %}
+                    <div class="col-md-4 mb-4">
+                        <div class="product-card position-relative">
+                            <span class="product-status {{ apartment.status|lower }}">{{ apartment.status }}</span>
+                            <img src="{{ apartment.images.first.image.url }}" alt="apartment Image" class="product-image">
+                            <div class="product-details">
+                                <strong class="product-title">
+                                    apartment - {{ apartment.property_title|default_if_none:"N/A" }} - {{ apartment.listing_type }}
+                                    {% if apartment.listing_type == "rent" and apartment.rental_period %}
+                                        - {{ apartment.rental_period }}
+                                    {% endif %}
+                                </strong>
+                                
+                                <p>Price: <span class="product-price">{{ apartment.price|default_if_none:"N/A" }}</span></p>
+                                <p>Location: <span class="product-location">{{ apartment.location|default_if_none:"N/A" }}</span></p>
+                                <a href="{% url 'product_detail' product_type='apartment' product_id=apartment.id %}" class="btn btn-primary">View Details</a>
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ apartment.id }}">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Delete Confirmation Modal -->
+                        <div class="modal fade" id="deleteModal{{ apartment.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ apartment.id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteModalLabel{{ apartment.id }}">Confirm Deletion</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete this product?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <form action="{% url 'delete_product' product_type='apartment' product_id=apartment.id %}" method="POST" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div class="row">
+            {% if office_list %}
+                {% for office in office_list %}
+                    <div class="col-md-4 mb-4">
+                        <div class="product-card position-relative">
+                            <span class="product-status {{ office.status|lower }}">{{ office.status }}</span>
+                            <img src="{{ office.images.first.image.url }}" alt="office Image" class="product-image">
+                            <div class="product-details">
+                                <strong class="product-title">
+                                    office - {{ office.property_title|default_if_none:"N/A" }} - {{ office.listing_type }}
+                                    {% if office.listing_type == "rent" and office.rental_period %}
+                                        - {{ office.rental_period }}
+                                    {% endif %}
+                                </strong>
+                                
+                                <p>Price: <span class="product-price">{{ office.price|default_if_none:"N/A" }}</span></p>
+                                <p>Location: <span class="product-location">{{ office.location|default_if_none:"N/A" }}</span></p>
+                                <a href="{% url 'product_detail' product_type='office' product_id=office.id %}" class="btn btn-primary">View Details</a>
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ office.id }}">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Delete Confirmation Modal -->
+                        <div class="modal fade" id="deleteModal{{ office.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ office.id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteModalLabel{{ office.id }}">Confirm Deletion</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete this product?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <form action="{% url 'delete_product' product_type='office' product_id=office.id %}" method="POST" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div class="row">
+            {% if shop_list %}
+                {% for shop in shop_list %}
+                    <div class="col-md-4 mb-4">
+                        <div class="product-card position-relative">
+                            <span class="product-status {{ shop.status|lower }}">{{ shop.status }}</span>
+                            <img src="{{ shop.images.first.image.url }}" alt="shop Image" class="product-image">
+                            <div class="product-details">
+                                <strong class="product-title">
+                                    shop - {{ shop.property_title|default_if_none:"N/A" }} - {{ shop.listing_type }}
+                                    {% if shop.listing_type == "rent" and shop.rental_period %}
+                                        - {{ shop.rental_period }}
+                                    {% endif %}
+                                </strong>
+                                
+                                <p>Price: <span class="product-price">{{ shop.price|default_if_none:"N/A" }}</span></p>
+                                <p>Location: <span class="product-location">{{ shop.location|default_if_none:"N/A" }}</span></p>
+                                <a href="{% url 'product_detail' product_type='shop' product_id=shop.id %}" class="btn btn-primary">View Details</a>
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ shop.id }}">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Delete Confirmation Modal -->
+                        <div class="modal fade" id="deleteModal{{ shop.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ shop.id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteModalLabel{{ shop.id }}">Confirm Deletion</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete this product?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <form action="{% url 'delete_product' product_type='shop' product_id=shop.id %}" method="POST" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div class="row">
+            {% if cafe_list %}
+                {% for cafe in cafe_list %}
+                    <div class="col-md-4 mb-4">
+                        <div class="product-card position-relative">
+                            <span class="product-status {{ cafe.status|lower }}">{{ cafe.status }}</span>
+                            <img src="{{ cafe.images.first.image.url }}" alt="cafe Image" class="product-image">
+                            <div class="product-details">
+                                <strong class="product-title">
+                                    cafe - {{ cafe.property_title|default_if_none:"N/A" }} - {{ cafe.listing_type }}
+                                    {% if cafe.listing_type == "rent" and cafe.rental_period %}
+                                        - {{ cafe.rental_period }}
+                                    {% endif %}
+                                </strong>
+                                
+                                <p>Price: <span class="product-price">{{ cafe.price|default_if_none:"N/A" }}</span></p>
+                                <p>Location: <span class="product-location">{{ cafe.location|default_if_none:"N/A" }}</span></p>
+                                <a href="{% url 'product_detail' product_type='cafe' product_id=cafe.id %}" class="btn btn-primary">View Details</a>
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ cafe.id }}">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Delete Confirmation Modal -->
+                        <div class="modal fade" id="deleteModal{{ cafe.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ cafe.id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteModalLabel{{ cafe.id }}">Confirm Deletion</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete this product?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <form action="{% url 'delete_product' product_type='cafe' product_id=cafe.id %}" method="POST" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+        <div class="row">
+            {% if staff_list %}
+                {% for staff in staff_list %}
+                    <div class="col-md-4 mb-4">
+                        <div class="product-card position-relative">
+                            <span class="product-status {{ staff.status|lower }}">{{ staff.status }}</span>
+                            <img src="{{ staff.images.first.image.url }}" alt="staff Image" class="product-image">
+                            <div class="product-details">
+                                <strong class="product-title">
+                                    staff - {{ staff.property_title|default_if_none:"N/A" }} - {{ staff.listing_type }}
+                                    {% if staff.listing_type == "rent" and staff.rental_period %}
+                                        - {{ staff.rental_period }}
+                                    {% endif %}
+                                </strong>
+                                
+                                <p>Price: <span class="product-price">{{ staff.price|default_if_none:"N/A" }}</span></p>
+                                <p>Location: <span class="product-location">{{ staff.location|default_if_none:"N/A" }}</span></p>
+                                <a href="{% url 'product_detail' product_type='staff' product_id=staff.id %}" class="btn btn-primary">View Details</a>
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ staff.id }}">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Delete Confirmation Modal -->
+                        <div class="modal fade" id="deleteModal{{ staff.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ staff.id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteModalLabel{{ staff.id }}">Confirm Deletion</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete this product?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <form action="{% url 'delete_product' product_type='staff' product_id=staff.id %}" method="POST" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+        <div class="row">
+            {% if warehouse_list %}
+                {% for warehouse in warehouse_list %}
+                    <div class="col-md-4 mb-4">
+                        <div class="product-card position-relative">
+                            <span class="product-status {{ warehouse.status|lower }}">{{ warehouse.status }}</span>
+                            <img src="{{ warehouse.images.first.image.url }}" alt="warehouse Image" class="product-image">
+                            <div class="product-details">
+                                <strong class="product-title">
+                                    warehouse - {{ warehouse.property_title|default_if_none:"N/A" }} - {{ warehouse.listing_type }}
+                                    {% if warehouse.listing_type == "rent" and warehouse.rental_period %}
+                                        - {{ warehouse.rental_period }}
+                                    {% endif %}
+                                </strong>
+                                
+                                <p>Price: <span class="product-price">{{ warehouse.price|default_if_none:"N/A" }}</span></p>
+                                <p>Location: <span class="product-location">{{ warehouse.location|default_if_none:"N/A" }}</span></p>
+                                <a href="{% url 'product_detail' product_type='warehouse' product_id=warehouse.id %}" class="btn btn-primary">View Details</a>
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ warehouse.id }}">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Delete Confirmation Modal -->
+                        <div class="modal fade" id="deleteModal{{ warehouse.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ warehouse.id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteModalLabel{{ warehouse.id }}">Confirm Deletion</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete this product?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <form action="{% url 'delete_product' product_type='warehouse' product_id=warehouse.id %}" method="POST" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+        <div class="row">
+            {% if townhouse_list %}
+                {% for townhouse in townhouse_list %}
+                    <div class="col-md-4 mb-4">
+                        <div class="product-card position-relative">
+                            <span class="product-status {{ townhouse.status|lower }}">{{ townhouse.status }}</span>
+                            <img src="{{ townhouse.images.first.image.url }}" alt="townhouse Image" class="product-image">
+                            <div class="product-details">
+                                <strong class="product-title">
+                                    townhouse - {{ townhouse.property_title|default_if_none:"N/A" }} - {{ townhouse.listing_type }}
+                                    {% if townhouse.listing_type == "rent" and townhouse.rental_period %}
+                                        - {{ townhouse.rental_period }}
+                                    {% endif %}
+                                </strong>
+                                
+                                <p>Price: <span class="product-price">{{ townhouse.price|default_if_none:"N/A" }}</span></p>
+                                <p>Location: <span class="product-location">{{ townhouse.location|default_if_none:"N/A" }}</span></p>
+                                <a href="{% url 'product_detail' product_type='townhouse' product_id=townhouse.id %}" class="btn btn-primary">View Details</a>
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ townhouse.id }}">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Delete Confirmation Modal -->
+                        <div class="modal fade" id="deleteModal{{ townhouse.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ townhouse.id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteModalLabel{{ townhouse.id }}">Confirm Deletion</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete this product?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <form action="{% url 'delete_product' product_type='townhouse' product_id=townhouse.id %}" method="POST" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+        <div class="row">
+            {% if fullfloors_list %}
+                {% for fullfloors in fullfloors_list %}
+                    <div class="col-md-4 mb-4">
+                        <div class="product-card position-relative">
+                            <span class="product-status {{ fullfloors.status|lower }}">{{ fullfloors.status }}</span>
+                            <img src="{{ fullfloors.images.first.image.url }}" alt="fullfloors Image" class="product-image">
+                            <div class="product-details">
+                                <strong class="product-title">
+                                    fullfloors - {{ fullfloors.property_title|default_if_none:"N/A" }} - {{ fullfloors.listing_type }}
+                                    {% if fullfloors.listing_type == "rent" and fullfloors.rental_period %}
+                                        - {{ fullfloors.rental_period }}
+                                    {% endif %}
+                                </strong>
+                                
+                                <p>Price: <span class="product-price">{{ fullfloors.price|default_if_none:"N/A" }}</span></p>
+                                <p>Location: <span class="product-location">{{ fullfloors.location|default_if_none:"N/A" }}</span></p>
+                                <a href="{% url 'product_detail' product_type='fullfloors' product_id=fullfloors.id %}" class="btn btn-primary">View Details</a>
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ fullfloors.id }}">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Delete Confirmation Modal -->
+                        <div class="modal fade" id="deleteModal{{ fullfloors.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ fullfloors.id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteModalLabel{{ fullfloors.id }}">Confirm Deletion</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete this product?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <form action="{% url 'delete_product' product_type='fullfloors' product_id=fullfloors.id %}" method="POST" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+        <div class="row">
+            {% if showrooms_list %}
+                {% for showrooms in showrooms_list %}
+                    <div class="col-md-4 mb-4">
+                        <div class="product-card position-relative">
+                            <span class="product-status {{ showrooms.status|lower }}">{{ showrooms.status }}</span>
+                            <img src="{{ showrooms.images.first.image.url }}" alt="showrooms Image" class="product-image">
+                            <div class="product-details">
+                                <strong class="product-title">
+                                    showrooms - {{ showrooms.property_title|default_if_none:"N/A" }} - {{ showrooms.listing_type }}
+                                    {% if showrooms.listing_type == "rent" and showrooms.rental_period %}
+                                        - {{ showrooms.rental_period }}
+                                    {% endif %}
+                                </strong>
+                                
+                                <p>Price: <span class="product-price">{{ showrooms.price|default_if_none:"N/A" }}</span></p>
+                                <p>Location: <span class="product-location">{{ showrooms.location|default_if_none:"N/A" }}</span></p>
+                                <a href="{% url 'product_detail' product_type='showrooms' product_id=showrooms.id %}" class="btn btn-primary">View Details</a>
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ showrooms.id }}">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Delete Confirmation Modal -->
+                        <div class="modal fade" id="deleteModal{{ showrooms.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ showrooms.id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteModalLabel{{ showrooms.id }}">Confirm Deletion</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete this product?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <form action="{% url 'delete_product' product_type='showrooms' product_id=showrooms.id %}" method="POST" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div class="row">
+            {% if supermarket_list %}
+                {% for supermarket in supermarket_list %}
+                    <div class="col-md-4 mb-4">
+                        <div class="product-card position-relative">
+                            <span class="product-status {{ supermarket.status|lower }}">{{ supermarket.status }}</span>
+                            <img src="{{ supermarket.images.first.image.url }}" alt="supermarket Image" class="product-image">
+                            <div class="product-details">
+                                <strong class="product-title">
+                                    supermarket - {{ supermarket.property_title|default_if_none:"N/A" }} - {{ supermarket.listing_type }}
+                                    {% if supermarket.listing_type == "rent" and supermarket.rental_period %}
+                                        - {{ supermarket.rental_period }}
+                                    {% endif %}
+                                </strong>
+                                
+                                <p>Price: <span class="product-price">{{ supermarket.price|default_if_none:"N/A" }}</span></p>
+                                <p>Location: <span class="product-location">{{ supermarket.location|default_if_none:"N/A" }}</span></p>
+                                <a href="{% url 'product_detail' product_type='supermarket' product_id=supermarket.id %}" class="btn btn-primary">View Details</a>
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ supermarket.id }}">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Delete Confirmation Modal -->
+                        <div class="modal fade" id="deleteModal{{ supermarket.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ supermarket.id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteModalLabel{{ supermarket.id }}">Confirm Deletion</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete this product?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <form action="{% url 'delete_product' product_type='supermarket' product_id=supermarket.id %}" method="POST" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+        <div class="row">
+            {% if wholebuilding_list %}
+                {% for wholebuilding in wholebuilding_list %}
+                    <div class="col-md-4 mb-4">
+                        <div class="product-card position-relative">
+                            <span class="product-status {{ wholebuilding.status|lower }}">{{ wholebuilding.status }}</span>
+                            <img src="{{ wholebuilding.images.first.image.url }}" alt="wholebuilding Image" class="product-image">
+                            <div class="product-details">
+                                <strong class="product-title">
+                                    wholebuilding - {{ wholebuilding.property_title|default_if_none:"N/A" }} - {{ wholebuilding.listing_type }}
+                                    {% if wholebuilding.listing_type == "rent" and wholebuilding.rental_period %}
+                                        - {{ wholebuilding.rental_period }}
+                                    {% endif %}
+                                </strong>
+                                
+                                <p>Price: <span class="product-price">{{ wholebuilding.price|default_if_none:"N/A" }}</span></p>
+                                <p>Location: <span class="product-location">{{ wholebuilding.location|default_if_none:"N/A" }}</span></p>
+                                <a href="{% url 'product_detail' product_type='wholebuilding' product_id=wholebuilding.id %}" class="btn btn-primary">View Details</a>
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ wholebuilding.id }}">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Delete Confirmation Modal -->
+                        <div class="modal fade" id="deleteModal{{ wholebuilding.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ wholebuilding.id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteModalLabel{{ wholebuilding.id }}">Confirm Deletion</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete this product?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <form action="{% url 'delete_product' product_type='wholebuilding' product_id=wholebuilding.id %}" method="POST" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+                
+        
+
+    </div>
+    {% include 'footer.html' %}
+</body>

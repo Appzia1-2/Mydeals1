@@ -1,0 +1,165 @@
+{% load static %}
+{% include 'admin1/headeradmin.html' %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
+<div class="toolbar py-5 py-lg-15" id="kt_toolbar">
+    <div id="kt_toolbar_container" class="container-xxl d-flex flex-stack flex-wrap">
+        <h3 class="text-white fw-bolder fs-2qx me-5">Users</h3>
+        <div class="d-flex align-items-center flex-wrap py-2">
+            <div id="kt_header_search" class="d-flex align-items-center w-200px w-lg-250px my-2 me-4 me-lg-6">
+                <form class="search w-100 position-relative" autocomplete="off">
+                    <input type="text" class="form-control ps-15" name="search" placeholder="Search..." />
+                </form>
+            </div>
+            <button type="button" class="btn btn-success my-2" data-bs-toggle="modal" data-bs-target="#addUser Modal">
+                Add
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="kt_content_container" class="d-flex flex-column-fluid align-items-start container-xxl">
+    <div class="content flex-row-fluid" id="kt_content">
+        <div class="card">
+            <div class="card-body p-lg-17">
+                <div class="mb-18">
+                    <div class="mb-10">
+                        <div class="text-center mb-15">
+                            <h3 class="fs-2hx text-dark mb-5">Users</h3>
+                            <div class="table-responsive">
+                                <table id="reviewTable" class="table table-bordered table-striped table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th width="50px">Sl No</th>
+                                            <th>Photo</th>
+                                            <th>Username</th>
+                                            <th>Email</th>
+                                            <th>Phone</th>
+                                            <th>Address</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for user in user %}
+                                            {% if not user.is_superuser %}
+                                                <tr>
+                                                    <td>{{ forloop.counter }}</td>
+                                                    <td>{% if user.image %}
+                                                        <img  width="100px" src="{{ user.image.url }}" alt="Profile Image">
+                                                    {% else %}
+                                                        <img width="100px" src="{% static 'assets/images/resource/author-1.png' %}" alt="Default Profile Image">
+                                                    {% endif %}</td>
+                                                    <td>{{ user.username }}</td>
+                                                    <td>{{ user.email }}</td>
+                                                    <td>{{ user.phone }}</td>
+                                                    <td>{{ user.address }}</td>
+                                                  <!-- View Button in Table -->
+<td>
+    <button class="btn btn-info btn-sm view-btn" 
+        data-username="{{ user.username }}" 
+        data-email="{{ user.email }}" 
+        data-phone="{{ user.phone }}" 
+        data-address="{{ user.address }}" 
+        data-dob="{{ user.dob|date:'Y-m-d' }}" 
+        data-nationality="{{ user.nationality }}" 
+        data-gender="{{ user.gender }}" 
+        data-image="{% if user.image %}{{ user.image.url }}{% else %}{% static 'assets/images/resource/author-1.png' %}{% endif %}"
+        data-bs-toggle="modal" 
+        data-bs-target="#viewUserModal">
+        <i class="fas fa-eye"></i>
+    </button>
+</td>
+
+                                   
+                                                </tr>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- View User Modal -->
+<div class="modal fade" id="viewUserModal" tabindex="-1" aria-labelledby="viewUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="viewUserModalLabel">View User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-3">
+                    <img id="viewUserImage" width="100px" alt="User Image" class="img-thumbnail">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Username:</label>
+                    <p id="viewUsername" class="form-control-plaintext"></p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Email:</label>
+                    <p id="viewEmail" class="form-control-plaintext"></p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Phone:</label>
+                    <p id="viewPhone" class="form-control-plaintext"></p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Address:</label>
+                    <p id="viewAddress" class="form-control-plaintext"></p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Date of Birth:</label>
+                    <p id="viewDob" class="form-control-plaintext"></p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Nationality:</label>
+                    <p id="viewNationality" class="form-control-plaintext"></p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Gender:</label>
+                    <p id="viewGender" class="form-control-plaintext"></p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+                 
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const viewButtons = document.querySelectorAll('.view-btn');
+        
+        const viewUsername = document.getElementById('viewUsername');
+        const viewEmail = document.getElementById('viewEmail');
+        const viewPhone = document.getElementById('viewPhone');
+        const viewAddress = document.getElementById('viewAddress');
+        const viewDob = document.getElementById('viewDob');
+        const viewNationality = document.getElementById('viewNationality');
+        const viewGender = document.getElementById('viewGender');
+        const viewUserImage = document.getElementById('viewUserImage');
+
+        viewButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                viewUsername.textContent = this.getAttribute('data-username');
+                viewEmail.textContent = this.getAttribute('data-email');
+                viewPhone.textContent = this.getAttribute('data-phone') || 'N/A';
+                viewAddress.textContent = this.getAttribute('data-address') || 'N/A';
+                viewDob.textContent = this.getAttribute('data-dob') || 'N/A';
+                viewNationality.textContent = this.getAttribute('data-nationality') || 'N/A';
+                viewGender.textContent = this.getAttribute('data-gender') || 'N/A';
+                viewUserImage.src = this.getAttribute('data-image');
+            });
+        });
+    });
+</script>
+{% include 'admin1/footeradmin.html' %}

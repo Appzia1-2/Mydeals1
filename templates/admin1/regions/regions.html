@@ -1,0 +1,185 @@
+{% load static %}
+{% include 'admin1/headeradmin.html' %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
+
+<div class="toolbar py-5 py-lg-15" id="kt_toolbar">
+    <div id="kt_toolbar_container" class="container-xxl d-flex flex-stack flex-wrap">
+        <h3 class="text-white fw-bolder fs-2qx me-5">region</h3>
+        <div class="d-flex align-items-center flex-wrap py-2">
+            <div id="kt_header_search" class="d-flex align-items-center w-200px w-lg-250px my-2 me-4 me-lg-6">
+                <form class="search w-100 position-relative" autocomplete="off">
+                    <input type="text" class="form-control ps-15" name="search" placeholder="Search..." />
+                </form>
+            </div>
+            <button type="button" class="btn btn-success my-2" data-bs-toggle="modal" data-bs-target="#addregionModal">
+                Add
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="kt_content_container" class="d-flex flex-column-fluid align-items-start container-xxl">
+    <div class="content flex-row-fluid" id="kt_content">
+        <div class="card">
+            <div class="card-body p-lg-17">
+                <div class="mb-18">
+                    <div class="mb-10">
+                        <div class="text-center mb-15">
+                            <h3 class="fs-2hx text-dark mb-5">region</h3>
+                            <div class="table-responsive">
+								<table id="reviewTable" class="table table-bordered table-striped table-sm">
+									<thead>
+										<tr>
+											<th width="50px">Sl No</th>
+											<th>region</th>
+											
+											<th>Actions</th>
+										</tr>
+									</thead>
+									<tbody><br>
+										{% for region in region %}
+										<tr>
+											<td>{{ forloop.counter }}</td>
+											<td>{{ region.name }}</td>
+											
+											<td>
+												<button class="btn btn-primary btn-sm edit-btn" 
+														data-edit-url="{% url 'edit_region' region.id %}" 
+														data-region-name="{{ region.name }}" 
+														
+														data-bs-toggle="modal" 
+														data-bs-target="#editregionModal">
+													<i class="fas fa-edit"></i>
+												</button>
+												<button class="btn btn-outline-danger btn-sm delete-btn" 
+														data-delete-url="{% url 'delete_region' region.id %}" 
+														data-bs-toggle="modal" 
+														data-bs-target="#deleteregionModal">
+													<i class="fas fa-trash"></i>
+												</button>
+											</td>
+										</tr>
+										{% endfor %}
+									</tbody>
+								</table>
+							</div>
+							
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add region Modal -->
+<div class="modal fade" id="addregionModal" tabindex="-1" aria-labelledby="addregionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form id="addregionForm" method="POST" action="{% url 'add_region' %}">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addregionModalLabel">Add region</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="regionName" class="form-label">region Name</label>
+                        <input type="text" class="form-control" id="regionName" name="name" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit region Modal -->
+<div class="modal fade" id="editregionModal" tabindex="-1" aria-labelledby="editregionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form id="editregionForm" method="POST">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editregionModalLabel">Edit region</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="editregionName" class="form-label">region Name</label>
+                        <input type="text" class="form-control" id="editregionName" name="name" required>
+                    </div>
+                </div>
+				
+				
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteregionModal" tabindex="-1" aria-labelledby="deleteregionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form id="deleteregionForm" method="POST">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteregionModalLabel">Delete region</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete this region?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Yes, Delete</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% include 'admin1/footeradmin.html' %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Handle delete modal
+        const deleteButtons = document.querySelectorAll('.delete-btn');
+        const deleteForm = document.getElementById('deleteregionForm');
+
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const deleteUrl = button.getAttribute('data-delete-url');
+                deleteForm.action = deleteUrl; // Update the form's action with the delete URL
+            });
+        });
+
+        // Handle edit modal
+        const editButtons = document.querySelectorAll('.edit-btn');
+        const editForm = document.getElementById('editregionForm');
+        const editregionNameInput = document.getElementById('editregionName');
+		
+
+		editButtons.forEach(button => {
+			button.addEventListener('click', function () {
+				const editUrl = button.getAttribute('data-edit-url');
+				const regionName = button.getAttribute('data-region-name');
+				
+		
+				editForm.action = editUrl;
+				editregionNameInput.value = regionName;
+				
+			});
+		});
+    });
+
+	
+</script>

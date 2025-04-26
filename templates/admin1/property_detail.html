@@ -1,0 +1,1046 @@
+{% load static %}
+{% include 'admin1/headeradmin.html' %}
+<style>
+    /* Style for white background container with shadow */
+    .content-background {
+        background-color: #ffffff;  /* White background */
+        padding: 20px;              /* Padding around the content */
+        border-radius: 8px;         /* Rounded corners */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow around content */
+    }
+
+    .shadow-white {
+        box-shadow: 0 4px 8px rgba(255, 255, 255, 0.5); /* Light white shadow */
+        transition: box-shadow 0.3s ease-in-out;
+    }
+
+    .shadow-white:hover {
+        box-shadow: 0 8px 16px rgba(255, 255, 255, 0.7); /* Stronger shadow on hover */
+    }
+
+    /* Responsive Media Gallery */
+    .product-media-gallery {
+        margin-top: 20px;
+    }
+    .product-media img, .product-media video {
+        width: 100%;
+        height: auto;
+        border-radius: 8px;
+    }
+    .fallback {
+        background: #f0f0f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        height: 100px;
+        text-align: center;
+    }
+</style>
+
+<div class="container mt-5">
+    <div class="content-background shadow-white">
+
+        <!-- Product Title and Basic Information -->
+        <h2>{{ product.name }}</h2>
+        <p><strong>Category:</strong> {{ product.property_type }}</p>
+        <p><strong>Price:</strong> {{ product.price }} OMR</p>
+        <p><strong>Status:</strong> {{ product.get_status_display }}</p>
+
+        <p><strong>Description:</strong> {{ product.description }}</p>
+
+        <!-- Product Details Based on Type -->
+        {% if product_type == 'land' %}
+        <div class="product-details">
+            <p><strong>Plot Area:</strong> {{ product.plot_area }} sqm</p>
+            <p><strong>Ownership Details:</strong> {{ product.ownership_details }}</p>
+            <p><strong>Additional Information:</strong> {{ product.additional_information }}</p>
+            <!-- <p><strong>Location:</strong> {{ product.location }}</p> -->
+            <p><strong>Region:</strong> {{ product.regions }}</p>
+            <p><strong>City:</strong> {{ product.cities }}</p>
+            <p><strong>Property Type:</strong> {{ product.property_type }}</p>
+            <p><strong>Status:</strong> {{ product.status }}</p>
+        </div>
+        
+        {% elif product_type == 'villa' %}
+        <div class="product-details">
+            <p><strong>Property Title:</strong> {{ product.property_title }}</p>
+            <p><strong>Region:</strong> {{ product.regions }}</p>
+            <p><strong>City:</strong> {{ product.cities }}</p>
+            <!-- <p><strong>Location:</strong> {{ product.location }}</p> -->
+            <p><strong>Latitude:</strong> {{ product.latitude }}</p>
+            <p><strong>Longitude:</strong> {{ product.longitude }}</p>
+            <p><strong>Plot Area:</strong> {{ product.plot_area }} sqm</p>
+            <p><strong>Bedrooms:</strong> {{ product.bedrooms }}</p>
+            <p><strong>Bathrooms:</strong> {{ product.bathrooms }}</p>
+            <p><strong>Description:</strong> {{ product.description }}</p>
+            <p><strong>Property Type:</strong> {{ product.property_type }}</p>
+            <p><strong>Ownership Details:</strong> {{ product.ownership_details }}</p>
+            <p><strong>Contact Details:</strong> {{ product.contact_details }}</p>
+            <p><strong>Additional Information:</strong> {{ product.additional_information }}</p>
+            <p><strong>Status:</strong> {{ product.status }}</p>
+        </div>
+
+        {% elif product_type == 'farm' %}
+        <div class="product-details">
+            <p><strong>Property Title:</strong> {{ product.property_title }}</p>
+            <p><strong>Region:</strong> {{ product.regions }}</p>
+            <p><strong>City:</strong> {{ product.cities }}</p>
+            <!-- <p><strong>Location:</strong> {{ product.location }}</p> -->
+            <p><strong>Latitude:</strong> {{ product.latitude }}</p>
+            <p><strong>Longitude:</strong> {{ product.longitude }}</p>
+            <p><strong>Plot Area:</strong> {{ product.plot_area }} sqm</p>
+            <p><strong>Irrigation/Water Source:</strong> {{ product.irrigation_water_source }}</p>
+            <p><strong>Soil Type:</strong> {{ product.soil_type }}</p>
+            <p><strong>Tenancy Information:</strong> {{ product.tenancy_information }}</p>
+            <p><strong>Description:</strong> {{ product.description }}</p>
+            <p><strong>Contact Details:</strong> {{ product.contact_details }}</p>
+            <p><strong>Additional Information:</strong> {{ product.additional_information }}</p>
+            <p><strong>Status:</strong> {{ product.status }}</p>
+           
+        </div>
+        
+
+        {% elif product_type == 'apartment' %}
+
+        <div class="product-details">
+            <p><strong>Property Title:</strong> {{ product.property_title }}</p>
+            <p><strong>Price (OMR):</strong> {{ product.price }}</p>
+            <p><strong>Region:</strong> {{ product.get_region_display }}</p>
+            <p><strong>City:</strong> {{ product.cities }}</p>
+            <p><strong>Latitude:</strong> {{ product.latitude }}</p>
+            <p><strong>Longitude:</strong> {{ product.longitude }}</p>
+            <p><strong>Plot Area:</strong> {{ product.plot_area }} sqm</p>
+            <p><strong>Bedrooms:</strong> {{ product.get_bedrooms_display }}</p>
+            <p><strong>Bathrooms:</strong> {{ product.get_bathrooms_display }}</p>
+            <p><strong>Floors:</strong> {{ product.get_floors_display }}</p>
+            <p><strong>Listing Type:</strong> {{ product.get_listing_type_display }}</p>
+            <p><strong>Furnished:</strong> {{ product.get_furnished_display }}</p>
+            <p><strong>Building Age:</strong> {{ product.get_building_display }}</p>
+            <p><strong>Property Mortgage:</strong> {{ product.get_property_mortgage_display }}</p>
+            <p><strong>Facade:</strong> {{ product.get_facade_display }}</p>
+            <p><strong>Approval Status:</strong> {{ product.get_status_display }}</p>
+            <p><strong>Property Description:</strong> {{ product.description }}</p>
+            <p><strong>Nearby Locations:</strong> 
+                {% for location in product.nearby_location.all %}
+                    {{ location }}, 
+                {% endfor %}
+            </p>
+            <p><strong>Main Amenities:</strong> 
+                {% for amenity in product.main_amenities.all %}
+                    {{ amenity }}, 
+                {% endfor %}
+            </p>
+            <p><strong>Additional Amenities:</strong> 
+                {% for amenity in product.additional_amenities.all %}
+                    {{ amenity }}, 
+                {% endfor %}
+            </p>
+         
+        </div>
+    
+    
+        {% elif product_type == 'factory' %}
+
+    <div class="product-details">
+        <p><strong>Property Title:</strong> {{ product.property_title }}</p>
+        <p><strong>Region:</strong> {{ product.get_region_display }}</p>
+        <p><strong>City:</strong> {{ product.cities }}</p>
+        <p><strong>Latitude:</strong> {{ product.latitude }}</p>
+        <p><strong>Longitude:</strong> {{ product.longitude }}</p>
+        <p><strong>Plot Area:</strong> {{ product.plot_area }} sqm</p>
+        <p><strong>Description:</strong> {{ product.description }}</p>
+        <p><strong>Listing Type:</strong> {{ product.get_listing_type_display }}</p>
+        <p><strong>Status:</strong> {{ product.get_status_display }}</p>
+        <p><strong>Nearby Locations:</strong> 
+            {% for location in product.nearby_location.all %}
+                {{ location.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        <p><strong>Main Amenities:</strong> 
+            {% for amenity in product.main_amenities.all %}
+                {{ amenity.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        <p><strong>Additional Amenities:</strong> 
+            {% for amenity in product.additional_amenities.all %}
+                {{ amenity.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        <p><strong>Created At:</strong> {{ product.created_at }}</p>
+    </div>
+
+    {% elif product_type == 'complexes' %}
+
+    <div class="product-details">
+        <p><strong>Property Title:</strong> {{ product.property_title }}</p>
+        <p><strong>Region:</strong> {{ product.get_region_display }}</p>
+        <p><strong>City:</strong> {{ product.cities }}</p>
+        <p><strong>Latitude:</strong> {{ product.latitude }}</p>
+        <p><strong>Longitude:</strong> {{ product.longitude }}</p>
+        <p><strong>Plot Area:</strong> {{ product.plot_area }} sqm</p>
+        <p><strong>Description:</strong> {{ product.description }}</p>
+        <p><strong>Listing Type:</strong> {{ product.get_listing_type_display }}</p>
+        <p><strong>Status:</strong> {{ product.get_status_display }}</p>
+        <p><strong>Floors:</strong> {{ product.get_floors_display }}</p>
+        <p><strong>Property Status:</strong> {{ product.get_property_display }}</p>
+        <p><strong>Property Mortgage:</strong> {{ product.get_property_mortgage_display }}</p>
+        <p><strong>Lister Type:</strong> {{ product.get_lister_type_display }}</p>
+        <p><strong>Nearby Locations:</strong> 
+            {% for location in product.nearby_location.all %}
+                {{ location.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        <p><strong>Main Amenities:</strong> 
+            {% for amenity in product.main_amenities.all %}
+                {{ amenity.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        <p><strong>Additional Amenities:</strong> 
+            {% for amenity in product.additional_amenities.all %}
+                {{ amenity.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        <p><strong>Created At:</strong> {{ product.created_at }}</p>
+    
+       
+    </div>
+    {% elif product_type == 'clinic' %}
+
+    <div class="product-details">
+        <p><strong>Property Title:</strong> {{ product.property_title }}</p>
+        <p><strong>Region:</strong> {{ product.get_region_display }}</p>
+        <p><strong>City:</strong> {{ product.cities }}</p>
+        <p><strong>Latitude:</strong> {{ product.latitude }}</p>
+        <p><strong>Longitude:</strong> {{ product.longitude }}</p>
+        <p><strong>Plot Area:</strong> {{ product.plot_area }} sqm</p>
+        <p><strong>Description:</strong> {{ product.description }}</p>
+        <p><strong>Listing Type:</strong> {{ product.get_listing_type_display }}</p>
+        <p><strong>Status:</strong> {{ product.get_status_display }}</p>
+        <p><strong>Floors:</strong> {{ product.get_floors_display }}</p>
+        <p><strong>Property Status:</strong> {{ product.get_property_display }}</p>
+        <p><strong>Property Mortgage:</strong> {{ product.get_property_mortgage_display }}</p>
+        <p><strong>Lister Type:</strong> {{ product.get_lister_type_display }}</p>
+        <p><strong>Nearby Locations:</strong> 
+            {% for location in product.nearby_location.all %}
+                {{ location.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        <p><strong>Main Amenities:</strong> 
+            {% for amenity in product.main_amenities.all %}
+                {{ amenity.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        <p><strong>Additional Amenities:</strong> 
+            {% for amenity in product.additional_amenities.all %}
+                {{ amenity.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        <p><strong>Created At:</strong> {{ product.created_at }}</p>
+    
+       
+    
+       
+    </div>
+    {% elif product_type == 'hostel' %}
+
+    <div class="product-details">
+        <p><strong>Property Title:</strong> {{ product.property_title }}</p>
+        <p><strong>Region:</strong> {{ product.get_region_display }}</p>
+        <p><strong>City:</strong> {{ product.cities }}</p>
+        <p><strong>Latitude:</strong> {{ product.latitude }}</p>
+        <p><strong>Longitude:</strong> {{ product.longitude }}</p>
+        <p><strong>Plot Area:</strong> {{ product.plot_area }} sqm</p>
+        <p><strong>Number of Bedrooms:</strong> {{ product.get_bedrooms_display }}</p>
+        <p><strong>Description:</strong> {{ product.description }}</p>
+        <p><strong>Listing Type:</strong> {{ product.get_listing_type_display }}</p>
+        <p><strong>Status:</strong> {{ product.get_status_display }}</p>
+        <p><strong>Floors:</strong> {{ product.get_floors_display }}</p>
+        <p><strong>Property Status:</strong> {{ product.get_property_display }}</p>
+        <p><strong>Property Mortgage:</strong> {{ product.get_property_mortgage_display }}</p>
+        <p><strong>Furnished:</strong> {{ product.get_furnished_display }}</p>
+        <p><strong>Lister Type:</strong> {{ product.get_lister_type_display }}</p>
+        <p><strong>Nearby Locations:</strong> 
+            {% for location in product.nearby_location.all %}
+                {{ location.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        <p><strong>Main Amenities:</strong> 
+            {% for amenity in product.main_amenities.all %}
+                {{ amenity.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        <p><strong>Additional Amenities:</strong> 
+            {% for amenity in product.additional_amenities.all %}
+                {{ amenity.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        <p><strong>Created At:</strong> {{ product.created_at }}</p>
+    
+        
+    </div>
+            
+    {% elif product_type == 'office' %}
+
+    <div class="product-details">
+        <p><strong>Property Title:</strong> {{ product.property_title }}</p>
+        <p><strong>Region:</strong> {{ product.get_region_display }}</p>
+        <p><strong>City:</strong> {{ product.cities }}</p>
+        <p><strong>Latitude:</strong> {{ product.latitude }}</p>
+        <p><strong>Longitude:</strong> {{ product.longitude }}</p>
+        <p><strong>Plot Area:</strong> {{ product.plot_area }} sqm</p>
+        <p><strong>Description:</strong> {{ product.description }}</p>
+        <p><strong>Listing Type:</strong> {{ product.get_listing_type_display }}</p>
+        <p><strong>Status:</strong> {{ product.get_status_display }}</p>
+        <p><strong>Floors:</strong> {{ product.get_floors_display }}</p>
+        <p><strong>Property Status:</strong> {{ product.get_property_display }}</p>
+        <p><strong>Property Mortgage:</strong> {{ product.get_property_mortgage_display }}</p>
+        <p><strong>Furnished:</strong> {{ product.get_furnished_display }}</p>
+        <p><strong>Lister Type:</strong> {{ product.get_lister_type_display }}</p>
+        <p><strong>Nearby Locations:</strong> 
+            {% for location in product.nearby_location.all %}
+                {{ location.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        <p><strong>Main Amenities:</strong> 
+            {% for amenity in product.main_amenities.all %}
+                {{ amenity.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        <p><strong>Additional Amenities:</strong> 
+            {% for amenity in product.additional_amenities.all %}
+                {{ amenity.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        <p><strong>Created At:</strong> {{ product.created_at }}</p>
+    
+    </div> 
+    {% elif product_type == 'shop' %}
+
+    <div class="product-details">
+        <p><strong>Property Title:</strong> {{ product.property_title }}</p>
+        <p><strong>Region:</strong> {{ product.get_region_display }}</p>
+        <p><strong>City:</strong> {{ product.cities }}</p>
+        <p><strong>Latitude:</strong> {{ product.latitude }}</p>
+        <p><strong>Longitude:</strong> {{ product.longitude }}</p>
+        <p><strong>Surface Area:</strong> {{ product.plot_area }} sqm</p>
+        <p><strong>Description:</strong> {{ product.description }}</p>
+        <p><strong>Listing Type:</strong> {{ product.get_listing_type_display }}</p>
+        <p><strong>Status:</strong> {{ product.get_status_display }}</p>
+        <p><strong>Property Mortgage:</strong> {{ product.get_property_mortgage_display }}</p>
+        <p><strong>Lister Type:</strong> {{ product.get_lister_type_display }}</p>
+        <p><strong>Nearby Locations:</strong> 
+            {% for location in product.nearby_location.all %}
+                {{ location.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        <p><strong>Main Amenities:</strong> 
+            {% for amenity in product.main_amenities.all %}
+                {{ amenity.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        <p><strong>Additional Amenities:</strong> 
+            {% for amenity in product.additional_amenities.all %}
+                {{ amenity.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        <p><strong>Created At:</strong> {{ product.created_at }}</p>
+    
+        
+    
+        
+    </div> 
+
+    {% elif product_type == 'cafe' %}
+
+    <div class="product-details">
+        <p><strong>Property Title:</strong> {{ product.property_title }}</p>
+        <p><strong>Region:</strong> {{ product.get_region_display }}</p>
+        <p><strong>City:</strong> {{ product.cities }}</p>
+        <p><strong>Latitude:</strong> {{ product.latitude }}</p>
+        <p><strong>Longitude:</strong> {{ product.longitude }}</p>
+        <p><strong>Surface Area:</strong> {{ product.plot_area }} sqm</p>
+        <p><strong>Description:</strong> {{ product.description }}</p>
+        <p><strong>Listing Type:</strong> {{ product.get_listing_type_display }}</p>
+        <p><strong>Status:</strong> {{ product.get_status_display }}</p>
+        <p><strong>Property Mortgage:</strong> {{ product.get_property_mortgage_display }}</p>
+        <p><strong>Lister Type:</strong> {{ product.get_lister_type_display }}</p>
+        <p><strong>Nearby Locations:</strong> 
+            {% for location in product.nearby_location.all %}
+                {{ location.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        <p><strong>Main Amenities:</strong> 
+            {% for amenity in product.main_amenities.all %}
+                {{ amenity.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        <p><strong>Additional Amenities:</strong> 
+            {% for amenity in product.additional_amenities.all %}
+                {{ amenity.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        <p><strong>Created At:</strong> {{ product.created_at }}</p>
+    
+        
+    
+        
+    </div> 
+
+    {% elif product_type == 'staff' %}
+
+    <div class="product-details">
+        <p><strong>Property Title:</strong> {{ product.property_title }}</p>
+        <p><strong>Region:</strong> {{ product.get_region_display }}</p>
+        <p><strong>City:</strong> {{ product.cities }}</p>
+        <p><strong>Latitude:</strong> {{ product.latitude }}</p>
+        <p><strong>Longitude:</strong> {{ product.longitude }}</p>
+        <p><strong>Surface Area:</strong> {{ product.plot_area }} sqm</p>
+        <p><strong>Description:</strong> {{ product.description }}</p>
+        <p><strong>Listing Type:</strong> {{ product.get_listing_type_display }}</p>
+        <p><strong>Status:</strong> {{ product.get_status_display }}</p>
+        <p><strong>Property Mortgage:</strong> {{ product.get_property_mortgage_display }}</p>
+        <p><strong>Lister Type:</strong> {{ product.get_lister_type_display }}</p>
+        <p><strong>Nearby Locations:</strong> 
+            {% for location in product.nearby_location.all %}
+                {{ location.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        <p><strong>Main Amenities:</strong> 
+            {% for amenity in product.main_amenities.all %}
+                {{ amenity.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        <p><strong>Additional Amenities:</strong> 
+            {% for amenity in product.additional_amenities.all %}
+                {{ amenity.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        <p><strong>Created At:</strong> {{ product.created_at }}</p>
+    
+        
+    
+        
+    </div> 
+
+    {% elif product_type == 'warehouse' %}
+
+    <div class="product-details">
+        <p><strong>Property Title:</strong> {{ product.property_title }}</p>
+        <p><strong>Region:</strong> {{ product.get_region_display }}</p>
+        <p><strong>City:</strong> {{ product.cities }}</p>
+        <p><strong>Latitude:</strong> {{ product.latitude }}</p>
+        <p><strong>Longitude:</strong> {{ product.longitude }}</p>
+        <p><strong>Surface Area:</strong> {{ product.plot_area }} sqm</p>
+        <p><strong>Description:</strong> {{ product.description }}</p>
+        <p><strong>Listing Type:</strong> {{ product.get_listing_type_display }}</p>
+        <p><strong>Status:</strong> {{ product.get_status_display }}</p>
+        <p><strong>Property Mortgage:</strong> {{ product.get_property_mortgage_display }}</p>
+        <p><strong>Lister Type:</strong> {{ product.get_lister_type_display }}</p>
+        <p><strong>Nearby Locations:</strong> 
+            {% for location in product.nearby_location.all %}
+                {{ location.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        <p><strong>Main Amenities:</strong> 
+            {% for amenity in product.main_amenities.all %}
+                {{ amenity.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        <p><strong>Additional Amenities:</strong> 
+            {% for amenity in product.additional_amenities.all %}
+                {{ amenity.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        <p><strong>Created At:</strong> {{ product.created_at }}</p>
+    
+        
+    
+        
+    </div> 
+    {% elif product_type == 'townhouse' %}
+
+    <div class="product-details">
+        <p><strong>Property Title:</strong> {{ product.property_title }}</p>
+        <p><strong>Region:</strong> {{ product.get_region_display }}</p>
+        <p><strong>City:</strong> {{ product.cities }}</p>
+        <p><strong>Latitude:</strong> {{ product.latitude }}</p>
+        <p><strong>Longitude:</strong> {{ product.longitude }}</p>
+        <p><strong>Surface Area:</strong> {{ product.plot_area }} sqm</p>
+        <p><strong>Description:</strong> {{ product.description }}</p>
+        <p><strong>Listing Type:</strong> {{ product.get_listing_type_display }}</p>
+        <p><strong>Status:</strong> {{ product.get_status_display }}</p>
+        <p><strong>Property Mortgage:</strong> {{ product.get_property_mortgage_display }}</p>
+        <p><strong>Lister Type:</strong> {{ product.get_lister_type_display }}</p>
+        <p><strong>Nearby Locations:</strong> 
+            {% for location in product.nearby_location.all %}
+                {{ location.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        <p><strong>Main Amenities:</strong> 
+            {% for amenity in product.main_amenities.all %}
+                {{ amenity.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        <p><strong>Additional Amenities:</strong> 
+            {% for amenity in product.additional_amenities.all %}
+                {{ amenity.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        <p><strong>Created At:</strong> {{ product.created_at }}</p>
+    
+        
+    
+        
+    </div> 
+
+    {% elif product_type == 'fullfloors' %}
+
+    <div class="product-details">
+        <p><strong>Property Title:</strong> {{ product.property_title }}</p>
+        <p><strong>Region:</strong> {{ product.get_region_display }}</p>
+        <p><strong>City:</strong> {{ product.cities }}</p>
+        <p><strong>Latitude:</strong> {{ product.latitude }}</p>
+        <p><strong>Longitude:</strong> {{ product.longitude }}</p>
+        <p><strong>Surface Area:</strong> {{ product.plot_area }} sqm</p>
+        <p><strong>Description:</strong> {{ product.description }}</p>
+        <p><strong>Listing Type:</strong> {{ product.get_listing_type_display }}</p>
+        <p><strong>Status:</strong> {{ product.get_status_display }}</p>
+        <p><strong>Property Mortgage:</strong> {{ product.get_property_mortgage_display }}</p>
+        <p><strong>Lister Type:</strong> {{ product.get_lister_type_display }}</p>
+        <p><strong>Nearby Locations:</strong> 
+            {% for location in product.nearby_location.all %}
+                {{ location.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        <p><strong>Main Amenities:</strong> 
+            {% for amenity in product.main_amenities.all %}
+                {{ amenity.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        <p><strong>Additional Amenities:</strong> 
+            {% for amenity in product.additional_amenities.all %}
+                {{ amenity.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        <p><strong>Created At:</strong> {{ product.created_at }}</p>
+    
+        
+    
+        
+    </div> 
+    {% elif product_type == 'showrooms' %}
+
+    <div class="product-details">
+        <p><strong>Property Title:</strong> {{ product.property_title }}</p>
+        <p><strong>Region:</strong> {{ product.get_region_display }}</p>
+        <p><strong>City:</strong> {{ product.cities }}</p>
+        <p><strong>Latitude:</strong> {{ product.latitude }}</p>
+        <p><strong>Longitude:</strong> {{ product.longitude }}</p>
+        <p><strong>Surface Area:</strong> {{ product.plot_area }} sqm</p>
+        <p><strong>Description:</strong> {{ product.description }}</p>
+        <p><strong>Listing Type:</strong> {{ product.get_listing_type_display }}</p>
+        <p><strong>Status:</strong> {{ product.get_status_display }}</p>
+        <p><strong>Property Mortgage:</strong> {{ product.get_property_mortgage_display }}</p>
+        <p><strong>Lister Type:</strong> {{ product.get_lister_type_display }}</p>
+        <p><strong>Nearby Locations:</strong> 
+            {% for location in product.nearby_location.all %}
+                {{ location.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        <p><strong>Main Amenities:</strong> 
+            {% for amenity in product.main_amenities.all %}
+                {{ amenity.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        <p><strong>Additional Amenities:</strong> 
+            {% for amenity in product.additional_amenities.all %}
+                {{ amenity.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        <p><strong>Created At:</strong> {{ product.created_at }}</p>
+    
+        
+    
+        
+    </div> 
+
+    {% elif product_type == 'wholebuilding' %}
+
+    <div class="product-details">
+        <p><strong>Property Title:</strong> {{ product.property_title }}</p>
+        <p><strong>Region:</strong> {{ product.get_region_display }}</p>
+        <p><strong>City:</strong> {{ product.cities }}</p>
+        <p><strong>Latitude:</strong> {{ product.latitude }}</p>
+        <p><strong>Longitude:</strong> {{ product.longitude }}</p>
+        <p><strong>Surface Area:</strong> {{ product.plot_area }} sqm</p>
+        <p><strong>Description:</strong> {{ product.description }}</p>
+        <p><strong>Listing Type:</strong> {{ product.get_listing_type_display }}</p>
+        <p><strong>Status:</strong> {{ product.get_status_display }}</p>
+        <p><strong>Property Mortgage:</strong> {{ product.get_property_mortgage_display }}</p>
+        <p><strong>Lister Type:</strong> {{ product.get_lister_type_display }}</p>
+        <p><strong>Nearby Locations:</strong> 
+            {% for location in product.nearby_location.all %}
+                {{ location.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        <p><strong>Main Amenities:</strong> 
+            {% for amenity in product.main_amenities.all %}
+                {{ amenity.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        <p><strong>Additional Amenities:</strong> 
+            {% for amenity in product.additional_amenities.all %}
+                {{ amenity.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        <p><strong>Created At:</strong> {{ product.created_at }}</p>
+    
+        
+    
+        
+    </div> 
+
+    {% elif product_type == 'supermarket' %}
+
+    <div class="product-details">
+        <p><strong>Property Title:</strong> {{ product.property_title }}</p>
+        <p><strong>Region:</strong> {{ product.get_region_display }}</p>
+        <p><strong>City:</strong> {{ product.cities }}</p>
+        <p><strong>Latitude:</strong> {{ product.latitude }}</p>
+        <p><strong>Longitude:</strong> {{ product.longitude }}</p>
+        <p><strong>Surface Area:</strong> {{ product.plot_area }} sqm</p>
+        <p><strong>Description:</strong> {{ product.description }}</p>
+        <p><strong>Listing Type:</strong> {{ product.get_listing_type_display }}</p>
+        <p><strong>Status:</strong> {{ product.get_status_display }}</p>
+        <p><strong>Property Mortgage:</strong> {{ product.get_property_mortgage_display }}</p>
+        <p><strong>Lister Type:</strong> {{ product.get_lister_type_display }}</p>
+        <p><strong>Nearby Locations:</strong> 
+            {% for location in product.nearby_location.all %}
+                {{ location.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        <p><strong>Main Amenities:</strong> 
+            {% for amenity in product.main_amenities.all %}
+                {{ amenity.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        <p><strong>Additional Amenities:</strong> 
+            {% for amenity in product.additional_amenities.all %}
+                {{ amenity.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        <p><strong>Created At:</strong> {{ product.created_at }}</p>
+    
+        
+    
+        
+    </div> 
+    {% elif product_type == 'foreign' %}
+
+    <div class="product-details">
+        <p><strong>Property Title:</strong> {{ product.property_title }}</p>
+        <p><strong>Region:</strong> {{ product.get_region_display }}</p>
+        <p><strong>City:</strong> {{ product.cities }}</p>
+        <p><strong>Latitude:</strong> {{ product.latitude }}</p>
+        <p><strong>Longitude:</strong> {{ product.longitude }}</p>
+        <p><strong>Surface Area:</strong> {{ product.plot_area }} sqm</p>
+        <p><strong>Description:</strong> {{ product.description }}</p>
+        <p><strong>Listing Type:</strong> {{ product.get_listing_type_display }}</p>
+        <p><strong>Status:</strong> {{ product.get_status_display }}</p>
+        <p><strong>Property Mortgage:</strong> {{ product.get_property_mortgage_display }}</p>
+        <p><strong>Lister Type:</strong> {{ product.get_lister_type_display }}</p>
+        <p><strong>Nearby Locations:</strong> 
+            {% for location in product.nearby_location.all %}
+                {{ location.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        <p><strong>Main Amenities:</strong> 
+            {% for amenity in product.main_amenities.all %}
+                {{ amenity.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        <p><strong>Additional Amenities:</strong> 
+            {% for amenity in product.additional_amenities.all %}
+                {{ amenity.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        <p><strong>Created At:</strong> {{ product.created_at }}</p>
+    
+        
+    
+        
+    </div> 
+
+        {% elif product_type == 'commercial' %}
+
+        <div class="product-details">
+            <p><strong>Property Title:</strong> {{ product.property_title }}</p>
+            <p><strong>Region:</strong> {{ product.regions }}</p>
+            <p><strong>City:</strong> {{ product.cities }}</p>
+            <!-- <p><strong>Location:</strong> {{ product.location }}</p> -->
+            <p><strong>Latitude:</strong> {{ product.latitude }}</p>
+            <p><strong>Longitude:</strong> {{ product.longitude }}</p>
+            <p><strong>Plot Area:</strong> {{ product.plot_area }} sq ft/m²</p>
+            <p><strong>Amenities:</strong> {{ product.amenities }}</p>
+            <p><strong>Description:</strong> {{ product.description }}</p>
+            <p><strong>Property Type:</strong> {{ product.property_type }}</p>
+            <p><strong>Ownership Details:</strong> {{ product.ownership_details }}</p>
+            <p><strong>Contact Details:</strong> {{ product.contact_details }}</p>
+            <p><strong>Additional Information:</strong> {{ product.additional_information }}</p>
+            <p><strong>Status:</strong> {{ product.status }}</p>
+        </div>
+        
+        
+        {% elif product_type == 'motorcycle' %}
+        <div class="product-details">
+            <p><strong>Make:</strong> {{ product.make }}</p>
+            <p><strong>Name:</strong> {{ product.name }}</p>
+            <p><strong>Model:</strong> {{ product.model }}</p>
+            <p><strong>Year:</strong> {{ product.year }}</p>
+            <p><strong>Body Type:</strong> {{ product.body_type }}</p>
+            <p><strong>Engine Capacity:</strong> {{ product.engine_capacity }} cc</p>
+            <p><strong>Region:</strong> {{ product.regions }}</p>
+            <p><strong>Location:</strong> {{ product.location }}</p>
+            <p><strong>Listing Type:</strong> {{ product.listing_type }}</p>
+            <p><strong>Price:</strong> {{ product.price }} OMR</p>
+            <p><strong>Condition:</strong> {{ product.condition }}</p>
+        </div>
+    
+        {% elif product_type == 'fashion' %}
+        <div class="product-details">
+            <p><strong>Product Name:</strong> {{ product.product_name }}</p>
+            <p><strong>Region:</strong> {{ product.regions }}</p>
+            <p><strong>City:</strong> {{ product.cities }}</p>
+            <!-- <p><strong>Location:</strong> {{ product.location }}</p> -->
+            <p><strong>Latitude:</strong> {{ product.latitude }}</p>
+            <p><strong>Longitude:</strong> {{ product.longitude }}</p>
+            <p><strong>Category:</strong> {{ product.category }}</p>
+            <p><strong>Brand:</strong> {{ product.brand }}</p>
+            <p><strong>Size:</strong> {{ product.size }}</p>
+            <p><strong>Gender:</strong> {{ product.gender }}</p>
+            <p><strong>Color:</strong> {{ product.color }}</p>
+            <p><strong>Material:</strong> {{ product.material }}</p>
+            <p><strong>Condition:</strong> {{ product.condition }}</p>
+            <p><strong>Description:</strong> {{ product.description }}</p>
+            <p><strong>Contact Details:</strong> {{ product.contact_details }}</p>
+            <p><strong>Status:</strong> {{ product.status }}</p>
+        </div>
+        {% elif product_type == 'toys' %}
+        <div class="product-details">
+            <p><strong>Product Name:</strong> {{ product.product_name }}</p>
+            <p><strong>Region:</strong> {{ product.regions }}</p>
+            <p><strong>City:</strong> {{ product.cities }}</p>
+            <!-- <p><strong>Location:</strong> {{ product.location }}</p> -->
+            <p><strong>Latitude:</strong> {{ product.latitude }}</p>
+            <p><strong>Longitude:</strong> {{ product.longitude }}</p>
+            <p><strong>Category:</strong> {{ product.category }}</p>
+            <p><strong>Brand:</strong> {{ product.brand }}</p>
+            <p><strong>Platform:</strong> {{ product.platform }}</p>
+            <p><strong>Age Group:</strong> {{ product.age_group }}</p>
+            <p><strong>Condition:</strong> {{ product.condition }}</p>
+            <p><strong>Description:</strong> {{ product.description }}</p>
+            <p><strong>Contact Details:</strong> {{ product.contact_details }}</p>
+            <p><strong>Status:</strong> {{ product.status }}</p>
+        </div>
+        
+        {% elif product_type == 'food' %}
+        <div class="product-details">
+            <p><strong>Product Type:</strong> {{ product.product_type }}</p>
+            <p><strong>Brand:</strong> {{ product.brand }}</p>
+            <p><strong>Quantity:</strong> {{ product.quantity }}</p>
+            <p><strong>Expiration Date:</strong> {{ product.expiration_date }}</p>
+            <p><strong>Dietary Information:</strong> {{ product.dietary_info }}</p>
+            <!-- <p><strong>Location:</strong> {{ product.location }}</p> -->
+            <p><strong>Region:</strong> {{ product.regions }}</p>
+            <p><strong>City:</strong> {{ product.cities }}</p>
+            <p><strong>Status:</strong> {{ product.status }}</p>
+        </div>
+        {% elif product_type == 'fitness' %}
+
+        <div class="product-details">
+            <p><strong>Product Name:</strong> {{ product.product_name }}</p>
+            <p><strong>Category:</strong> {{ product.category }}</p>
+            <p><strong>Brand:</strong> {{ product.brand }}</p>
+            <p><strong>Condition:</strong> {{ product.condition }}</p>
+            <p><strong>Description:</strong> {{ product.description }}</p>
+            <p><strong>Warranty Status:</strong> {{ product.warranty_status }}</p>
+            <p><strong>Region:</strong> {{ product.regions }}</p>
+            <p><strong>City:</strong> {{ product.cities }}</p>
+            <!-- <p><strong>Location:</strong> {{ product.location }}</p> -->
+            <p><strong>Latitude:</strong> {{ product.latitude }}</p>
+            <p><strong>Longitude:</strong> {{ product.longitude }}</p>
+            <p><strong>Status:</strong> {{ product.status }}</p>
+        </div>
+        
+        {% elif product_type == 'pet' %}
+        <div class="product-details">
+            <p><strong>Pet Name:</strong> {{ product.pet_name }}</p>
+            <p><strong>Pet Type:</strong> {{ product.pet_type }}</p>
+            <p><strong>Breed:</strong> {{ product.breed }}</p>
+            <p><strong>Age:</strong> {{ product.age }} months/years</p>
+            <p><strong>Description:</strong> {{ product.description }}</p>
+            <p><strong>Vaccination Status:</strong> {{ product.vaccinated }}</p>
+            <p><strong>Region:</strong> {{ product.regions }}</p>
+            <p><strong>City:</strong> {{ product.cities }}</p>
+            <!-- <p><strong>Location:</strong> {{ product.location }}</p> -->
+            <p><strong>Latitude:</strong> {{ product.latitude }}</p>
+            <p><strong>Longitude:</strong> {{ product.longitude }}</p>
+            <p><strong>Status:</strong> {{ product.status }}</p>
+        </div>
+        
+        {% elif product_type == 'book' %}
+        <div class="product-details">
+            <p><strong>Book Name:</strong> {{ product.book_name }}</p>
+            <p><strong>Category:</strong> {{ product.category }}</p>
+            <p><strong>Genre:</strong> {{ product.genre }}</p>
+            <p><strong>Description:</strong> {{ product.description }}</p>
+            <p><strong>Condition:</strong> {{ product.condition }}</p>
+            <p><strong>Region:</strong> {{ product.regions }}</p>
+            <p><strong>City:</strong> {{ product.cities }}</p>
+            <!-- <p><strong>Location:</strong> {{ product.location }}</p> -->
+            <p><strong>Latitude:</strong> {{ product.latitude }}</p>
+            <p><strong>Longitude:</strong> {{ product.longitude }}</p>
+            <p><strong>Status:</strong> {{ product.status }}</p>
+        </div>
+        
+
+        {% elif product_type == 'appliance' %}
+
+        <div class="product-details">
+            <p><strong>Product Name:</strong> {{ product.product_name }}</p>
+            <p><strong>Appliance Type:</strong> {{ product.appliance_type }}</p>
+            <p><strong>Brand:</strong> {{ product.brand }}</p>
+            <p><strong>Model Number:</strong> {{ product.model_number }}</p>
+            <p><strong>Description:</strong> {{ product.description }}</p>
+            <p><strong>Condition:</strong> {{ product.condition }}</p>
+            <p><strong>Warranty Status:</strong> {{ product.warranty_status }}</p>
+            <p><strong>Region:</strong> {{ product.regions }}</p>
+            <p><strong>City:</strong> {{ product.cities }}</p>
+            <!-- <p><strong>Location:</strong> {{ product.location }}</p> -->
+            <p><strong>Latitude:</strong> {{ product.latitude }}</p>
+            <p><strong>Longitude:</strong> {{ product.longitude }}</p>
+            <p><strong>Status:</strong> {{ product.status }}</p>
+        </div>
+        
+
+        {% elif product_type == 'mobile' %}
+    <div class="product-details">
+        <p><strong>Brand:</strong> {{ product.brand }}</p>
+        <p><strong>Model:</strong> {{ product.model_number }}</p>
+        <p><strong>Operating System:</strong> {{ product.operating_system }}</p>
+        <p><strong>Screen Size:</strong> {{ product.screen_size }} inches</p>
+        <p><strong>Storage:</strong> {{ product.storage_capacity }} GB</p>
+        <p><strong>RAM:</strong> {{ product.ram_size }} GB</p>
+        <p><strong>Battery Capacity:</strong> {{ product.battery_capacity }} mAh</p>
+        <p><strong>Condition:</strong> {{ product.condition }}</p>
+        <!-- <p><strong>Location:</strong> {{ product.location }}</p> -->
+    </div>
+{% elif product_type == 'computer' %}
+    <div class="product-details">
+        <p><strong>Brand:</strong> {{ product.brand }}</p>
+        <p><strong>Model:</strong> {{ product.model_number }}</p>
+        <p><strong>Operating System:</strong> {{ product.operating_system }}</p>
+        <p><strong>Screen Size:</strong> {{ product.screen_size }} inches</p>
+        <p><strong>Storage:</strong> {{ product.storage_capacity }} GB</p>
+        <p><strong>RAM:</strong> {{ product.ram_size }} GB</p>
+        <p><strong>Processor:</strong> {{ product.processor }}</p>
+        <p><strong>Graphics Card:</strong> {{ product.graphics_card }}</p>
+        <p><strong>Battery Life:</strong> {{ product.battery_life }} hours</p>
+        <p><strong>Condition:</strong> {{ product.condition }}</p>
+        <!-- <p><strong>Location:</strong> {{ product.location }}</p> -->
+    </div>
+{% elif product_type == 'sound' %}
+    <div class="product-details">
+        <p><strong>Brand:</strong> {{ product.brand }}</p>
+        <p><strong>Model:</strong> {{ product.model_number }}</p>
+        <p><strong>Connectivity:</strong> {{ product.connectivity }}</p>
+        <p><strong>Output Power:</strong> {{ product.output_power }}</p>
+        <p><strong>Audio Channels:</strong> {{ product.channels }}</p>
+        <p><strong>Smart Assistant Support:</strong> {% if product.has_smart_assistant %}Yes{% else %}No{% endif %}</p>
+        <p><strong>Condition:</strong> {{ product.condition }}</p>
+        <!-- <p><strong>Location:</strong> {{ product.location }}</p> -->
+    </div>
+
+      
+    {% elif product_type == 'business' %}
+    <div class="product-details">
+        <p><strong>Product Name:</strong> {{ product.product_name }}</p>
+        <p><strong>Brand:</strong> {{ product.brand }}</p>
+        <p><strong>Category:</strong> {{ product.get_category_display }}</p>
+        <p><strong>Description:</strong> {{ product.description }}</p>
+        <p><strong>Condition:</strong> {{ product.get_condition_display }}</p>
+        <p><strong>Warranty Status:</strong> {{ product.get_warranty_status_display }}</p>
+        <p><strong>Region:</strong> {{ product.get_regions_display }}</p>
+        <!-- <p><strong>Location:</strong> {{ product.location }}</p> -->
+        <p><strong>Approval Status:</strong> {{ product.get_status_display }}</p>
+    </div>
+    {% elif product_type == 'education' %}
+    <div class="product-details">
+        <p><strong>Course Subject:</strong> {{ product.subject }}</p>
+        <p><strong>Course Type:</strong> {{ product.get_course_type_display }}</p>
+        <p><strong>Duration:</strong> {{ product.duration }} weeks/months</p>
+        <p><strong>Description:</strong> {{ product.description }}</p>
+        <p><strong>Course Fee:</strong> {{ product.price }} OMR</p>
+        <p><strong>Region:</strong> {{ product.get_regions_display }}</p>
+        <p><strong>Instructor Name:</strong> {{ product.instructor_name }}</p>
+        <p><strong>Instructor Qualification:</strong> {{ product.qualification }}</p>
+        <p><strong>Instructor Experience:</strong> {{ product.experience }}</p>
+        <p><strong>Approval Status:</strong> {{ product.get_status_display }}</p>
+    </div>
+    {% elif product_type == 'service' %}
+    <div class="product-details">
+        <p><strong>Service Type:</strong> {{ product.get_service_type_display }}</p>
+        <p><strong>Provider Name:</strong> {{ product.provider_name }}</p>
+        <p><strong>Description:</strong> {{ product.description }}</p>
+        <p><strong>Contact Info:</strong> {{ product.contact_info }}</p>
+        <p><strong>Region:</strong> {{ product.get_regions_display }}</p>
+        <!-- <p><strong>Location:</strong> {{ product.location }}</p> -->
+        <p><strong>Approval Status:</strong> {{ product.get_status_display }}</p>
+    </div>
+    {% elif product_type == 'heavyvehicle' %}
+    <div class="product-details">
+        <p><strong>Listing Type:</strong> {{ product.get_listing_type_display }}</p>
+        <p><strong>Vehicle Name:</strong> {{ product.name }}</p>
+        <p><strong>Description:</strong> {{ product.description }}</p>
+        <p><strong>Manufacturer:</strong> {{ product.manufacturer }}</p>
+        <p><strong>Year of Manufacture:</strong> {{ product.year }}</p>
+        <p><strong>Region:</strong> {{ product.get_regions_display }}</p>
+        <p><strong>City:</strong> {{ product.cities }}</p>
+        <p><strong>Location:</strong> {{ product.location }}</p>
+        <p><strong>Fuel Type:</strong> {{ product.get_fuel_type_display }}</p>
+        <p><strong>Engine Capacity:</strong> {{ product.engine_capacity }} cc</p>
+        <p><strong>Transmission:</strong> {{ product.get_transmission_display }}</p>
+        <p><strong>Mileage:</strong> {{ product.mileage }} km</p>
+        <p><strong>Load Capacity:</strong> {{ product.load_capacity }} tons</p>
+        <p><strong>Condition:</strong> {{ product.get_condition_display }}</p>
+       
+        
+    </div>
+    {% elif product_type == 'boat' %}
+    <div class="product-details">
+        <p><strong>Listing Type:</strong> {{ product.get_listing_type_display }}</p>
+        <p><strong>Boat Name:</strong> {{ product.name }}</p>
+        <p><strong>Description:</strong> {{ product.description }}</p>
+        <p><strong>Manufacturer:</strong> {{ product.manufacturer }}</p>
+        <p><strong>Year of Manufacture:</strong> {{ product.year }}</p>
+        <p><strong>Region:</strong> {{ product.get_regions_display }}</p>
+        <p><strong>City:</strong> {{ product.cities }}</p>
+        <p><strong>Location:</strong> {{ product.location }}</p>
+        <p><strong>Length:</strong> {{ product.length }} meters</p>
+        <p><strong>Engine Type:</strong> {{ product.get_engine_type_display }}</p>
+        <p><strong>Engine Power:</strong> {{ product.engine_power }} HP</p>
+        <p><strong>Fuel Type:</strong> {{ product.get_fuel_type_display }}</p>
+        <p><strong>Condition:</strong> {{ product.get_condition_display }}</p>
+       
+    </div>
+    {% elif product_type == 'accessoriesparts' %}
+    <div class="product-details">
+        <p><strong>Listing Type:</strong> {{ product.get_listing_type_display }}</p>
+        <p><strong>Part Name:</strong> {{ product.name }}</p>
+        <p><strong>Description:</strong> {{ product.description }}</p>
+        <p><strong>Manufacturer:</strong> {{ product.manufacturer }}</p>
+        <p><strong>Year of Manufacture:</strong> {{ product.year }}</p>
+        <p><strong>Region:</strong> {{ product.get_regions_display }}</p>
+        <p><strong>City:</strong> {{ product.cities }}</p>
+        <p><strong>Location:</strong> {{ product.location }}</p>
+        <p><strong>Condition:</strong> {{ product.get_condition_display }}</p>
+        <p><strong>Approval Status:</strong> {{ product.get_status_display }}</p>
+        
+    </div>
+    {% elif product_type == 'numberplate' %}
+    <div class="product-details">
+        <p><strong>Listing Type:</strong> {{ product.get_listing_type_display }}</p>
+        <p><strong>Plate Number:</strong> {{ product.number }}</p>
+        <p><strong>Description:</strong> {{ product.description }}</p>
+        <p><strong>Created At:</strong> {{ product.created_at|date:"d/m/Y H:i" }}</p>
+        <p><strong>Region:</strong> {{ product.get_regions_display }}</p>
+        <p><strong>Cities:</strong> {{ product.cities }}</p>
+        <p><strong>Latitude:</strong> {{ product.latitude }}</p>
+        <p><strong>Longitude:</strong> {{ product.longitude }}</p>
+        <p><strong>Location:</strong> {{ product.location }}</p>
+       
+     
+    </div>
+
+    {% elif product_type == 'automobile' %}
+    <div class="product-details">
+        <p><strong>Listing Type:</strong> {{ product.get_listing_type_display }}</p>
+        <p><strong>Car Name:</strong> {{ product.name }}</p>
+        <p><strong>Make:</strong> {{ product.make }}</p>
+        <p><strong>Year of Manufacture:</strong> {{ product.year }}</p>
+        <p><strong>Body Type:</strong> {{ product.body_type }}</p>
+        <p><strong>Fuel Type:</strong> {{ product.get_fuel_type_display }}</p>
+        <p><strong>Engine Capacity (cc):</strong> {{ product.engine_capacity }}</p>
+        <p><strong>Transmission Type:</strong> {{ product.get_transmission_display }}</p>
+        <p><strong>Exterior Color:</strong> {{ product.exterior_color }}</p>
+        <p><strong>Price (OMR):</strong> {{ product.price }}</p>
+        <p><strong>Region:</strong> {{ product.get_regions_display }}</p>
+        <p><strong>Cities:</strong> {{ product.cities }}</p>
+        <p><strong>Latitude:</strong> {{ product.latitude }}</p>
+        <p><strong>Longitude:</strong> {{ product.longitude }}</p>
+        <p><strong>Location:</strong> {{ product.location }}</p>
+        <p><strong>Description:</strong> {{ product.description }}</p>
+        <p><strong>Warranty Status:</strong> {{ product.get_warranty_status_display }}</p>
+        <p><strong>Condition:</strong> {{ product.get_condition_display }}</p>
+       
+    </div>
+    
+{% endif %}
+
+
+        <!-- Contact and Additional Info Section -->
+        <div class="contact-details mt-4">
+            <h3>Contact Information:</h3>
+            <p><strong>Name:</strong> {{ product.user.username }}</p>
+            <p><strong>Email:</strong> {{ product.user.email }}</p>
+            <p><strong>Phone:</strong> {{ product.user.phone }}</p>
+        </div>
+
+        <!-- Product Media Gallery -->
+        <div class="row">
+            <!-- Loop through all additional images associated with the product -->
+            {% for image in product.images.all %}
+            <div class="col-md-4">
+                <div class="card mb-3 shadow-white">
+                    <img src="{{ image.image.url }}" class="card-img-top" alt="Additional Image" height="270px" width="250px">
+                    <div class="card-body">
+                        <!-- You can add any text or title if needed -->
+                        <!-- <h5 class="card-title">Additional Image</h5> -->
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="row">
+            <!-- Loop through all videos associated with the product -->
+            {% for video in product.videos.all %}
+            <div class="col-md-4">
+                <div class="card mb-3 shadow-white">
+                    <!-- Video Preview -->
+                    <video class="card-img-top" controls height="270px" width="250px">
+                        <source src="{{ video.video.url }}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <div class="card-body">
+                        <!-- You can add any text or title if needed -->
+                        <!-- <h5 class="card-title">Video Preview</h5> -->
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p class="text-muted">No videos available for this product.</p>
+            {% endfor %}
+        </div>
+        
+        <!-- Approve/Reject Form -->
+        <form method="POST" class="mt-4">
+            {% csrf_token %}
+            <button type="submit" name="status" value="approved" class="btn btn-success">Approve</button>
+            <button type="submit" name="status" value="rejected" class="btn btn-danger">Reject</button>
+            <a href="javascript:history.back()" class="btn btn-secondary">Back</a>
+        </form>
+    </div>
+</div>
+
+{% include 'admin1/footeradmin.html' %}

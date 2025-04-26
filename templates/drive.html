@@ -1,0 +1,581 @@
+{% load static %}
+{% include 'header.html' %}
+
+
+<style>
+    /* General Body Styling */
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f8f9fa;
+    }
+
+    /* Header Styling */
+    .header {
+        text-align: center;
+        margin: 30px 0;
+    }
+
+    .header img {
+        width: 60px;
+        height: 60px;
+        margin-bottom: 15px;
+    }
+
+    .header h1 {
+        font-size: 2.5rem;
+        margin: 0;
+        color: #333;
+        letter-spacing: 2px;
+        font-weight: 600;
+    }
+
+    .home-icon-container {
+display: flex;
+justify-content: center; /* Center horizontally */
+align-items: center;    /* Center vertically */
+margin-bottom: 20px;
+font-size: 0.9rem;
+color: #333;
+cursor: pointer;
+border-radius: 8px;
+padding: 10px;
+transition: background-color 0.3s ease, box-shadow 0.3s ease;
+text-align: center;
+width: 100%; /* Ensures it spans full width for centering */
+}
+
+/* .home-icon-container:hover {
+background-color: #f1f1f1;
+box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+} */
+
+.home-icon-container i {
+    font-size: 1rem;
+    margin-right: 8px;
+}
+
+.home-icon-container span {
+    margin-right: 5px;
+}
+
+.home-icon-container .fa-arrow-right {
+    margin-left: 5px;
+    font-size: 0.8rem;
+    color: #888;
+}
+
+
+    /* Category List */
+    .category-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px; /* Space between items */
+    }
+
+    /* Category List Item Styling */
+    .category-list li {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px;
+        width: 90%;
+        max-width: 700px;
+        background-color: #ffffff;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    }
+
+    /* Hover Effect for List Items */
+    .category-list li:hover {
+        background-color: #f9f9f9;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Slightly stronger shadow */
+        transform: translateY(-5px); /* Lift effect */
+    }
+
+    /* Icon Styling */
+    .category-list li i {
+        font-size: 2rem;
+        margin-right: 15px;
+        color: #e96d15; /* Maintain color consistency */
+        transition: color 0.3s ease;
+    }
+
+    /* Hover Effect for Icon */
+    .category-list li:hover i {
+        color: #c05a10; /* Darker shade on hover */
+    }
+
+    /* Category Text Styling */
+    .category-list li span {
+        font-size: 1.3rem;
+        font-weight: 500;
+        color: #333;
+        letter-spacing: 1px;
+    }
+
+    /* Arrow Icon Styling */
+    .category-list li i.fa-arrow-right {
+        font-size: 1.5rem;
+        color: #999;
+        transition: color 0.3s ease;
+    }
+
+    /* Hover Effect for Arrow Icon */
+    .category-list li:hover i.fa-arrow-right {
+        color: #333;
+    }
+
+    /* Modal Content */
+    .modal-content {
+        border-radius: 15px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+        background-color: #fff;
+        transition: transform 0.3s ease;
+    }
+
+    /* Modal Header */
+    .modal-header {
+        padding: 20px;
+        background-color: #e96d15;
+        color: #fff;
+        border-radius: 15px 15px 0 0;
+    }
+
+    .modal-title {
+        font-size: 1.7rem;
+        font-weight: bold;
+    }
+
+    /* Modal Body */
+    .modal-body {
+        padding: 30px;
+    }
+
+    /* Input Field Styling */
+    .form-control {
+        border-radius: 10px;
+        border: 1px solid #ddd;
+        padding: 12px;
+        font-size: 1rem;
+        margin-bottom: 20px;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .form-control:focus {
+        border-color: #e96d15;
+        box-shadow: 0 0 8px rgba(227, 143, 6, 0.5);
+    }
+
+    /* Button Styling */
+    .btn-primary {
+        background-color: #e96d15;
+        border: none;
+        border-radius: 10px;
+        padding: 12px 25px;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background-color: #c05a10;
+        transform: translateY(-2px); /* Subtle lift effect */
+    }
+
+    /* Modal Footer */
+    .modal-footer {
+        border-top: 1px solid #ddd;
+        padding: 15px;
+        background-color: #f8f9fa;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .category-list li {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .category-list li i {
+            margin-right: 0;
+            margin-bottom: 10px;
+        }
+
+        .category-list li span {
+            font-size: 1.1rem;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .btn-primary {
+            width: 100%;
+        }
+    }
+    #map-land, #map-villa, #map-farm, #map-chalet, #map-commercial, {
+        height: 400px; 
+        width: 100%; /* Full width */
+        margin-bottom: 20px;
+    }
+    
+    .modal-content {
+        height: auto; /* Allow the modal content to adjust based on its content */
+    }
+    
+    .modal-body {
+        padding: 20px; /* Add some padding */
+        overflow: hidden; /* Prevent overflow */
+    }
+</style>
+
+
+
+<!-- Driving Training Modal -->
+
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="drivingTrainingModalLabel">Register Driving Training</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <input type="hidden" name="product_type" value="driving_training">
+
+                <!-- Trainer Name -->
+                <input type="text" name="trainer_name" placeholder="Trainer Name" class="form-control mb-3" required>
+
+                <!-- Trainer Gender -->
+                <select name="trainer_gender" class="form-control mb-3" required>
+                    <option value="">-- Trainer Gender --</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                </select>
+
+                <!-- Transmission Type -->
+                <select name="transmission" class="form-control mb-3" required>
+                    <option value="">-- Transmission Type --</option>
+                    <option value="Automatic">Automatic</option>
+                    <option value="Manual">Manual</option>
+                    <option value="Both">Both</option>
+                </select>
+
+                <!-- Price -->
+                <input type="number" step="0.01" name="price" placeholder="Price (OMR)" class="form-control mb-3" required>
+
+                <!-- Vehicle Type -->
+                <select name="body_type" class="form-control mb-3" required>
+                    <option value="">-- Vehicle Type --</option>
+                    <option value="Sedan">Sedan</option>
+                    <option value="Hatchback">Hatchback</option>
+                    <option value="Small Truck">Small Truck</option>
+                    <option value="Large Truck">Large Truck</option>
+                    <option value="Motorcycle">Motorcycle</option>
+                </select>
+
+                <!-- Model Year -->
+                <input type="number" name="model_year" placeholder="Model Year" class="form-control mb-3" required>
+
+                <!-- Description -->
+                <textarea name="description" placeholder="Description" class="form-control mb-3" rows="3" required></textarea>
+
+                <!-- Region Dropdown -->
+                <select name="regions" class="form-control mb-3" required>
+                    <option value="">-- Select Region --</option>
+                    <option value="MS">Muscat</option>
+                    <option value="DH">Dhofar</option>
+                    <option value="BT">Batinah</option>
+                    <option value="DA">Dakhiliyah</option>
+                    <option value="SH">Sharqiyah</option>
+                    <option value="BR">Buraimi</option>
+                    <option value="ZU">Zufar</option>
+                    <option value="MW">Musandam</option>
+                    <option value="WR">Wusta</option>
+                </select>
+
+                <!-- Cities -->
+                <input type="text" name="cities" placeholder="City" class="form-control mb-3" required>
+
+      
+              
+
+                <!-- Location -->
+                <input type="text" name="location" placeholder="Location Address" class="form-control mb-3" required>
+
+                <!-- Language -->
+                <input type="text" name="language" placeholder="Language Spoken" class="form-control mb-3" required>
+
+                <!-- About Instructor -->
+                <textarea name="about_instructor" placeholder="About Instructor" class="form-control mb-3" rows="3" required></textarea>
+
+                <!-- Map Section -->
+                <div id="map-training" style="height: 300px; width:100%; margin-bottom: 20px;"></div>
+
+                <!-- Image Upload -->
+                <label for="training-images">Upload Images (at least one required):</label>
+                <input type="file" id="training-images" name="images" class="form-control mb-3" multiple required>
+
+                
+
+                <button type="submit" class="btn btn-primary w-100">Register Training</button>
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Define regions with their correct coordinates
+const regions = {
+    'MS': [23.5880, 58.3829], // Muscat
+    'DH': [17.0174, 54.0822], // Dhofar (Salalah coordinates)
+    'BT': [23.6951, 57.9876], // Al Batinah (Sohar coordinates)
+    'DA': [22.9233, 57.5310], // Al Dakhiliyah (Nizwa coordinates)
+    'SH': [22.5660, 59.5291], // Al Sharqiyah (Sur coordinates)
+    'BR': [24.2497, 55.7930], // Al Buraimi
+    'ZU': [23.2273, 56.4861], // Al Dhahirah (Ibri coordinates)
+    'MW': [26.1979, 56.2462], // Musandam (Khasab coordinates)
+    'WR': [19.5076, 57.6342]  // Al Wusta (Duqm coordinates)
+};
+
+    
+        // Define cities with coordinates for each region
+        const citiesByRegion = {
+            MS: {
+                "Al Amarat": [23.5461, 58.2956],
+                "Al Bustan": [23.5869, 58.6014],
+                "Al Ghubrah": [23.5986, 58.4142],
+                "Al Hail": [23.6540, 58.2807],
+                "Al Hamriyah": [23.6040, 58.5366],
+                "Al Khoud": [23.6658, 58.1806],
+                "Al Khuwair": [23.5949, 58.4313],
+                "Al Maabilah": [23.7133, 58.1708],
+                "Al Mawaleh": [23.6657, 58.2487],
+                "Al Rusayl": [23.6006, 58.1997],
+                "Al Seeb": [23.6515, 58.3320],
+                "Al Sifah": [23.3825, 58.7907],
+                "Al Wadi Al Kabir": [23.6012, 58.5718],
+                "Ansab": [23.5656, 58.3612],
+                "Azaiba": [23.5943, 58.3798],
+                "Barr Al Jissah": [23.5637, 58.6494],
+                "Bosher": [23.5935, 58.4547],
+                "Darsait": [23.6115, 58.5513],
+                "Ghala": [23.5829, 58.3921],
+                "Madinat As Sultan Qaboos": [23.6021, 58.4517],
+                "Misfah": [23.5995, 58.3742],
+                "Muscat - Other": [23.5880, 58.3829],
+                "Muscat Hills": [23.5910, 58.3667],
+                "Mutrah": [23.6168, 58.5649],
+                "Qantab": [23.5468, 58.6610],
+                "Qurayyat": [23.5519, 58.8989],
+                "Qurum": [23.6134, 58.4725],
+                "Ruwi": [23.6038, 58.5433],
+                "Sadab": [23.5874, 58.6184],
+                "Sultan Haitham City": [23.6267, 58.4000],
+                "The Wave (Almouj)": [23.6549, 58.2352],
+                "Yiti": [23.5211, 58.6910]
+            },
+            DH: {
+                "Al Mazyona": [17.2160, 53.6120],
+                "Dhalkut": [16.8210, 53.7880],
+                "Mirbat": [17.0195, 54.0479],
+                "Muqshin": [18.4303, 54.0956],
+                "Rakhyut": [16.8210, 54.0271],
+                "Sadah": [17.0354, 55.0671],
+                "Salalah": [17.0079, 54.0927],
+                "Shalim and The Hallaniyat Island": [17.0487, 53.6290],
+                "Taqah": [17.0173, 54.5175],
+                "Thumrait": [17.2899, 54.5371]
+            },
+            BT: {
+                "Al 'Awabi": [23.3300, 57.5244],
+                "Al Khaboura": [24.5939, 56.1792],
+                "Al Masn'a": [23.7810, 57.5406],
+                "Al Rustaq": [23.4262, 57.4469],
+                "Barka": [23.7074, 57.9985],
+                "Liwa": [24.5051, 56.0591],
+                "Nakhl": [23.4794, 57.6129],
+                "Saham": [24.1722, 56.8885],
+                "Shinas": [24.6424, 56.1481],
+                "Sohar": [24.4231, 56.7047],
+                "Suwaiq": [24.6982, 56.4723],
+                "Wadi Al Ma'awal": [23.2017, 57.4058]
+            },
+            DA: {
+                "Adam": [22.3756, 57.5265],
+                "Bahla": [22.9570, 57.3303],
+                "Bidbid": [23.4069, 58.1267],
+                "Hamra": [23.1201, 57.3187],
+                "Izki": [23.1306, 57.4529],
+                "Manah": [22.9241, 57.4385],
+                "Nizwa": [22.9333, 57.5333],
+                "Sumail": [23.3708, 57.4025]
+            },
+            SH: {
+                "Al Kamil and Al Waafi": [22.3805, 58.9537],
+                "Al Mudaibi": [22.6458, 58.6012],
+                "Al Qabil": [22.5685, 58.5478],
+                "Bidiya": [22.4612, 59.1605],
+                "Dima and Al Taaiyin": [22.8594, 58.6679],
+                "Ibra": [22.6833, 58.5328],
+                "Ja'alan Bani Bu Ali": [22.0167, 59.4921],
+                "Ja'alan Bani Buhassan": [22.2022, 59.4669],
+                "Masira": [20.4724, 58.7197],
+                "Sur": [22.5667, 59.5278],
+                "Wadi Bani Khalid": [22.6290, 58.7436]
+            },
+            BR: {
+                "Al Buraimi": [23.2550, 55.9247],
+                "Al Sinainah": [23.3278, 55.8999],
+                "Mahdhah": [23.3971, 55.8210]
+            },
+            ZU: {
+                "Dhank": [23.1520, 56.0728],
+                "Ibri": [23.2257, 56.5154],
+                "Yunqul": [23.5875, 55.5298]
+            },
+            MW: {
+                "Bukha": [26.3005, 56.1320],
+                "Dibba": [26.2913, 56.0894],
+                "Khasab": [26.1723, 56.2425],
+                "Madha": [26.3075, 56.1144]
+            },
+            WR: {
+                "Al Duqum": [19.1875, 57.7500],
+                "Al Jazur": [19.4065, 58.2543],
+                "Haima": [20.6375, 57.4999],
+                "Mahut": [19.5050, 58.2907]
+            }
+        };
+    
+        function initializeMap(mapId, modal) {
+            var map = L.map(mapId).setView([20.5937, 57.8304], 6); // Centered on Oman
+            var currentMarkers = []; // To store reference to current markers
+            var cityCircle = null; // To store reference to the city circle
+        
+            // Add OpenStreetMap tile layer
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 30,
+                attribution: '© OpenStreetMap'
+            }).addTo(map);
+        
+            // Update map view based on selected region
+            modal.querySelector('select[name="regions"]').addEventListener('change', function () {
+                var region = this.value;
+                if (regions[region]) {
+                    map.setView(regions[region], 7); // Zoom in on the selected region
+                    // Clear existing markers
+                    currentMarkers.forEach(marker => map.removeLayer(marker));
+                    currentMarkers = [];
+                    // Remove city circle if it exists
+                    if (cityCircle) {
+                        map.removeLayer(cityCircle);
+                        cityCircle = null;
+                    }
+                }
+            });
+        
+            // Update map view based on selected city under region
+            modal.querySelector('select[name="cities"]').addEventListener('change', function () {
+                var region = modal.querySelector('select[name="regions"]').value;
+                var city = this.value;
+                if (citiesByRegion[region] && citiesByRegion[region][city]) {
+                    var cityCoords = citiesByRegion[region][city];
+                    map.setView(cityCoords, 12); // Zoom in to the city level
+        
+                    // Clear existing markers
+                    currentMarkers.forEach(marker => map.removeLayer(marker));
+                    currentMarkers = [];
+        
+                    // Remove existing city circle if it exists
+                    if (cityCircle) {
+                        map.removeLayer(cityCircle);
+                    }
+        
+                    // Add a new marker for the selected city
+                    var marker = L.marker(cityCoords).addTo(map).bindPopup("City: " + city).openPopup();
+                    currentMarkers.push(marker); // Store the marker
+        
+                    // Draw a circle around the city to highlight it
+                    cityCircle = L.circle(cityCoords, {
+                        color: 'orange',
+                        
+                        fillOpacity: 0.2,
+                        radius: 3000 // Adjust the radius as needed
+                    }).addTo(map);
+                }
+            });
+        
+            // Add click event to the map
+            map.on('click', function (e) {
+                var lat = e.latlng.lat;
+                var lng = e.latlng.lng;
+        
+                // Clear existing markers but keep the city circle
+                currentMarkers.forEach(marker => map.removeLayer(marker));
+                currentMarkers = [];
+        
+                // Set latitude and longitude input values within the current modal context
+                modal.querySelector('input[name="latitude"]').value = lat.toFixed(6); // Limit to 6 decimal places
+                modal.querySelector('input[name="longitude"]').value = lng.toFixed(6); // Limit to 6 decimal places
+        
+                // Add a new marker for the clicked location
+                var marker = L.marker([lat, lng]).addTo(map).bindPopup("Location: " + lat + ", " + lng).openPopup();
+                currentMarkers.push(marker); // Store the marker
+            });
+        
+            // Resize the map when the modal is shown
+            modal.addEventListener('shown.bs.modal', function () {
+                map.invalidateSize(); // Resize the map to fit the modal
+            });
+        }
+        
+    
+        // Initialize map for each modal when it is shown
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('show.bs.modal', function () {
+                const mapId = this.querySelector('div[id^="map-"]').id; // Get the unique map ID
+                initializeMap(mapId, this); // Pass the modal context to the initializeMap function
+            });
+        });
+    
+        // Handle region change for each modal
+        function handleRegionChange(modal) {
+            const regionDropdown = modal.querySelector('select[name="regions"]');
+            const cityDropdown = modal.querySelector('select[name="cities"]');
+    
+            regionDropdown.addEventListener("change", function() {
+                const region = this.value;
+                cityDropdown.innerHTML = <option value="">Select City</option>; // Reset cities dropdown
+    
+                if (region && citiesByRegion[region]) {
+                    for (const city in citiesByRegion[region]) {
+                        const option = document.createElement("option");
+                        option.value = city;
+                        option.textContent = city;
+                        cityDropdown.appendChild(option);
+                    }
+                }
+            });
+        }
+    
+        // Initialize event listeners for each modal
+        document.querySelectorAll('.modal').forEach(modal => {
+            handleRegionChange(modal);
+        });
+    </script>
+
+{% include 'footer.html' %}

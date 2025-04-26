@@ -1,0 +1,373 @@
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Company Registration</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        header {
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        a {
+            text-decoration: none;
+        }
+        main {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #6c757d;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        select.form-select {
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            background-color: white;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Edit Company Registration</h1>
+    <p>Register your company to collaborate with us.</p>
+</header>
+
+<main>
+    <h2>Edit Company</h2>
+
+    <!-- Check if user already has a company -->
+    {% if user.company %}
+        <!-- Display Company Details -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">{{ user.company.company_name }}</h5>
+                <p><strong>Type:</strong> {{ user.company.company_type }}</p>
+                <p><strong>City:</strong> {{ user.company.city }}</p>
+                <p><strong>Industry:</strong> {{ user.company.industry }}</p>
+                <p><strong>Description:</strong> {{ user.company.description }}</p>
+                <a href="{% url 'company_dashboard' company_id=user.company.id %}" class="btn btn-primary">Go to Dashboard</a>
+            </div>
+        </div>
+    {% else %}
+      <!-- Registration Form -->
+<form action="" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="row">
+        <!-- Left Column -->
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="company_name" class="form-label">Company Name</label>
+                <input type="text" id="company_name" name="company_name" class="form-control" value="{{ company.company_name }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="company_type" class="form-label">Company Type</label>
+                <select id="company_type" name="company_type" class="form-select" required>
+                    <option value="" disabled>Select Company Type</option>
+                    <option value="private" {% if company.company_type == "private" %}selected{% endif %}>Private</option>
+                    <option value="partnership" {% if company.company_type == "partnership" %}selected{% endif %}>Partnership</option>
+                    <option value="civil_company" {% if company.company_type == "civil_company" %}selected{% endif %}>Civil Company</option>
+                    <option value="public" {% if company.company_type == "public" %}selected{% endif %}>Public</option>
+                </select>
+            </div>
+
+            
+
+            <div class="form-group">
+                <label for="trade_license" class="form-label">Trade License Number</label>
+                <input type="text" id="trade_license" name="trade_license" class="form-control" value="{{ company.trade_license }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="contact_name" class="form-label">Contact Name</label>
+                <input type="text" id="contact_name" name="contact_name" class="form-control" value="{{ company.contact_name }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="linkedin" class="form-label">
+                    <i class="fa-brands fa-linkedin"></i> LinkedIn Profile
+                </label>
+                <input type="url" id="linkedin" name="linkedin" class="form-control" value="{{ company.linkedin|default:"" }}">
+            </div>
+
+            <div class="form-group">
+                <label for="facebook" class="form-label">
+                    <i class="fa-brands fa-facebook"></i> Facebook Profile
+                </label>
+                <input type="url" id="facebook" name="facebook" class="form-control" value="{{ company.facebook|default:"" }}">
+            </div>
+            <div class="form-group">
+                <label for="youtube" class="form-label">
+                    <i class="fa-brands fa-youtube"></i> YouTube Channel
+                </label>
+                <input type="url" id="youtube" name="youtube" class="form-control" value="{{ company.youtube|default:"" }}">
+            </div>
+            <div class="form-group">
+                <label for="regions" class="form-label">Region</label>
+                <select name="regions" id="regions" class="form-control mb-3" required>
+                    <option value="">Select Region</option>
+                    <option value="MS" {% if company.regions == 'MS' %}selected{% endif %}>Muscat</option>
+                    <option value="DH" {% if company.regions == 'DH' %}selected{% endif %}>Dhofar</option>
+                    <option value="BT" {% if company.regions == 'BT' %}selected{% endif %}>Batinah</option>
+                    <option value="DA" {% if company.regions == 'DA' %}selected{% endif %}>Dakhiliyah</option>
+                    <option value="SH" {% if company.regions == 'SH' %}selected{% endif %}>Sharqiyah</option>
+                    <option value="BR" {% if company.regions == 'BR' %}selected{% endif %}>Buraimi</option>
+                    <option value="ZU" {% if company.regions == 'ZU' %}selected{% endif %}>Zufar</option>
+                    <option value="MW" {% if company.regions == 'MW' %}selected{% endif %}>Musandam</option>
+                    <option value="WR" {% if company.regions == 'WR' %}selected{% endif %}>Wusta</option>
+                </select>
+            </div>
+            
+    
+    <div class="form-group">
+        <label for="cities" class="form-label">City</label>
+        <select id="cityDropdown" name="cities" class="form-control mb-3" required>
+            <option value="">Select City</option>
+        </select>
+    </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="industry" class="form-label">Industry</label>
+                <select id="industry" name="industry" class="form-select" required>
+                    <option value="" disabled>Select Industry</option>
+                    <option value="agriculture" {% if company.industry == 'agriculture' %}selected{% endif %}>Agriculture</option>
+                    <option value="accounting" {% if company.industry == 'accounting' %}selected{% endif %}>Accounting</option>
+                    <option value="it" {% if company.industry == 'it' %}selected{% endif %}>IT</option>
+                    <option value="education" {% if company.industry == 'education' %}selected{% endif %}>Education</option>
+                    <option value="healthcare" {% if company.industry == 'healthcare' %}selected{% endif %}>Healthcare</option>
+                </select>
+            </div>
+            
+
+            <div class="form-group">
+                <label for="company_size" class="form-label">Company Size</label>
+                <input type="number" id="company_size" name="company_size" class="form-control" value="{{ company.company_size }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="phone" class="form-label">Phone</label>
+                <input type="number" id="phone" name="phone" class="form-control" value="{{ company.phone }}" required>
+            </div>
+            <div class="form-group">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" id="email" name="email" class="form-control" value="{{ company.email }}" required>
+            </div>
+            <div class="form-group">
+                <label for="logo" class="form-label">Company Logo</label>
+                {% if company.logo %}
+                    <div class="mb-2">
+                        <img src="{{ company.logo.url }}" alt="Current Logo" width="80px" height="80px">
+                    </div>
+                {% endif %}
+                <input type="file" id="logo" name="logo" class="form-control" accept=".jpg,.png,.jpeg">
+            </div>
+            
+
+            <div class="form-group">
+                <label for="website" class="form-label">
+                    <i class="fa-solid fa-globe"></i> Website
+                </label>
+                <input type="url" id="website" name="website" class="form-control" value="{{ company.website|default:"" }}">
+            </div>
+
+            <div class="form-group">
+                <label for="instagram" class="form-label">
+                    <i class="fa-brands fa-instagram"></i> Instagram Profile
+                </label>
+                <input type="url" id="instagram" name="instagram" class="form-control" value="{{ company.instagram|default:"" }}">
+            </div>
+       
+           
+       
+   
+</div>
+    </div>
+<!-- Right Column -->
+<div class="col-md-6">
+    <div class="form-group " hidden>
+        <label for="latitude" class="form-label">Latitude</label>
+        <input type="number" step="0.000001" name="latitude" 
+               class="form-control mb-3" placeholder="Latitude" required 
+               value="{{ company.latitude }}" readonly>
+    </div>
+    
+    <div class="form-group" hidden>
+        <label for="longitude" class="form-label">Longitude</label>
+        <input type="number" step="0.000001" name="longitude" 
+               class="form-control mb-3" placeholder="Longitude" readonly required 
+               value="{{ company.longitude }}">
+    </div>
+</div>
+</div>
+    <!-- <div id="map-company" style="height: 300px; width:100%;"></div> -->
+    <!-- Description -->
+    <div class="col-md-12">
+    <div class="form-group mt-3">
+        <label for="description" class="form-label">Description</label>
+        <textarea id="description" name="description" class="form-control" rows="4" required>{{ company.description }}</textarea>
+    </div>
+    
+
+    <button type="submit" class="btn btn-primary w-100 mt-3">Save Changes</button>
+</form>
+
+    {% endif %}
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script>
+    const citiesByRegion = {
+        MS: {
+                "Al Amarat": [23.5461, 58.2956],
+                "Al Bustan": [23.5869, 58.6014],
+                "Al Ghubrah": [23.5986, 58.4142],
+                "Al Hail": [23.6540, 58.2807],
+                "Al Hamriyah": [23.6040, 58.5366],
+                "Al Khoud": [23.6658, 58.1806],
+                "Al Khuwair": [23.5949, 58.4313],
+                "Al Maabilah": [23.7133, 58.1708],
+                "Al Mawaleh": [23.6657, 58.2487],
+                "Al Rusayl": [23.6006, 58.1997],
+                "Al Seeb": [23.6515, 58.3320],
+                "Al Sifah": [23.3825, 58.7907],
+                "Al Wadi Al Kabir": [23.6012, 58.5718],
+                "Ansab": [23.5656, 58.3612],
+                "Azaiba": [23.5943, 58.3798],
+                "Barr Al Jissah": [23.5637, 58.6494],
+                "Bosher": [23.5935, 58.4547],
+                "Darsait": [23.6115, 58.5513],
+                "Ghala": [23.5829, 58.3921],
+                "Madinat As Sultan Qaboos": [23.6021, 58.4517],
+                "Misfah": [23.5995, 58.3742],
+                "Muscat - Other": [23.5880, 58.3829],
+                "Muscat Hills": [23.5910, 58.3667],
+                "Mutrah": [23.6168, 58.5649],
+                "Qantab": [23.5468, 58.6610],
+                "Qurayyat": [23.5519, 58.8989],
+                "Qurum": [23.6134, 58.4725],
+                "Ruwi": [23.6038, 58.5433],
+                "Sadab": [23.5874, 58.6184],
+                "Sultan Haitham City": [23.6267, 58.4000],
+                "The Wave (Almouj)": [23.6549, 58.2352],
+                "Yiti": [23.5211, 58.6910]
+            },
+            DH: {
+                "Al Mazyona": [17.2160, 53.6120],
+                "Dhalkut": [16.8210, 53.7880],
+                "Mirbat": [17.0195, 54.0479],
+                "Muqshin": [18.4303, 54.0956],
+                "Rakhyut": [16.8210, 54.0271],
+                "Sadah": [17.0354, 55.0671],
+                "Salalah": [17.0079, 54.0927],
+                "Shalim and The Hallaniyat Island": [17.0487, 53.6290],
+                "Taqah": [17.0173, 54.5175],
+                "Thumrait": [17.2899, 54.5371]
+            },
+            BT: {
+                "Al 'Awabi": [23.3300, 57.5244],
+                "Al Khaboura": [24.5939, 56.1792],
+                "Al Masn'a": [23.7810, 57.5406],
+                "Al Rustaq": [23.4262, 57.4469],
+                "Barka": [23.7074, 57.9985],
+                "Liwa": [24.5051, 56.0591],
+                "Nakhl": [23.4794, 57.6129],
+                "Saham": [24.1722, 56.8885],
+                "Shinas": [24.6424, 56.1481],
+                "Sohar": [24.4231, 56.7047],
+                "Suwaiq": [24.6982, 56.4723],
+                "Wadi Al Ma'awal": [23.2017, 57.4058]
+            },
+            DA: {
+                "Adam": [22.3756, 57.5265],
+                "Bahla": [22.9570, 57.3303],
+                "Bidbid": [23.4069, 58.1267],
+                "Hamra": [23.1201, 57.3187],
+                "Izki": [23.1306, 57.4529],
+                "Manah": [22.9241, 57.4385],
+                "Nizwa": [22.9333, 57.5333],
+                "Sumail": [23.3708, 57.4025]
+            },
+            SH: {
+                "Al Kamil and Al Waafi": [22.3805, 58.9537],
+                "Al Mudaibi": [22.6458, 58.6012],
+                "Al Qabil": [22.5685, 58.5478],
+                "Bidiya": [22.4612, 59.1605],
+                "Dima and Al Taaiyin": [22.8594, 58.6679],
+                "Ibra": [22.6833, 58.5328],
+                "Ja'alan Bani Bu Ali": [22.0167, 59.4921],
+                "Ja'alan Bani Buhassan": [22.2022, 59.4669],
+                "Masira": [20.4724, 58.7197],
+                "Sur": [22.5667, 59.5278],
+                "Wadi Bani Khalid": [22.6290, 58.7436]
+            },
+            BR: {
+                "Al Buraimi": [23.2550, 55.9247],
+                "Al Sinainah": [23.3278, 55.8999],
+                "Mahdhah": [23.3971, 55.8210]
+            },
+            ZU: {
+                "Dhank": [23.1520, 56.0728],
+                "Ibri": [23.2257, 56.5154],
+                "Yunqul": [23.5875, 55.5298]
+            },
+            MW: {
+                "Bukha": [26.3005, 56.1320],
+                "Dibba": [26.2913, 56.0894],
+                "Khasab": [26.1723, 56.2425],
+                "Madha": [26.3075, 56.1144]
+            },
+            WR: {
+                "Al Duqum": [19.1875, 57.7500],
+                "Al Jazur": [19.4065, 58.2543],
+                "Haima": [20.6375, 57.4999],
+                "Mahut": [19.5050, 58.2907]
+            }
+    };
+
+    document.getElementById('regions').addEventListener('change', function() {
+        const selectedRegion = this.value;
+        const cityDropdown = document.getElementById('cityDropdown');
+
+        cityDropdown.innerHTML = '<option value="">Select City</option>';
+
+        if (selectedRegion && citiesByRegion[selectedRegion]) {
+            const cities = citiesByRegion[selectedRegion];
+            Object.keys(cities).forEach(city => {
+                const option = document.createElement('option');
+                option.value = city;
+                option.textContent = city;
+                cityDropdown.appendChild(option);
+            });
+        }
+    });
+</script>
+
+
+
+
+
+</body><!-- End of .page_wrapper -->
+</html>

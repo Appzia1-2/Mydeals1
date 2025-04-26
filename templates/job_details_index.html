@@ -1,0 +1,455 @@
+{% load static %}
+{% include 'header.html' %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+    .job_details_area {
+        padding: 30px 0;
+    }
+
+    .job_details_header {
+        margin-bottom: 30px;
+    }
+
+    .job_details_header .single_jobs {
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        background-color: #fff;
+    }
+
+    .jobs_left {
+        display: flex;
+        align-items: center;
+    }
+
+    .jobs_left .thumb {
+        margin-right: 15px;
+    }
+
+    .jobs_left .thumb img {
+        width: 40px;
+        height: 40px;
+    }
+
+    .jobs_left .jobs_conetent h4 {
+        font-size: 20px;
+        color: #333;
+        margin: 0;
+        border-bottom: 2px solid transparent;
+        padding-bottom: 5px;
+        transition: border-bottom 0.3s ease;
+    }
+
+   
+
+    .jobs_left .links_locat {
+        display: flex;
+        margin-top: 5px;
+    }
+
+    .jobs_left .links_locat .location {
+        display: flex;
+        align-items: center;
+        margin-right: 15px;
+    }
+
+    .jobs_left .links_locat .location i {
+        margin-right: 5px;
+        /* color: #ff6f61; */
+    }
+
+    .jobs_right {
+        display: flex;
+        align-items: center;
+    }
+
+    .jobs_right .apply_now {
+        margin-left: 15px;
+    }
+
+    .job_details_header .heart_mark {
+        font-size: 20px;
+        color: #ff6f61;
+    }
+
+    /* Job Description, Responsibility, Qualifications, and Benefits */
+    .descript_wrap {
+        margin-bottom: 30px;
+        background-color: #fff;
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .single_wrap h4 {
+        font-size: 22px;
+        color: #333;
+        margin-bottom: 15px;
+        /* border-bottom: 2px solid #ff6f61; */
+        padding-bottom: 5px;
+    }
+
+    .single_wrap ul {
+        list-style: none;
+        padding-left: 20px;
+    }
+
+    .single_wrap ul li {
+        margin-bottom: 10px;
+        color: #666;
+    }
+
+    .apply_now_button {
+        background-color: #ff6f61;
+        color: #fff;
+        padding: 12px 30px;
+        font-size: 18px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        display: inline-block;
+        transition: background-color 0.3s ease;
+    }
+
+    .apply_now_button:hover {
+        background-color: #ff4b3a;
+    }
+
+    /* Job Summary Section */
+    .job_sumary {
+        background-color: #fff;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .job_sumary h3 {
+        font-size: 24px;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    .job_sumary .job_content ul {
+        list-style: none;
+        padding-left: 0;
+    }
+
+    .job_sumary .job_content ul li {
+        margin-bottom: 10px;
+        font-size: 16px;
+        color: #666;
+    }
+
+    /* Share Section */
+    .share_wrap {
+        margin-top: 30px;
+    }
+
+    .share_wrap span {
+        font-size: 16px;
+        /* color: #333; */
+        margin-right: 10px;
+    }
+
+    .share_wrap ul {
+        list-style: none;
+        display: flex;
+        padding-left: 0;
+    }
+
+    .share_wrap ul li {
+        margin-right: 15px;
+    }
+
+    .share_wrap ul li a {
+        font-size: 18px;
+        color: #333;
+        transition: color 0.3s;
+    }
+
+    .share_wrap ul li a:hover {
+        color: #ff6f61;
+    }
+
+    /* Map Section */
+    .job_location_wrap {
+        margin-top: 30px;
+    }
+
+    .job_location_wrap #map {
+        width: 100%;
+        height: 250px;
+        border-radius: 10px;
+    }
+
+    /* Responsive Styling */
+    @media (max-width: 768px) {
+        .job_details_area .container {
+            padding: 0 15px;
+        }
+
+        .job_details_header .single_jobs {
+            flex-direction: column;
+        }
+
+        .jobs_left {
+            margin-bottom: 15px;
+        }
+
+        .apply_now_button {
+            width: 100%;
+            margin-top: 20px;
+        }
+    }
+    .list1 {
+        list-style-type: none; 
+        margin-left: 40px;
+        position: relative;
+        padding-left: 30px; 
+    }
+    
+    .list1::before {
+        content: '\f0b1';
+        font-family: 'FontAwesome';
+        font-size: 14px;
+        position: absolute;
+        left: 0;
+        top: 0;
+    }
+    /* The Modal (background) */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0, 0, 0, 0.4); /* Black with transparency */
+}
+
+/* Modal Content */
+.modal-content {
+    background-color: #fff;
+    margin: 15% auto;
+    padding: 20px;
+    border-radius: 10px;
+    width: 50%;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* The Close Button */
+.close {
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    position: absolute;
+    top: 10px;
+    right: 25px;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Modal Form Inputs */
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+form label {
+    margin: 5px 0;
+}
+
+form input {
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+form button {
+    padding: 10px;
+    background-color: #ff6f61;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+form button:hover {
+    background-color: #ff4b3a;
+}
+
+</style>
+
+<!-- banner-section -->
+<section class="banner-section style-two centred" style="background-image: url(assets/images/banner/banner-1.jpg);">
+    <div class="auto-container">
+        <div class="content-box">
+            <div class="text">
+                <h1>Job hunting made easy with OMAN</h1>
+                <p>Amet consectetur adipisicing elit sed do eiusmod.</p>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- banner-section end -->
+<div class="job_details_area">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="job_details_header">
+                    <div class="single_jobs white-bg d-flex justify-content-between">
+                        <div class="jobs_left d-flex align-items-center">
+                            <div class="thumb">
+                                <img src="https://placehold.co/60x60" alt="Company logo">
+                            </div>
+                            <div class="jobs_conetent">
+                                <a href="#"><h4>{{ job.title }}</h4></a>
+                                <div class="links_locat d-flex align-items-center">
+                                    <div class="location">
+                                        <p><i class="fa fa-map-marker"></i> {{ job.work_location }}</p>
+                                    </div>
+                                    <div class="location">
+                                        <p><i class="fa fa-clock-o"></i> {{ job.job_type|title }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="jobs_right">
+                            <div class="apply_now">
+                                <a class="heart_mark" href="#"><i class="ti-heart"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="descript_wrap white-bg">
+                    <div class="single_wrap">
+                        <h4>Job description</h4>
+                        <p>{{ job.description }}</p>
+                    </div>
+                    <div class="single_wrap">
+                        <h4>Responsibilities</h4>
+                        <ul style="list-style-type: disc; padding-left: 20px;">
+                            <li class="list1">{{ job.skills_required }}</li>
+                            <li class="list1">{{ job.experience_required }}</li>
+                            <!-- You can add more fields or content as needed -->
+                        </ul>
+                    </div>
+                    <div class="single_wrap">
+                        <h4>Qualifications</h4>
+                        <ul style="list-style-type: disc; padding-left: 20px;">
+                            <li class="list1">{{ job.qualifications }}</li>
+                            <!-- You can add more qualification details as needed -->
+                        </ul>
+                    </div>
+                    <div class="single_wrap">
+                        <h4>Benefits</h4>
+                        <p>Additional benefits or perks can go here. (Optional)</p>
+                    </div>
+                </div>
+                
+                <div class="submit_btn">
+                    {% if user.is_authenticated %}
+                        <!-- Redirect to the job application page if the user is authenticated -->
+                        <a href="{% url 'jobdetails' user_id=user.id job_id=job.id %}">
+                            <button class="apply_now_button">Apply Now</button>
+                        </a>
+                    {% else %}
+                        <!-- Redirect to the login page if the user is not authenticated -->
+                        <a href="{% url 'login' %}">
+                            <button class="apply_now_button">Apply Now</button>
+                        </a>
+                    {% endif %}
+                </div>
+                
+                
+            </div>
+
+            <div class="col-lg-4">
+                <div class="job_sumary">
+                    <div class="summery_header">
+                        <h3>Job Summary</h3>
+                    </div>
+                    <div class="job_content">
+                        <ul>
+                            <li>Published on: <span>{{ job.posted_on|date:"d M, Y" }}</span></li>
+                            <li>Vacancy: <span>{{ job.number_of_vacancies }} Position</span></li>
+                            <li>Experience: <span>{{ job.experience_required }} </span></li>
+                            <li>Salary: <span>{{ job.salary_range }}</span></li>
+                            <li>Location: <span>{{ job.work_location }}</span></li>
+                            <li>Job Nature: <span>{{ job.job_type|title }}</span></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="share_wrap d-flex">
+                    <span>Share at:</span>
+                    <ul>
+                        <li><a href="#"> <i class="fab fa-facebook"></i> </a> </li>
+                        <li><a href="#"> <i class="fab fa-google-plus"></i> </a> </li>
+                        <li><a href="#"> <i class="fab fa-twitter"></i> </a> </li>
+                        <li><a href="#"> <i class="fas fa-envelope"></i> </a> </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Popup Modal -->
+<div id="applyModal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="closeModal">&times;</span>
+        <h2>Apply with Resume</h2>
+        <p>Please fill in your details below to apply:</p>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <label for="name">Full Name</label>
+            <input type="text" id="name" name="name" value="{{ request.user.username|title }}" required>
+            
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" value="{{ request.user.email }}" required>
+            
+            <label for="phone">Phone Number</label>
+            <input type="text" id="phone" name="phone" value="{{ request.user.phone|default:'' }}">
+            
+            <label for="resume">Upload Resume</label>
+            <input type="file" id="resume" name="resume" accept="application/pdf">
+            
+            <button type="submit">Submit Application</button>
+        </form>
+    </div>
+</div>
+{% include 'footer.html' %}
+
+<script>
+    // Modal logic
+    var modal = document.getElementById("applyModal");
+    var btn = document.getElementById("applyNowBtn");
+    var span = document.getElementById("closeModal");
+
+    // Open the modal
+    btn.onclick = function() {
+        modal.style.display = "block";
+    }
+
+    // Close the modal on clicking the close button
+    span.onclick = function() {
+        modal.style.display = "none";
+    }
+
+    // Close the modal on clicking outside the modal
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+</script>

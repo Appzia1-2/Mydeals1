@@ -1,0 +1,1151 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+
+<title>OMAN</title>
+
+<!-- Fav Icon -->
+<link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
+
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,300;1,400;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- Stylesheets -->
+<link href="{% static 'assets/css/font-awesome-all.css' %}" rel="stylesheet">
+<link href="{% static 'assets/css/flaticon.css' %}" rel="stylesheet">
+<link href="{% static 'assets/css/owl.css' %}" rel="stylesheet">
+<link href="{% static 'assets/css/bootstrap.css' %}" rel="stylesheet">
+<link href="{% static 'assets/css/jquery.fancybox.min.css' %}" rel="stylesheet">
+<link href="{% static 'assets/css/animate.css' %}" rel="stylesheet">
+<link href="{% static 'assets/css/nice-select.css' %}" rel="stylesheet">
+<link href="{% static 'assets/css/color.css' %}" rel="stylesheet">
+<link href="{% static 'assets/css/style.css' %}" rel="stylesheet">
+<link href="{% static 'assets/css/responsive.css' %}" rel="stylesheet">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+</head>
+<style>
+    /* Show dropdown on hover */
+.navbar .dropdown:hover .dropdown-menu {
+    display: block;
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Optional: Smooth transition effect */
+.dropdown-menu {
+    display: none; /* Hide by default */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+.property-video{
+        width:300px;
+      }
+
+</style>
+<style>
+/* Make the search field smaller and position it closer to the logo */
+.search-box {
+    display: inline-flex;
+    align-items: center;
+    width: 100%;
+    margin-left: -170px;
+}
+.location-icon {
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+    font-size: 18px;
+    background: linear-gradient(45deg, red, orange);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.search-input {
+    border: 1px solid #15818E; 
+    border-radius: 10px; 
+    padding: 10px;
+    width: 70%; 
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
+}
+.search-btn {
+    position: absolute;
+    right: 0;
+    padding: 5px 10px;
+    background: linear-gradient(45deg, #EB362D, #F9AD1F, #EB362D, #F9AD1F); /* Gradient background */
+    border: none;
+    border-radius: 0 10px 20px 0;
+    cursor: pointer;
+}
+
+.search-btn i {
+    color: #fff; /* White color for the icon */
+}
+
+/* Adjust spacing for the right section */
+.row.align-items-center {
+    display: flex;
+    justify-content: space-between;
+}
+
+.icon-logo {
+    margin-right: 10px;
+}
+
+.icon-text {
+    font-size: 12px;
+    text-align: center;
+}
+
+/* Ensure the right section (logos + sign-in) is aligned properly */
+.col-md-6.d-flex.justify-content-end {
+    display: flex;
+    justify-content: flex-end;
+}
+.icon-logo a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    transition: all 0.3s ease; /* Smooth transition for hover effects */
+}
+
+.icon-logo:hover {
+    background-color: #f0f0f0; /* Light background on hover */
+    border-radius: 5px; /* Optional: Adds slight rounded corners to the hovered area */
+    padding: 5px; /* Adds padding around the icon and text */
+}
+
+.icon-logo img {
+    width: 20px;
+    height: 20px;
+    margin-left: 11px; /* Adjust margin based on your preference */
+    transition: transform 0.3s ease; /* Smooth scale effect for the icon */
+}
+
+.icon-logo:hover img {
+    transform: scale(1.1); /* Slightly enlarge the icon when hovered */
+}
+
+.icon-text {
+    font-size: 12px;
+    text-align: center;
+    margin-top: 5px;
+    color: #333; /* Default color */
+    transition: color 0.3s ease; /* Smooth color transition for text */
+}
+
+.icon-logo:hover .icon-text {
+    color: #007bff; /* Change text color on hover */
+}
+
+
+
+
+/* Small line between Sign In and Add Post */
+.separator {
+    width: 1px;
+    height: 30px;
+    background-color: #ccc;
+    margin: 0 10px;
+}
+
+/* Underline below Sign In */
+.sign-in a {
+    position: relative;
+    display: inline-block;
+    text-decoration: none;
+    color: black;
+    font-weight: bold;
+}
+
+.sign-in a::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #333;
+}
+/* Change the background color of icons on hover */
+.icon-logo a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.icon-logo:hover {
+    background-color: #f0f0f0; /* Light background on hover */
+    border-radius: 5px; /* Slight rounded corners */
+    padding: 5px; /* Padding around the icon */
+}
+
+.icon-logo:hover img {
+    transform: scale(1.1); /* Slightly enlarge the icon when hovered */
+}
+
+/* Add gradient color to "Add Post" button */
+.theme-btn-one {
+    background: linear-gradient(45deg, #F9AD1F, #EB362D);
+    color: white;
+    padding: 5px 15px;
+    border-radius: 15px;
+    text-decoration: none;
+    margin-right: 10px;
+}
+
+.theme-btn-two {
+    background: linear-gradient(45deg, #F9AD1F, #EB362D);
+    color: white;
+    padding: 2px 15px;
+    border-radius: 15px;
+    margin-top:-2px;
+    text-decoration: none;
+    margin-right: 10px;
+}
+
+/* Small line between Sign In and Add Post */
+.separator {
+    width: 1px;
+    height: 50px;
+    background-color: #ccc;
+    margin: 0 10px;
+}
+
+/* Underline below Sign In */
+.sign-in a {
+    position: relative;
+    display: inline-block;
+    text-decoration: none;
+    color: black;
+    font-weight: bold;
+}
+
+.sign-in a::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #333;
+}
+/* Style for the "Log in or sign up" link */
+.login-link {
+    position: relative;
+    display: inline-block;
+    text-decoration: none;
+    color: black;
+    font-weight: bold;
+    font-size: 14px; /* Reduced font size */
+    transition: font-size 0.3s ease, color 0.3s ease; /* Smooth transition for font size and color */
+}
+
+/* Animated underline effect with gradient */
+.login-link::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: linear-gradient( #F9AD1F, #EB362D); /* Gradient from orange to red */
+    transition: width 0.3s ease; /* Animate the width of the underline */
+}
+
+/* Hover effects on the link */
+.login-link:hover {
+    color: linear-gradient( #F9AD1F, #EB362D); /* Change text color on hover */
+    font-size: 16px; /* Increase font size slightly on hover */
+}
+
+.login-link:hover::after {
+    width: 100%; /* Expand underline to full width on hover */
+}
+
+
+
+/* Center the navbar */
+.main-menu {
+    text-align: center;
+    margin: 0 auto;
+    padding: 0;
+  
+}
+
+.main-menu .navigation {
+    display: inline-block; /* Center the navigation items */
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.main-menu .navigation > li {
+    display: inline-block;
+   
+}
+
+.main-menu .navigation > li > a {
+    text-decoration: none;
+    color: #000; /* Default color */
+    padding: 10px 15px;
+}
+
+.main-menu .navigation > li > a:hover {
+    color: #007bff; /* Change color on hover */
+}
+
+.gradient-button {
+    display: inline-block;
+    background: linear-gradient( #F9AD1F, #EB362D);
+    padding: 5px;
+    border-radius: 30px;
+    color: white;
+    font-weight: bold;
+    text-decoration: none;
+    transition: background 0.3s ease, filter 0.3s ease;
+    filter: blur(0px); /* Initial blur level */
+}
+
+.gradient-button:hover {
+    background: linear-gradient( #F9AD1F, #EB362D);
+    filter: blur(18px); /* Add a blur effect on hover */
+}
+
+.gradient-button span {
+    font-size: 12px;
+}
+
+/* Hide the mobile toggle on larger screens */
+@media (min-width: 768px) {
+    .mobile-nav-toggler {
+        display: none;
+    }
+}
+
+ #l1{
+    padding: 28px 0px;
+    margin-right:-10px;
+  }
+
+
+
+</style>
+
+<style>
+   @media (max-width: 768px) {
+    .search-box {
+        display: none; /* Hide search box on mobile screens */
+    }
+
+    .logo-box {
+        text-align: center;
+        margin-bottom: 10px;
+    }
+
+    .icon-logo {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 10px 5px;
+    }
+
+    .icon-text {
+        font-size: 12px;
+        margin-top: 5px;
+    }
+
+   
+   
+    .sign-in {
+        margin-right: 10px;
+        
+    }
+
+  
+    .row.align-items-center {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .d-flex.justify-content-end {
+        justify-content: center !important;
+        flex-wrap: wrap;
+    }
+}
+.dropdown {
+    position: relative;
+}
+
+.real-estate-container {
+    display: flex;
+    align-items: 
+    gap: 20px;
+    color:black;
+    padding: 10px 15px;
+}
+
+.real-estate-container > a {
+    text-decoration: none; /* Removes underline from links */
+    color:black;
+    position: relative;
+    display: block;
+    text-align: center;
+    font-size: 16px;
+    line-height: 30px;
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 600;
+    opacity: 1;
+}
+
+.theme-btn-one.exclusive-btn:hover {
+    background-color: #ff7647; /* Slightly lighter color on hover */
+}
+.search-box {
+    position: relative;
+    width:220px;
+    border-color:#15818E;
+}
+
+.location-icon {
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+    font-size: 18px;
+    background: linear-gradient(45deg, red, orange);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.dropdown-icon {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    font-size: 12px;
+    background: linear-gradient(45deg, red, orange);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+.search-input {
+    width: 100%;
+    padding-left: 35px; /* Space for the location icon */
+    padding-right: 35px; /* Space for the dropdown icon */
+    height: 40px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    box-shadow: none;
+}
+
+
+.search-box {
+    position: relative; /* Ensure the dropdown is positioned relative to the search box */
+    width: 220px; /* Set a fixed width for the search box */
+}
+
+.regions-list {
+    position: absolute; /* Position the dropdown absolutely */
+    top: 100%; /* Position it directly below the search box */
+    left: 0; /* Align it to the left */
+    background: white; /* Background color */
+    border: 1px solid #ccc; /* Border */
+    z-index: 1000; /* Ensure it appears above other elements */
+    width: 100%; /* Match the width of the search box */
+    max-height: 200px; /* Limit height */
+    overflow-y: auto; /* Scroll if too many items */
+    display: none; /* Initially hidden */
+}
+
+.region-item {
+    margin-bottom: 5px; /* Space between region items */
+}
+
+.region-header {
+    display: flex; /* Flexbox for alignment */
+    justify-content: space-between; /* Space between region name and arrow */
+    cursor: pointer; /* Pointer cursor for interactivity */
+}
+
+.arrow-icon {
+    margin-left: 10px; /* Space between region name and arrow */
+}
+
+.cities-list {
+    list-style: none; /* Remove default list styling */
+    padding: 0; /* Remove padding */
+    margin: 0; /* Remove margin */
+    display: none; /* Initially hidden */
+}
+
+</style>
+
+
+<!-- page wrapper -->
+<body>
+
+    <div class="boxed_wrapper">
+
+
+        <!-- preloader -->
+         <!-- <div class="preloader"></div> -->
+        <!-- preloader -->
+
+
+        <!-- main header -->
+        <header class="main-header">
+            
+            <!-- header-lower -->
+            <div class="header-lower1">
+              <div class="auto-container">
+                <div class="outer-box">
+                    <div class="logo-box">
+                        <figure class="logo"><a href="{% url 'index' %}"><img src="{% static 'assets\images\logo.png'%}" style="height:60px;" alt="Oman"></a></figure>
+                    </div>
+                    <div class="menu-area">
+                        <nav class="main-menu clearfix">
+                            <div class="collapse navbar-collapse show clearfix" id="navbarSupportedContent">
+                                <ul class="navigation clearfix" style="margin-top: -40px; margin-bottom: -50px;margin-right=-500px;">
+                                    <li class="current dropdown mt-2" id="l1"><a href="{% url 'index2' %}">Motors</a>
+                                        <ul>
+                                            <li><a href="{% url 'car' %}">Car</a></li>
+                                            <li><a href="{% url 'motorcycle' %}">Motorcycle</a></li>
+                                            <li><a href="{% url 'heavyvehicle' %}">Heavy Vehicle</a></li>
+                                            <li><a href="{% url 'boat' %}">Boat</a></li>
+                                        </ul>
+                                    </li>
+                                    <li class="dropdown">
+                                        <div class="real-estate-container">
+                                            <a href="{% url 'index3' %}">Real Estate</a>
+                                           
+                                        </div>
+                                        <ul>
+                                            <li><a href="{% url 'villa' %}">Villa</a></li>
+                                            <li><a href="{% url 'land' %}">Land</a></li>
+                                            <li><a href="{% url 'commercial' %}">Commercial</a></li>
+                                            <li><a href="{% url 'chalet' %}">Chalet</a></li>
+                                            <li><a href="{% url 'farm' %}">Farm</a></li>
+                                        </ul>
+                                    </li>
+                                    
+                                    
+                                    <li class="dropdown"><a href="{% url 'job' %}">Jobs</a>
+                                        <ul>
+                                            <li><a href="{% url 'jobcategories' %}">Jobs By Category</a></li>
+
+                                            <li><a href="{% url 'full_time_jobs' %}">Full Time</a></li>
+                                            <li><a href="{% url 'part_time_jobs' %}">Part Time</a></li>
+                                            
+                                        </ul>
+                                    </li> 
+                                    <li class="dropdown"><a href="{% url 'index5' %}">Classified</a>
+                                        <ul>
+                                            <li><a href="{% url 'fashion' %}">Fashion</a></li>
+                                            <li><a href="{% url 'toys' %}">Toys</a></li>
+                                            <li><a href="{% url 'foods' %}">Foods</a></li>
+                                            <li><a href="{% url 'fitness' %}">Fitness</a></li>
+                                            <li><a href="{% url 'pets' %}">Pets</a></li>
+                                            <li><a href="{% url 'books' %}">Books</a></li>
+                                            <li><a href="{% url 'appliances' %}">Appliances</a></li>
+                                        </ul>
+                                    </li>
+                                    <li class="dropdown">
+                                        <a href="{% url 'index6' %}">Mobile and Tablets</a>
+                                        <ul class="dropdown-menu">
+                                            <!-- Mobiles Section -->
+                                            <li class="dropdown">
+                                                <a href="{% url 'mobiles' %}">Mobiles</a>
+                                                <ul class="submenu">
+                                                    <li><a href="{% url 'mobiles_by_brand' brand='Samsung' %}">Samsung</a></li>
+                                                    <li><a href="{% url 'mobiles_by_brand' brand='Oppo' %}">Oppo</a></li>
+                                                    <li><a href="{% url 'mobiles_by_brand' brand='iPhone' %}">iPhone</a></li>
+                                                    <li><a href="{% url 'mobiles_by_brand' brand='Xiaomi' %}">Xiaomi</a></li>
+                                                    <li><a href="{% url 'mobiles_by_brand' brand='OnePlus' %}">OnePlus</a></li>
+                                                    <li><a href="{% url 'mobiles_by_brand' brand='Huawei' %}">Huawei</a></li>
+                                                    <li><a href="{% url 'mobiles_by_brand' brand='Realme' %}">Realme</a></li>
+                                                    <li><a href="{% url 'mobiles_by_brand' brand='Nokia' %}">Nokia</a></li>
+                                                    <li><a href="{% url 'mobiles_by_brand' brand='Google Pixel' %}">Google Pixel</a></li>
+                                                    <li><a href="{% url 'mobiles_by_brand' brand='Vivo' %}">Vivo</a></li>
+                                                </ul>
+                                            </li>
+                                            <!-- Computers Section -->
+                                            <li class="dropdown">
+                                                <a href="{% url 'computer' %}">Computers</a>
+                                                <ul class="submenu">
+                                                    <li><a href="{% url 'computer_by_brand' brand='Dell' %}">Dell</a></li>
+                                                    <li><a href="{% url 'computer_by_brand' brand='HP' %}">HP</a></li>
+                                                    <li><a href="{% url 'computer_by_brand' brand='Apple' %}">Apple</a></li>
+                                                    <li><a href="{% url 'computer_by_brand' brand='Lenovo' %}">Lenovo</a></li>
+                                                    <li><a href="{% url 'computer_by_brand' brand='Asus' %}">Asus</a></li>
+                                                    <li><a href="{% url 'computer_by_brand' brand='Acer' %}">Acer</a></li>
+                                                    <li><a href="{% url 'computer_by_brand' brand='Microsoft' %}">Microsoft</a></li>
+                                                    <li><a href="{% url 'computer_by_brand' brand='Samsung' %}">Samsung</a></li>
+                                                    <li><a href="{% url 'computer_by_brand' brand='MSI' %}">MSI</a></li>
+                                                    <li><a href="{% url 'computer_by_brand' brand='Razer' %}">Razer</a></li>
+                                                </ul>
+                                            </li>
+                                            <!-- Sounds Section -->
+                                            <li class="dropdown">
+                                                <a href="{% url 'sounds' %}">Sounds</a>
+                                                <ul class="submenu">
+                                                    <li><a href="{% url 'sound_by_brand' brand='Sony' %}">Sony</a></li>
+                                                    <li><a href="{% url 'sound_by_brand' brand='Bose' %}">Bose</a></li>
+                                                    <li><a href="{% url 'sound_by_brand' brand='JBL' %}">JBL</a></li>
+                                                    <li><a href="{% url 'sound_by_brand' brand='Sennheiser' %}">Sennheiser</a></li>
+                                                    <li><a href="{% url 'sound_by_brand' brand='Beats' %}">Beats</a></li>
+                                                    <li><a href="{% url 'sound_by_brand' brand='AKG' %}">AKG</a></li>
+                                                    <li><a href="{% url 'sound_by_brand' brand='Pioneer' %}">Pioneer</a></li>
+                                                    <li><a href="{% url 'sound_by_brand' brand='Marshall' %}">Marshall</a></li>
+                                                    <li><a href="{% url 'sound_by_brand' brand='Bang & Olufsen' %}">Bang & Olufsen</a></li>
+                                                    <li><a href="{% url 'sound_by_brand' brand='Harman Kardon' %}">Harman Kardon</a></li>
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    
+                                    <li class="dropdown"><a href="{% url 'community' %}">Community</a>
+                                        <ul>
+                                            <li><a href="{% url 'business' %}">Business</a></li>
+                                            <li><a href="{% url 'education' %}">Education</a></li>
+                                            <li><a href="{% url 'service' %}">Service</a></li>
+                                        </ul>
+                                    </li> 
+                                    <li class="dropdown">
+                                        <div class="real-estate-container">
+                                            <a href="{% url 'upload_image' %}">Map</a>
+                                           
+                                        </div>
+                                    </li> 
+                                    <li class="dropdown">
+                                        <div class="real-estate-container">
+                                            <a href="{% url 'index3' %}">Chat With Ahmed</a>
+                                          
+                                        </div>
+                                    </li> 
+                                </ul>
+                            </div>
+                        </nav>
+                    </div>
+                    
+                    <nav class="navbar navbar-expand-lg navbar-light">
+                        <div class="ml-auto current dropdown">
+                            {% if user.is_authenticated %}
+                                {% if not user.is_superuser and not user.is_staff %}
+                                    <!-- Regular user dropdown -->
+                                    <span class="dropdown-toggle" id="userDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="cursor: pointer;">
+                                        {% if user.image %}
+                                            <img src="{{ user.image.url }}" alt="{{ user.username }}" class="user-image" style="width: 20px; height: 20px; border-radius: 50%; margin-right: 8px;">
+                                        {% else %}
+                                            <img src="{% static 'assets/images/resource/author-1.png' %}" alt="{{ user.username }}" class="user-image" style="width: 20px; height: 20px; border-radius: 50%; margin-right: 8px;">
+                                        {% endif %}
+                                        {{ user.username|title }}
+                                    </span>
+                                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
+                                        <a class="dropdown-item" href="{% url 'userprofile' user.id %}">My Profile</a>
+                                        <a class="dropdown-item" href="{% url 'jobapplication' user.id %}">My Job Application</a>
+                                        <a class="dropdown-item" href="{% url 'adss1' user.id %}">My Ads</a>
+                                        <a class="dropdown-item" href="{% url 'user_chat' %}">Chat</a>
+                                        <a class="dropdown-item" href="{% url 'account_settings' user.id %}">Account Settings</a>
+                                        <a class="dropdown-item" href="{% url 'favorites' user.id %}">Favorites</a>
+                                        <div class="dropdown-divider"></div>
+                                        <a class="dropdown-item" href="{% url 'logout' %}">Sign out</a>
+                                    </div>
+                                {% elif user.is_superuser %}
+                                    <!-- Admin user content -->
+                                    <span class="navbar-text">Admin</span>
+                                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
+                                        <a class="dropdown-item" href="{% url 'admin_dashboard' %}">Admin Dashboard</a>
+                                        <div class="dropdown-divider"></div>
+                                        <a class="dropdown-item" href="{% url 'adminlogout' %}">Sign out</a>
+                                    </div>
+                                {% endif %}
+                            {% else %}
+                            <div class="sign-in">
+
+                                <a href="{% url 'login1' %}" class="login-link">
+
+                                    Log in or sign up
+
+                                </a>
+
+                            </div>
+                            {% endif %}
+                        </div>
+                    </nav>
+                  </div>
+                    
+                </div>
+            </div>
+            <hr>
+
+            <!--sticky Header-->
+            <div class="sticky-header">
+                <div class="auto-container">
+                    <div class="outer-box">
+                        <div class="logo-box">
+                            <figure class="logo"><a href="{% url 'index' %}"><img src="{% static 'assets\images\logo.png'%}" style="height:60px;" alt="Oman"></a></figure>
+                        </div>
+                        <div class="menu-area">
+                            <nav class="main-menu clearfix">
+                                <div class="collapse navbar-collapse show clearfix" id="navbarSupportedContent">
+                                    <ul class="navigation clearfix" style="margin-top: -40px; margin-bottom: -50px;margin-right=-500px;">
+                                        <li class="current dropdown" id="l1"><a href="{% url 'index2' %}">Motors</a>
+                                            <ul>
+                                                <li><a href="{% url 'car' %}">Car</a></li>
+                                                <li><a href="{% url 'motorcycle' %}">Motorcycle</a></li>
+                                                <li><a href="{% url 'heavyvehicle' %}">Heavy Vehicle</a></li>
+                                                <li><a href="{% url 'boat' %}">Boat</a></li>
+                                            </ul>
+                                        </li>
+                                        <li class="dropdown">
+                                            <div class="real-estate-container">
+                                                <a href="{% url 'index3' %}">Real Estate</a>
+                                               
+                                            </div>
+                                            <ul>
+                                                <li><a href="{% url 'villa' %}">Villa</a></li>
+                                                <li><a href="{% url 'land' %}">Land</a></li>
+                                                <li><a href="{% url 'commercial' %}">Commercial</a></li>
+                                                <li><a href="{% url 'chalet' %}">Chalet</a></li>
+                                                <li><a href="{% url 'farm' %}">Farm</a></li>
+                                            </ul>
+                                        </li>
+                                        
+                                        
+                                        <li class="dropdown"><a href="{% url 'job' %}">Jobs</a>
+                                            <ul>
+                                                <li><a href="{% url 'jobcategories' %}">Jobs By Category</a></li>
+
+                                                <li><a href="{% url 'full_time_jobs' %}">Full Time</a></li>
+                                                <li><a href="{% url 'part_time_jobs' %}">Part Time</a></li>
+                                                
+                                            </ul>
+                                        </li> 
+                                        <li class="dropdown"><a href="{% url 'index5' %}">Classified</a>
+                                            <ul>
+                                                <li><a href="{% url 'fashion' %}">Fashion</a></li>
+                                                <li><a href="{% url 'toys' %}">Toys</a></li>
+                                                <li><a href="{% url 'foods' %}">Foods</a></li>
+                                                <li><a href="{% url 'fitness' %}">Fitness</a></li>
+                                                <li><a href="{% url 'pets' %}">Pets</a></li>
+                                                <li><a href="{% url 'books' %}">Books</a></li>
+                                                <li><a href="{% url 'appliances' %}">Appliances</a></li>
+                                            </ul>
+                                        </li>
+                                        <li class="dropdown">
+                                            <a href="{% url 'index6' %}">Mobile and Tablets</a>
+                                            <ul class="dropdown-menu">
+                                                <!-- Mobiles Section -->
+                                                <li class="dropdown">
+                                                    <a href="{% url 'mobiles' %}">Mobiles</a>
+                                                    <ul class="submenu">
+                                                        <li><a href="{% url 'mobiles_by_brand' brand='Samsung' %}">Samsung</a></li>
+                                                        <li><a href="{% url 'mobiles_by_brand' brand='Oppo' %}">Oppo</a></li>
+                                                        <li><a href="{% url 'mobiles_by_brand' brand='iPhone' %}">iPhone</a></li>
+                                                        <li><a href="{% url 'mobiles_by_brand' brand='Xiaomi' %}">Xiaomi</a></li>
+                                                        <li><a href="{% url 'mobiles_by_brand' brand='OnePlus' %}">OnePlus</a></li>
+                                                        <li><a href="{% url 'mobiles_by_brand' brand='Huawei' %}">Huawei</a></li>
+                                                        <li><a href="{% url 'mobiles_by_brand' brand='Realme' %}">Realme</a></li>
+                                                        <li><a href="{% url 'mobiles_by_brand' brand='Nokia' %}">Nokia</a></li>
+                                                        <li><a href="{% url 'mobiles_by_brand' brand='Google Pixel' %}">Google Pixel</a></li>
+                                                        <li><a href="{% url 'mobiles_by_brand' brand='Vivo' %}">Vivo</a></li>
+                                                    </ul>
+                                                </li>
+                                                <!-- Computers Section -->
+                                                <li class="dropdown">
+                                                    <a href="{% url 'computer' %}">Computers</a>
+                                                    <ul class="submenu">
+                                                        <li><a href="{% url 'computer_by_brand' brand='Dell' %}">Dell</a></li>
+                                                        <li><a href="{% url 'computer_by_brand' brand='HP' %}">HP</a></li>
+                                                        <li><a href="{% url 'computer_by_brand' brand='Apple' %}">Apple</a></li>
+                                                        <li><a href="{% url 'computer_by_brand' brand='Lenovo' %}">Lenovo</a></li>
+                                                        <li><a href="{% url 'computer_by_brand' brand='Asus' %}">Asus</a></li>
+                                                        <li><a href="{% url 'computer_by_brand' brand='Acer' %}">Acer</a></li>
+                                                        <li><a href="{% url 'computer_by_brand' brand='Microsoft' %}">Microsoft</a></li>
+                                                        <li><a href="{% url 'computer_by_brand' brand='Samsung' %}">Samsung</a></li>
+                                                        <li><a href="{% url 'computer_by_brand' brand='MSI' %}">MSI</a></li>
+                                                        <li><a href="{% url 'computer_by_brand' brand='Razer' %}">Razer</a></li>
+                                                    </ul>
+                                                </li>
+                                                <!-- Sounds Section -->
+                                                <li class="dropdown">
+                                                    <a href="{% url 'sounds' %}">Sounds</a>
+                                                    <ul class="submenu">
+                                                        <li><a href="{% url 'sound_by_brand' brand='Sony' %}">Sony</a></li>
+                                                        <li><a href="{% url 'sound_by_brand' brand='Bose' %}">Bose</a></li>
+                                                        <li><a href="{% url 'sound_by_brand' brand='JBL' %}">JBL</a></li>
+                                                        <li><a href="{% url 'sound_by_brand' brand='Sennheiser' %}">Sennheiser</a></li>
+                                                        <li><a href="{% url 'sound_by_brand' brand='Beats' %}">Beats</a></li>
+                                                        <li><a href="{% url 'sound_by_brand' brand='AKG' %}">AKG</a></li>
+                                                        <li><a href="{% url 'sound_by_brand' brand='Pioneer' %}">Pioneer</a></li>
+                                                        <li><a href="{% url 'sound_by_brand' brand='Marshall' %}">Marshall</a></li>
+                                                        <li><a href="{% url 'sound_by_brand' brand='Bang & Olufsen' %}">Bang & Olufsen</a></li>
+                                                        <li><a href="{% url 'sound_by_brand' brand='Harman Kardon' %}">Harman Kardon</a></li>
+                                                    </ul>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                        
+                                        <li class="dropdown"><a href="{% url 'community' %}">Community</a>
+                                            <ul>
+                                                <li><a href="{% url 'business' %}">Business</a></li>
+                                                <li><a href="{% url 'education' %}">Education</a></li>
+                                                <li><a href="{% url 'service' %}">Service</a></li>
+                                            </ul>
+                                        </li> 
+                                        <li class="dropdown">
+                                            <div class="real-estate-container">
+                                                <a href="{% url 'upload_image' %}">Map</a>
+                                               
+                                            </div>
+                                        </li> 
+                                        <li class="dropdown">
+                                            <div class="real-estate-container">
+                                                <a href="{% url 'index3' %}">Chat With Ahmed</a>
+                                              
+                                            </div>
+                                        </li> 
+                                    </ul>
+                                </div>
+                            </nav>
+                        </div>
+                        
+                        <nav class="navbar navbar-expand-lg navbar-light">
+                            <div class="ml-auto current dropdown">
+                                {% if user.is_authenticated %}
+                                    {% if not user.is_superuser and not user.is_staff %}
+                                        <!-- Regular user dropdown -->
+                                        <span class="dropdown-toggle" id="userDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="cursor: pointer;">
+                                            {% if user.image %}
+                                                <img src="{{ user.image.url }}" alt="{{ user.username }}" class="user-image" style="width: 20px; height: 20px; border-radius: 50%; margin-right: 8px;">
+                                            {% else %}
+                                                <img src="{% static 'assets/images/resource/author-1.png' %}" alt="{{ user.username }}" class="user-image" style="width: 20px; height: 20px; border-radius: 50%; margin-right: 8px;">
+                                            {% endif %}
+                                            {{ user.username|title }}
+                                        </span>
+                                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
+                                            <a class="dropdown-item" href="{% url 'userprofile' user.id %}">My Profile</a>
+                                            <a class="dropdown-item" href="{% url 'jobapplication' user.id %}">My Job Application</a>
+                                            <a class="dropdown-item" href="{% url 'adss1' user.id %}">My Ads</a>
+                                            <a class="dropdown-item" href="{% url 'user_chat' %}">Chat</a>
+                                            <a class="dropdown-item" href="{% url 'account_settings' user.id %}">Account Settings</a>
+                                            <a class="dropdown-item" href="{% url 'favorites' user.id %}">Favorites</a>
+                                            <div class="dropdown-divider"></div>
+                                            <a class="dropdown-item" href="{% url 'logout' %}">Sign out</a>
+                                        </div>
+                                    {% elif user.is_superuser %}
+                                        <!-- Admin user content -->
+                                        <span class="navbar-text">Admin</span>
+                                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
+                                            <a class="dropdown-item" href="{% url 'admin_dashboard' %}">Admin Dashboard</a>
+                                            <div class="dropdown-divider"></div>
+                                            <a class="dropdown-item" href="{% url 'adminlogout' %}">Sign out</a>
+                                        </div>
+                                    {% endif %}
+                                {% else %}
+                                <div class="sign-in">
+    
+                                    <a href="{% url 'login1' %}" class="login-link">
+
+                                        Log in or sign up
+
+                                    </a>
+
+                                </div>
+                                {% endif %}
+                            </div>
+                        </nav>
+            
+                        
+                        
+                    </div>
+                </div>
+            </div>
+            
+        </header>
+        <!-- main-header end -->
+
+        <!-- Mobile Menu  -->
+        <div class="mobile-menu">
+            <div class="menu-backdrop"></div>
+            <div class="close-btn"><i class="fas fa-times"></i></div>
+            
+            <nav class="menu-box">
+                <div class="nav-logo"><a href="index.html"><img src="assets/images/" alt="oman" title=""></a></div>
+                <div class="menu-outer"><!--Here Menu Will Come Automatically Via Javascript / Same Menu as in Header--></div>
+                <div class="contact-info">
+                    <h4>Contact Info</h4>
+                    <ul>
+                        <li>Chicago 12, Melborne City, USA</li>
+                        <li><a href="tel:+8801682648101">+88 01682648101</a></li>
+                        <li><a href="mailto:info@example.com">info@example.com</a></li>
+                    </ul>
+                </div>
+                <div class="social-links">
+                    <ul class="clearfix">
+                        <li><a href="index.html"><span class="fab fa-twitter"></span></a></li>
+                        <li><a href="index.html"><span class="fab fa-facebook-square"></span></a></li>
+                        <li><a href="index.html"><span class="fab fa-pinterest-p"></span></a></li>
+                        <li><a href="index.html"><span class="fab fa-instagram"></span></a></li>
+                        <li><a href="index.html"><span class="fab fa-youtube"></span></a></li>
+                    </ul>
+                </div>
+            </nav>
+        </div><!-- End Mobile Menu -->
+
+
+        <div class="auto-container">
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+  <style>
+    /* General Styles */
+    .container {
+      max-width: 900px;
+      margin: 50px auto;
+      padding: 20px;
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    .header h1 {
+      font-size: 2.5rem;
+      background: linear-gradient(45deg, #F9AD1F, #EB362D);
+      -webkit-background-clip: text; /* For Safari */
+      background-clip: text; /* For other browsers */
+      color: transparent; /* Make the text transparent to show the gradient */
+      margin-bottom: 10px;
+  }
+  
+    .header p {
+      font-size: 1rem;
+      color: #6c757d;
+    }
+    
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+    
+    .category-card {
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      padding: 20px;
+      transition: transform 0.3s, box-shadow 0.3s;
+      cursor: pointer;
+    }
+    
+    .category-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 8px 20px rgba(0, 123, 255, 0.2);
+    }
+    
+    /* Icon Gradient Animation */
+    .category-card i {
+      font-size: 3rem;
+      margin-bottom: 15px;
+      background: linear-gradient(45deg, #F9AD1F, #EB362D);
+      background-size: 200% 200%;
+      animation: gradientMove 3s linear infinite;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    /* Gradient Animation Keyframes */
+    @keyframes gradientMove {
+      0% {
+        background-position: 200% 0%;
+      }
+      50% {
+        background-position: -200% 0%;
+      }
+      100% {
+        background-position: 200% 0%;
+      }
+    }
+    
+    /* Category Heading Style */
+    .category-card h3 {
+      font-size: 1.25rem;
+      color: #333;
+      margin-bottom: 10px;
+    }
+    
+    /* Job Options Styles */
+    .job-options {
+      display: none;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+    
+    .job-option {
+      padding: 18px;
+      text-align: center;
+      transition: background 0.3s, transform 0.3s;
+    }
+    
+    .job-option i {
+      font-size: 2rem;
+      margin-bottom: 15px;
+      background: linear-gradient(45deg, #F9AD1F, #EB362D);
+      background-size: 200% 200%;
+      animation: gradientMove 3s linear infinite;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .job-option a {
+      text-decoration: none;
+      color: #333;
+    }
+    
+    .job-option:hover {
+      background:linear-gradient(45deg, #F9AD1F, #EB362D);
+      color: white;
+      transform: scale(1.05);
+    }
+    
+    .job-option h3 {
+      font-size: 1.25rem;
+      margin-top: 20px;
+    }
+    
+    @media (max-width: 576px) {
+      .header h1 {
+        font-size: 2rem;
+      }
+    
+      .category-card i {
+        font-size: 2.5rem;
+      }
+    
+      .job-options {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    a, a:hover, a:visited, a:focus, a:active {
+      text-decoration: none;
+    }
+    
+  </style>
+ 
+
+
+<div class="container">
+  <div class="header">
+    <h1>PICK A CATEGORY</h1>
+  </div>
+
+  <div class="category-grid">
+    <!-- Other Categories -->
+    <a href="{% url 'listingsub1' %}">
+      <div class="category-card">
+        <i class="bi bi-car-front"></i>
+        <h3>Motors</h3>
+      </div>
+    </a>
+
+    <a href="{% url 'listingsub' %}">
+      <div class="category-card">
+        <i class="bi bi-house"></i>
+        <h3>Property</h3>
+      </div>
+    </a>
+
+    <a href="{% url 'listingmobile' %}">
+      <div class="category-card">
+        <i class="bi bi-laptop"></i>
+        <h3>Electronics</h3>
+      </div>
+    </a>
+
+    <!-- Jobs Card -->
+    <div class="category-card" id="jobs-card" onclick="toggleJobs()">
+      <i class="bi bi-briefcase"></i>
+      <h3>Jobs</h3>
+    </div>
+    <div class="job-options" id="job-options">
+      <div class="job-option">
+        <a href="{% url 'jobcategories' %}">
+          <i class="bi bi-person-badge"></i>
+          <h3>Job Seeker</h3>
+        </a>
+      </div>
+      <div class="job-option">
+        {% if user.companies.exists %}
+            <a href="{% url 'company_dashboard' user.id user.companies.first.pk %}">
+                <i class="bi bi-building"></i>
+                <h3>We are Hiring</h3>
+            </a>
+        {% else %}
+            <a href="{% url 'we_are_hiring' %}">
+                <i class="bi bi-megaphone"></i>
+                <h3>We are Hiring</h3>
+            </a>
+        {% endif %}
+    </div>
+    
+    </div>
+
+    <a href="{% url 'listingclassified' %}">
+      <div class="category-card">
+        <i class="bi bi-cart"></i>
+        <h3>Classifieds</h3>
+      </div>
+    </a>
+
+    <a href="{% url 'listingcommunity' %}">
+      <div class="category-card">
+        <i class="bi bi-hammer"></i>
+        <h3>Services</h3>
+      </div>
+    </a>
+
+    <a href="{% url 'register_driving_training' %}">
+        <div class="category-card">
+          <i class="bi bi-car-front-fill"></i>
+          <h3>Driving</h3>
+        </div>
+      </a>
+  </div>
+</div>
+
+<script>
+  function toggleJobs() {
+    const jobOptions = document.getElementById('job-options');
+    const jobsCard = document.getElementById('jobs-card');
+
+    if (jobOptions.style.display === 'grid') {
+      jobOptions.style.display = 'none';
+      jobsCard.style.display = 'flex';
+    } else {
+      jobOptions.style.display = 'grid';
+      jobsCard.style.display = 'none';
+    }
+  }
+</script>
+
+{% include 'footer.html' %}

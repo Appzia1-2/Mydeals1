@@ -1,0 +1,4091 @@
+{% load static %}
+{% include 'admin1/headeradmin.html' %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+        }
+        .content-wrapper {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin: 150px auto;
+            width: 70%;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        .filter-menu {
+            margin: 20px 0;
+        }
+        .filter-menu a {
+            margin: 0 15px;
+            text-decoration: none;
+            color: #333;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+        .filter-menu a.active {
+            background-color: #007bff;
+            color: white;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        img {
+            margin: 5px;
+            border-radius: 4px;
+        }
+        .view-btn {
+            background-color: #007bff;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: none;
+        }
+        /* Popup style */
+        .popup {
+        display: none; /* Initially hidden */
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+
+    /* Popup content box */
+    .popup-content {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        position: relative;
+        max-width: 80%;
+        max-height: 80%;
+        overflow-y: auto;
+    }
+
+    /* Close button */
+    .close-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: transparent;
+        border: none;
+        font-size: 24px;
+        color: #000;
+        cursor: pointer;
+    }
+
+    .close-btn i {
+        font-size: 24px; /* Adjust size of the close icon */
+    }
+
+    .close-btn:hover {
+        color: red; /* Change color on hover */
+    }
+
+    .popup-images img {
+        margin: 5px;
+        border-radius: 8px;
+    }
+    /* Table styling to allow scrolling */
+.table-container {
+    max-height: 850px; /* Adjust this height based on your design */
+    overflow-y: auto;  /* Enable vertical scrolling */
+}
+/* General Button Styling */
+.filter-btn {
+    padding: 10px 20px;
+    margin: 5px;
+    border-radius: 5px;
+    border: 2px solid transparent;
+    background-color: #f5f5f5;
+    color: #333;
+    width:120px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+.filter-btn:hover {
+    background-color: #007bff;  /* Blue color on hover */
+    color: white;
+    border-color: #007bff;
+    background-color: #007bff;  /* Blue color on hover */
+
+}
+
+.filter-btn:active {
+    transform: scale(0.95);  /* Button press effect */
+}
+
+.filter-btn-primary {
+    background-color: #007bff;  /* Primary color */
+    color: white;
+    border-color: #007bff;
+}
+
+.filter-btn-primary:hover {
+    background-color: #0056b3;  /* Darker blue on hover */
+}
+
+.filter-btn-primary:active {
+    background-color: #003f7f;  /* Even darker blue when clicked */
+}
+
+/* Active State */
+.filter-btn.active {
+    background-color: #2874a7;  /* Green color for active */
+    color: white;
+}
+
+
+
+/* Disabled Button */
+.filter-btn:disabled {
+    background-color: #999494;
+    color: #999;
+    cursor: not-allowed;
+}
+
+/* Filter Menu Section */
+.filter-menu {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    margin: 20px 0;
+}
+.filter-btn.active {
+    background-color: #007bff;  /* Highlight color */
+    color: white;
+}
+
+    </style>
+</head>
+<body>
+    <div class="content-wrapper">
+        <h1>Product Dashboard</h1>
+            <!-- Approved/Rejection Filters -->
+            <div class="filter-menu">
+                <a href="?status=approved" class="{% if status == 'approved' %}active{% endif %}">
+                    <i class="fa fa-check-circle text-success"></i> Approved Products ({{ approved_count }})
+                </a>
+                <a href="?status=rejected" class="{% if status == 'rejected' %}active{% endif %}">
+                    <i class="fa fa-times-circle text-danger"></i> Rejected Products ({{ rejected_count }})
+                </a>
+                <a href="?status=soldout" class="{% if status == 'soldout' %}active{% endif %}">
+                    <i class="fa fa-ban text-secondary"></i> Sold Out Products ({{ soldout_count }})
+                </a>
+                
+                
+                <!-- <a href="?status=approved_or_rejected" class="{% if status == 'approved_or_rejected' %}active{% endif %}">
+                    <i class="fa fa-filter"></i> Approved & Rejected
+                </a>
+                <a href="?status=" class="{% if not status %}active{% endif %}">
+                    <i class="fa fa-list"></i> All Products
+                </a> -->
+            </div>
+    
+    
+            <div class="filter-menu">
+                <button class="filter-btn main" onclick="showSubButtons('property-types')">
+                    Properties ({{ properties_count }})
+                </button>
+                <button class="filter-btn main" onclick="showSubButtons('classified-types')">
+                    Classified ({{ classified_count }})
+                </button>
+                <button class="filter-btn main" onclick="showSubButtons('electronics-types')">
+                    Electronics ({{ electronics_count }})
+                </button>
+                <button class="filter-btn main" onclick="showSubButtons('services-types')">
+                    Services ({{ services_count }})
+                </button>
+                <button class="filter-btn main" onclick="showSubButtons('automobile-section')">
+                    Automobiles ({{ automobiles_count }})
+                </button>
+                
+
+            </div>
+            
+            <div id="property-types" class="sub-menu" style="display: none;">
+                <button class="filter-btn" onclick="showSection('villa-section')">
+                    Villas   ({{ villas|length }})
+                </button>
+                <button class="filter-btn" onclick="showSection('apartment-section')">
+                    Apartment ({{ apartment|length }})
+                </button>
+                <button class="filter-btn" onclick="showSection('factory-section')">
+                    Factory  ({{ factory|length }})
+                </button>
+                <button class="filter-btn" onclick="showSection('complexes-section')">
+                    Complexes  ({{ complexes|length }})
+                </button>
+                <button class="filter-btn" onclick="showSection('clinic-section')">
+                    Clinic   ({{ clinic|length }})
+                </button>
+                <button class="filter-btn" onclick="showSection('hostel-section')">
+                    Hostel   ({{ hostel|length }})
+                </button>
+                <button class="filter-btn" onclick="showSection('office-section')">
+                    Office   ({{ office|length }})
+                </button>
+                <button class="filter-btn" onclick="showSection('shop-section')">
+                    Shop    ({{ shop|length }})
+                </button>
+
+                <button class="filter-btn" onclick="showSection('cafe-section')">
+                    Cafe    ({{ cafe|length }})
+                </button>
+                <button class="filter-btn" onclick="showSection('staff-section')">
+                    Staff   ({{ staff|length }})
+                </button>
+                <button class="filter-btn" onclick="showSection('warehouse-section')">
+                    Warehouse  ({{ warehouse|length }})
+                </button>
+                <button class="filter-btn" onclick="showSection('townhouse-section')">
+                    Townhouse ({{ townhouse|length }})
+                </button>
+                <button class="filter-btn" onclick="showSection('fullfloors-section')">
+                    Fullfloors  ({{ fullfloors|length }})
+                </button>
+                <button class="filter-btn" onclick="showSection('showrooms-section')">
+                    Showrooms ({{ showrooms|length }})
+                </button>
+                <button class="filter-btn" onclick="showSection('wholebuilding-section')">
+                    Wholebuilding ({{ wholebuilding|length }})
+                </button>
+                <button class="filter-btn" onclick="showSection('supermarket-section')">
+                    Supermarket ({{ supermarket|length }})
+                </button>
+                <button class="filter-btn" onclick="showSection('foreign-section')">
+                    Foreign   ({{ foreign|length }})
+                </button>
+                <button class="filter-btn" onclick="showSection('commercial-section')">
+                    Commercials ({{ commercials|length }})
+                </button>
+                <button class="filter-btn" onclick="showSection('land-section')">
+                    Lands   ({{ lands|length }})
+                </button>
+                <button class="filter-btn" onclick="showSection('farm-section')">
+                    Farms   ({{ farms|length }})
+                </button>
+            </div>
+            
+            <div id="classified-types" class="sub-menu" style="display: none;">
+                <button class="filter-btn" onclick="showSection('fashion-section')">
+                    Fashion ({{ fashions|length }})
+                </button>
+                <button class="filter-btn" onclick="showSection('toys-section')">
+                    Toys ({{ toys|length }})
+                </button>
+                <button class="filter-btn" onclick="showSection('foods-section')">
+                    Foods ({{ foods|length }})
+                </button>
+                <button class="filter-btn" onclick="showSection('fitness-section')">
+                    Fitness ({{ fitness|length }})
+                </button>
+                <button class="filter-btn" onclick="showSection('pets-section')">
+                    Pets ({{ pets|length }})
+                </button>
+                <button class="filter-btn" onclick="showSection('books-section')">
+                    Books ({{ books|length }})
+                </button>
+                <button class="filter-btn" onclick="showSection('appliances-section')">
+                    Appliances ({{ appliances|length }})
+                </button>
+            </div>
+            
+            <div id="electronics-types" class="sub-menu" style="display: none;">
+                <button class="filter-btn" onclick="showSection('mobile-section')">
+                    Mobile ({{ mobile|length }})
+                </button>
+                <button class="filter-btn" onclick="showSection('computer-section')">
+                    Computer ({{ computer|length }})
+                </button>
+                <button class="filter-btn" onclick="showSection('sound-section')">
+                    Sound ({{ sound|length }})
+                </button>
+            </div>
+            
+            <div id="services-types" class="sub-menu" style="display: none;">
+                <button class="filter-btn" onclick="showSection('business-section')">
+                    Business ({{ businesses|length }})
+                </button>
+                <button class="filter-btn" onclick="showSection('education-section')">
+                    Education ({{ education|length }})
+                </button>
+                <button class="filter-btn" onclick="showSection('services-section')">
+                    Service ({{ services|length }})
+                </button>
+            </div>
+            <div id="automobile-section" class="sub-menu" style="display: none;">
+                <button class="filter-btn" onclick="showSection('automobile-section-items')">
+                    Cars ({{ automobiles|length }})
+                </button>
+                <button class="filter-btn" onclick="showSection('motorcycle-section-items')">
+                    Motorcycles ({{ motorcycle|length }})
+                </button>
+                <button class="filter-btn" onclick="showSection('heavy-vehicles-section-items')">
+                    Heavyvehicle ({{ heavy_vehicle|length }})
+                </button>
+                <button class="filter-btn" onclick="showSection('boats-section-items')">
+                    Boats ({{ boat|length }})
+                </button>
+                <button class="filter-btn" onclick="showSection('accessories-section-items')">
+                    Accessories ({{ accessories|length }})
+                </button>
+                <button class="filter-btn" onclick="showSection('number-plate-section-items')">
+                    Number Plates ({{ numberplate|length }})
+                </button>
+            </div>
+            
+            
+    
+    <!-- Existing property sections -->
+    <div id="fashion-section" class="property-section" style="display: none;">
+    <h2>Fashion</h2>
+    {% if fashions %}
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Brand</th>
+                    <th>Category</th>
+                    <th>Status</th>
+                    <th>Media</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for fashion in fashions %}
+                    <tr>
+                        <td>{{ fashion.brand }}</td>
+                        <td>{{ fashion.category }}</td>
+                        <td>{{ fashion.get_status_display }}</td>
+                        <td>
+                            {% if fashion.images.all %}
+                                <img src="{{ fashion.images.all.0.image.url }}" alt="Fashion Image" width="100">
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="view-btn" onclick="openPopup('fashion', '{{ fashion.id }}')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+        <p>No fashion items found.</p>
+    {% endif %}
+</div>
+    
+    <div id="toys-section" class="property-section" style="display: none;">
+        <h2>Toys</h2>
+        {% if toys %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Brand</th>
+                        <th>Category</th>
+                        <th>Condition</th>
+                        <th>Media</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for toy in toys %}
+                        <tr>
+                            <td>{{ toy.brand }}</td>
+                            <td>{{ toy.get_category_display }}</td>
+                            <td>{{ toy.get_condition_display }}</td>
+                            <td>
+                                {% if toy.images.all %}
+                                    <img src="{{ toy.images.all.0.image.url }}" alt="Fashion Image" width="100">
+                                {% endif %}
+                            </td>
+                            <td>
+                                <button class="view-btn" onclick="openPopup('toys', {{ toy.id }})">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <p>No toys found.</p>
+        {% endif %}
+    </div>
+    
+    
+    <div id="foods-section" class="property-section" style="display: none;">
+        <h2>Foods</h2>
+        {% if foods %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Brand</th>
+                        <th>Product Type</th>
+                        <th>Status</th>
+                        <th>Media</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for food in foods %}
+                        <tr>
+                            <td>{{ food.brand }}</td>
+                            <td>{{ food.product_type }}</td>
+                            <td>{{ food.get_status_display }}</td>
+                            <td>
+                                {% if food.images.all %}
+                                    <img src="{{ food.images.all.0.image.url }}" alt="Fashion Image" width="100">
+                                {% endif %}
+                            </td>
+                            <td>
+                                <button class="view-btn" onclick="openPopup('food', {{ food.id }})">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <p>No food items found.</p>
+        {% endif %}
+    </div>
+    
+    
+    <div id="fitness-section" class="property-section" style="display: none;">
+        <h2>Fitness</h2>
+        {% if fitness %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Brand</th>
+                        <th>Category</th>
+                        <th>Status</th>
+                        <th>Media</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for fitness_item in fitness %}
+                        <tr>
+                            <td>{{ fitness_item.brand }}</td>
+                            <td>{{ fitness_item.category }}</td>
+                            <td>{{ fitness_item.get_status_display }}</td>
+                            <td>
+                                {% if fitness_item.images.all %}
+                                    <img src="{{ fitness_item.images.all.0.image.url }}" alt="Fitness Image" width="100">
+                                {% endif %}
+                            </td>
+                            <td>
+                                <button class="view-btn" onclick="openPopup('fitness', {{ fitness_item.id }})">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <p>No fitness items found.</p>
+        {% endif %}
+    </div>
+    
+    
+    <div id="pets-section" class="property-section" style="display: none;">
+        <h2>Pets</h2>
+        {% if pets %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Pet Type</th>
+                        <th>Breed</th>
+                        <th>Status</th>
+                        <th>Media</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pet in pets %}
+                        <tr>
+                            <td>{{ pet.pet_type }}</td>
+                            <td>{{ pet.breed }}</td>
+                            <td>{{ pet.get_status_display }}</td>
+                            <td>
+                                {% if pet.images.all %}
+                                    <img src="{{ pet.images.all.0.image.url }}" alt="Fashion Image" width="100">
+                                {% endif %}
+                            </td>
+                            <td>
+                                <button class="view-btn" onclick="openPopup('pet', {{ pet.id }})">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <p>No pets found.</p>
+        {% endif %}
+    </div>
+    
+    
+    <div id="books-section" class="property-section" style="display: none;">
+        <h2>Books</h2>
+        {% if books %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Genre</th>
+                        <th>Condition</th>
+                        <th>Category</th>
+                        <th>Status</th>
+                        <th>Media</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for book in books %}
+                        <tr>
+                            <td>{{ book.genre }}</td>
+                            <td>{{ book.condition }}</td>
+                            <td>{{ book.category }}</td>
+                            <td>{{ book.get_status_display }}</td>
+                            <td>
+                                {% if book.images.all %}
+                                    <img src="{{ book.images.all.0.image.url }}" alt="Fashion Image" width="100">
+                                {% endif %}
+                            </td>
+                            <td>
+                                <button class="view-btn" onclick="openPopup('book', {{ book.id }})">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <p>No books found.</p>
+        {% endif %}
+    </div>
+    
+    
+    <div id="appliances-section" class="property-section" style="display: none;">
+        <h2>Appliances</h2>
+        {% if appliances %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Brand</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th>Media</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for appliance in appliances %}
+                        <tr>
+                            <td>{{ appliance.brand }}</td>
+                            <td>{{ appliance.appliance_type }}</td>
+                            <td>{{ appliance.get_status_display }}</td>
+                            <td>
+                                {% if appliance.images.all %}
+                                    <img src="{{ appliance.images.all.0.image.url }}" alt="Fashion Image" width="100">
+                                {% endif %}
+                            </td>
+                            <td>
+                                <button class="view-btn" onclick="openPopup('appliance', {{ appliance.id }})">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <p>No appliances found.</p>
+        {% endif %}
+    </div>
+    
+    <script>
+        function showSubButtons(menuId) {
+            // Hide all property sections
+            const sections = document.querySelectorAll('.property-section');
+            sections.forEach(section => section.style.display = 'none');
+        
+            // Hide all sub-menus
+            const subMenus = document.querySelectorAll('.sub-menu');
+            subMenus.forEach(menu => menu.style.display = 'none');
+        
+            // Get all main property buttons and remove the active class from all
+            const mainButtons = document.querySelectorAll('.filter-btn.main');
+            mainButtons.forEach(button => {
+                button.classList.remove('active');
+            });
+        
+            // Show the selected sub-menu
+            const selectedMenu = document.getElementById(menuId);
+            if (selectedMenu) {
+                selectedMenu.style.display = 'block'; // Keep the submenu visible
+                
+                // Highlight the clicked main button
+                const clickedButton = event.target;
+                clickedButton.classList.add('active');
+            }
+        }
+        
+        function showSection(sectionId) {
+            // Hide all property sections
+            const sections = document.querySelectorAll('.property-section');
+            sections.forEach(section => section.style.display = 'none');
+        
+            // Show the selected section
+            const selectedSection = document.getElementById(sectionId);
+            if (selectedSection) {
+                selectedSection.style.display = 'block'; // Show the selected section
+            }
+        
+            // Get all filter buttons and remove the active class from all
+            const buttons = document.querySelectorAll('.filter-btn');
+            buttons.forEach(button => {
+                button.classList.remove('active');
+            });
+        
+            // Add active class to the clicked button
+            const clickedButton = event.target;
+            clickedButton.classList.add('active');
+        }
+    </script>
+
+    <!-- Mobile Section -->
+<div id="mobile-section" class="property-section" style="display: none;">
+    <h2>Mobile Listings</h2>
+    {% if mobile %}
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Brand/Model</th>
+                    <th>Operating System</th>
+                    <th>Price</th>
+                    <th>Status</th>
+                    <th>Media</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for mobile in mobile %}
+                    <tr>
+                        <td>{{ mobile.brand }} {{ mobile.model_number }}</td>
+                        <td>{{ mobile.get_operating_system_display }}</td>
+                        <td>{{ mobile.price }} OMR</td>
+                        <td>{{ mobile.get_status_display }}</td>
+                        <td>
+                            {% if mobile.images.all %}
+                                <img src="{{ mobile.images.all.0.image.url }}" alt="Fashion Image" width="100">
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="view-btn" onclick="openPopup('mobile', {{ mobile.id }})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+        <p>No mobile items found.</p>
+    {% endif %}
+</div>
+
+<!-- Computer Section -->
+<div id="computer-section" class="property-section" style="display: none;">
+    <h2>Computer Listings</h2>
+    {% if computer %}
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Brand/Model</th>
+                    <th>Product Name</th>
+                    <th>Price</th>
+                    <th>Status</th>
+                    <th>Media</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for computer in computer %}
+                    <tr>
+                        <td>{{ computer.brand }} {{ computer.model_number }}</td>
+                        <td>{{ computer.product_name }}</td>
+                        <td>{{ computer.price }} OMR</td>
+                        <td>{{ computer.get_status_display }}</td>
+                        <td>
+                            {% if computer.images.all %}
+                                <img src="{{ computer.images.all.0.image.url }}" alt="Fashion Image" width="100">
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="view-btn" onclick="openPopup('computer', {{ computer.id }})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+        <p>No computer items found.</p>
+    {% endif %}
+</div>
+
+<!-- Sound Section -->
+<div id="sound-section" class="property-section" style="display: none;">
+    <h2>Sound Listings</h2>
+    {% if sound %}
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Brand/Model</th>
+                    <th>Type</th>
+                    <th>Price</th>
+                    <th>Status</th>
+                    <th>Media</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sound in sound %}
+                    <tr>
+                        <td>{{ sound.brand }} {{ sound.model_number }}</td>
+                        <td>{{ sound.get_connectivity_display }}</td>
+                        <td>{{ sound.price }} OMR</td>
+                        <td>{{ sound.get_status_display }}</td>
+                        <td>
+                            {% if sound.images.all %}
+                                <img src="{{ sound.images.all.0.image.url }}" alt="Fashion Image" width="100">
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="view-btn" onclick="openPopup('sound', {{ sound.id }})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+        <p>No sound items found.</p>
+    {% endif %}
+</div>
+
+    <!-- Existing property sections -->
+    <div id="villa-section" class="property-section" style="display: none;">
+        <h2>Villas</h2>
+        {% if villas %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Property Title</th>
+                        <th>Property Type</th>
+                        <th>Status</th>
+                        <th>Media</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for villa in villas %}
+                    <tr>
+                        <td>{{ villa.property_title }}</td>
+                        <td>{{ villa.get_property_type_display }}</td>
+                        <td>{{ villa.get_status_display }}</td>
+                        <td>
+                            {% if villa.images.all %}
+                                <img src="{{ villa.images.all.0.image.url }}" alt="Fashion Image" width="100">
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="view-btn" onclick="openPopup('villa', {{ villa.id }})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <p>No villas found.</p>
+        {% endif %}
+    </div>
+    
+    
+    <div id="apartment-section" class="property-section" style="display: none;">
+        <h2>Apartment</h2>
+        {% if apartment %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Property Title</th>
+                        <th>Property Description</th>
+
+                        <th>Status</th>
+                        <th>Media</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for apartment in apartment %}
+                    <tr>
+                        <td>{{ apartment.property_title }}</td>
+                        <td>{{ apartment.description }}</td>
+                        <td>{{ apartment.get_status_display }}</td>
+                        <td>
+                            {% if apartment.images.all %}
+                                <img src="{{ apartment.images.all.0.image.url }}" alt="apartment Image" width="100">
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="view-btn" onclick="openPopup('apartment', {{ apartment.id }})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <p>No apartment found.</p>
+        {% endif %}
+    </div>
+
+
+    <div id="factory-section" class="property-section" style="display: none;">
+        <h2>Factory</h2>
+        {% if factory %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Property Title</th>
+                        <th>Property Description</th>
+
+                        <th>Status</th>
+                        <th>Media</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for factory in factory %}
+                    <tr>
+                        <td>{{ factory.property_title }}</td>
+                        <td>{{ factory.description }}</td>
+                        <td>{{ factory.get_status_display }}</td>
+                        <td>
+                            {% if factory.images.all %}
+                                <img src="{{ factory.images.all.0.image.url }}" alt="factory Image" width="100">
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="view-btn" onclick="openPopup('factory', {{ factory.id }})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <p>No factory found.</p>
+        {% endif %}
+    </div>
+
+    <div id="complexes-section" class="property-section" style="display: none;">
+        <h2>Complexes</h2>
+        {% if complexes %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Property Title</th>
+                        <th>Property Description</th>
+
+                        <th>Status</th>
+                        <th>Media</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for complexes in complexes %}
+                    <tr>
+                        <td>{{ complexes.property_title }}</td>
+                        <td>{{ complexes.description }}</td>
+                        <td>{{ complexes.get_status_display }}</td>
+                        <td>
+                            {% if complexes.images.all %}
+                                <img src="{{ complexes.images.all.0.image.url }}" alt="complexes Image" width="100">
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="view-btn" onclick="openPopup('complexes', {{ complexes.id }})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <p>No complexes found.</p>
+        {% endif %}
+    </div>
+
+    <div id="clinic-section" class="property-section" style="display: none;">
+        <h2>Clinic</h2>
+        {% if clinic %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Property Title</th>
+                        <th>Property Description</th>
+
+                        <th>Status</th>
+                        <th>Media</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for clinic in clinic %}
+                    <tr>
+                        <td>{{ clinic.property_title }}</td>
+                        <td>{{ clinic.description }}</td>
+                        <td>{{ clinic.get_status_display }}</td>
+                        <td>
+                            {% if clinic.images.all %}
+                                <img src="{{ clinic.images.all.0.image.url }}" alt="clinic Image" width="100">
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="view-btn" onclick="openPopup('clinic', {{ clinic.id }})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <p>No clinic found.</p>
+        {% endif %}
+    </div>
+
+    <div id="hostel-section" class="property-section" style="display: none;">
+        <h2>Hostel</h2>
+        {% if hostel %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Property Title</th>
+                        <th>Property Description</th>
+
+                        <th>Status</th>
+                        <th>Media</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for hostel in hostel %}
+                    <tr>
+                        <td>{{ hostel.property_title }}</td>
+                        <td>{{ hostel.description }}</td>
+                        <td>{{ hostel.get_status_display }}</td>
+                        <td>
+                            {% if hostel.images.all %}
+                                <img src="{{ hostel.images.all.0.image.url }}" alt="hostel Image" width="100">
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="view-btn" onclick="openPopup('hostel', {{ hostel.id }})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <p>No hostel found.</p>
+        {% endif %}
+    </div>
+
+    <div id="office-section" class="property-section" style="display: none;">
+        <h2>Office</h2>
+        {% if office %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Property Title</th>
+                        <th>Property Description</th>
+                        <th>Status</th>
+                        <th>Media</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for office in office %}
+                    <tr>
+                        <td>{{ office.property_title }}</td>
+                        <td>{{ office.description }}</td>
+                        <td>{{ office.get_status_display }}</td>
+                        <td>
+                            {% if office.images.all %}
+                                <img src="{{ office.images.all.0.image.url }}" alt="office Image" width="100">
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="view-btn" onclick="openPopup('office', {{ office.id }})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <p>No office found.</p>
+        {% endif %}
+    </div>
+
+    <div id="shop-section" class="property-section" style="display: none;">
+        <h2>Shop</h2>
+        {% if shop %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Property Title</th>
+                        <th>Property Description</th>
+                                                <th>Status</th>
+                        <th>Media</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for shop in shop %}
+                    <tr>
+                        <td>{{ shop.property_title }}</td>
+                        <td>{{ shop.description }}</td>
+                        <td>{{ shop.get_status_display }}</td>
+                        <td>
+                            {% if shop.images.all %}
+                                <img src="{{ shop.images.all.0.image.url }}" alt="shop Image" width="100">
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="view-btn" onclick="openPopup('shop', {{ shop.id }})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <p>No shop found.</p>
+        {% endif %}
+    </div>
+
+    <div id="cafe-section" class="property-section" style="display: none;">
+        <h2>Cafe</h2>
+        {% if cafe %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Property Title</th>
+                        <th>Property Description</th>
+                                                <th>Status</th>
+                        <th>Media</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cafe in cafe %}
+                    <tr>
+                        <td>{{ cafe.property_title }}</td>
+                        <td>{{ cafe.description }}</td>
+                        <td>{{ cafe.get_status_display }}</td>
+                        <td>
+                            {% if cafe.images.all %}
+                                <img src="{{ cafe.images.all.0.image.url }}" alt="cafe Image" width="100">
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="view-btn" onclick="openPopup('cafe', {{ cafe.id }})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <p>No cafe found.</p>
+        {% endif %}
+    </div>
+
+    <div id="staff-section" class="property-section" style="display: none;">
+        <h2>Staff</h2>
+        {% if staff %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Property Title</th>
+                        <th>Property Description</th>
+                                                <th>Status</th>
+                        <th>Media</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for staff in staff %}
+                    <tr>
+                        <td>{{ staff.property_title }}</td>
+                        <td>{{ staff.description }}</td>
+                        <td>{{ staff.get_status_display }}</td>
+                        <td>
+                            {% if staff.images.all %}
+                                <img src="{{ staff.images.all.0.image.url }}" alt="staff Image" width="100">
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="view-btn" onclick="openPopup('staff', {{ staff.id }})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <p>No staff found.</p>
+        {% endif %}
+    </div>
+
+    <div id="warehouse-section" class="property-section" style="display: none;">
+        <h2>Warehouse</h2>
+        {% if warehouse %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Property Title</th>
+                        <th>Property Description</th>
+                                                <th>Status</th>
+                        <th>Media</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for warehouse in warehouse %}
+                    <tr>
+                        <td>{{ warehouse.property_title }}</td>
+                        <td>{{ warehouse.description }}</td>
+                        <td>{{ warehouse.get_status_display }}</td>
+                        <td>
+                            {% if warehouse.images.all %}
+                                <img src="{{ warehouse.images.all.0.image.url }}" alt="warehouse Image" width="100">
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="view-btn" onclick="openPopup('warehouse', {{ warehouse.id }})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <p>No warehouse found.</p>
+        {% endif %}
+    </div>
+
+    <div id="townhouse-section" class="property-section" style="display: none;">
+        <h2>Townhouse</h2>
+        {% if townhouse %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Property Title</th>
+                        <th>Property Description</th>
+                                                <th>Status</th>
+                        <th>Media</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for townhouse in townhouse %}
+                    <tr>
+                        <td>{{ townhouse.property_title }}</td>
+                        <td>{{ townhouse.description }}</td>
+                        <td>{{ townhouse.get_status_display }}</td>
+                        <td>
+                            {% if townhouse.images.all %}
+                                <img src="{{ townhouse.images.all.0.image.url }}" alt="townhouse Image" width="100">
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="view-btn" onclick="openPopup('townhouse', {{ townhouse.id }})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <p>No townhouse found.</p>
+        {% endif %}
+    </div>
+
+    <div id="fullfloors-section" class="property-section" style="display: none;">
+        <h2>Fullfloors</h2>
+        {% if fullfloors %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Property Title</th>
+                        <th>Property Description</th>
+                                                <th>Status</th>
+                        <th>Media</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for fullfloors in fullfloors %}
+                    <tr>
+                        <td>{{ fullfloors.property_title }}</td>
+                        <td>{{ fullfloors.description }}</td>
+                        <td>{{ fullfloors.get_status_display }}</td>
+                        <td>
+                            {% if fullfloors.images.all %}
+                                <img src="{{ fullfloors.images.all.0.image.url }}" alt="fullfloors Image" width="100">
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="view-btn" onclick="openPopup('fullfloors', {{ fullfloors.id }})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <p>No fullfloors found.</p>
+        {% endif %}
+    </div>
+
+    <div id="showrooms-section" class="property-section" style="display: none;">
+        <h2>Showrooms</h2>
+        {% if showrooms %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Property Title</th>
+                        <th>Property Description</th>
+                                                <th>Status</th>
+                        <th>Media</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for showrooms in showrooms %}
+                    <tr>
+                        <td>{{ showrooms.property_title }}</td>
+                        <td>{{ showrooms.description }}</td>
+                        <td>{{ showrooms.get_status_display }}</td>
+                        <td>
+                            {% if showrooms.images.all %}
+                                <img src="{{ showrooms.images.all.0.image.url }}" alt="showrooms Image" width="100">
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="view-btn" onclick="openPopup('showrooms', {{ showrooms.id }})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <p>No showrooms found.</p>
+        {% endif %}
+    </div>
+
+    <div id="wholebuilding-section" class="property-section" style="display: none;">
+        <h2>Wholebuilding</h2>
+        {% if wholebuilding %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Property Title</th>
+                        <th>Property Description</th>
+                                                <th>Status</th>
+                        <th>Media</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for wholebuilding in wholebuilding %}
+                    <tr>
+                        <td>{{ wholebuilding.property_title }}</td>
+                        <td>{{ wholebuilding.description }}</td>
+                        <td>{{ wholebuilding.get_status_display }}</td>
+                        <td>
+                            {% if wholebuilding.images.all %}
+                                <img src="{{ wholebuilding.images.all.0.image.url }}" alt="wholebuilding Image" width="100">
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="view-btn" onclick="openPopup('wholebuilding', {{ wholebuilding.id }})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <p>No wholebuilding found.</p>
+        {% endif %}
+    </div>
+
+    <div id="supermarket-section" class="property-section" style="display: none;">
+        <h2>Supermarket</h2>
+        {% if supermarket %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Property Title</th>
+                        <th>Property Description</th>
+                                                <th>Status</th>
+                        <th>Media</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for supermarket in supermarket %}
+                    <tr>
+                        <td>{{ supermarket.property_title }}</td>
+                        <td>{{ supermarket.description }}</td>
+                        <td>{{ supermarket.get_status_display }}</td>
+                        <td>
+                            {% if supermarket.images.all %}
+                                <img src="{{ supermarket.images.all.0.image.url }}" alt="supermarket Image" width="100">
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="view-btn" onclick="openPopup('supermarket', {{ supermarket.id }})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <p>No supermarket found.</p>
+        {% endif %}
+    </div>
+
+    <div id="foreign-section" class="property-section" style="display: none;">
+        <h2>Foreign</h2>
+        {% if foreign %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Property Title</th>
+                        <th>Property Description</th>
+                                                <th>Status</th>
+                        <th>Media</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for foreign in foreign %}
+                    <tr>
+                        <td>{{ foreign.property_title }}</td>
+                        <td>{{ foreign.description }}</td>
+                        <td>{{ foreign.get_status_display }}</td>
+                        <td>
+                            {% if foreign.images.all %}
+                                <img src="{{ foreign.images.all.0.image.url }}" alt="foreign Image" width="100">
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="view-btn" onclick="openPopup('foreign', {{ foreign.id }})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <p>No foreign found.</p>
+        {% endif %}
+    </div>
+    
+    <div id="commercial-section" class="property-section" style="display: none;">
+        <h2>Commercial Properties</h2>
+        {% if commercials %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Property Title</th>
+                        <th>Property Type</th>
+                        <th>Status</th>
+                        <th>Media</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for commercial in commercials %}
+                    <tr>
+                        <td>{{ commercial.property_title }}</td>
+                        <td>{{ commercial.get_property_type_display }}</td>
+                        <td>{{ commercial.get_status_display }}</td>
+                        <td>
+                            {% if commercial.images.all %}
+                                <img src="{{ commercial.images.all.0.image.url }}" alt="Fashion Image" width="100">
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="view-btn" onclick="openPopup('commercial', {{ commercial.id }})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <p>No commercial properties found.</p>
+        {% endif %}
+    </div>
+    
+    
+    <div id="land-section" class="property-section" style="display: none;">
+        <h2>Land</h2>
+        {% if lands %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Property Title</th>
+                        <th>Land Type</th>
+                        <th>Status</th>
+                        <th>Media</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for land in lands %}
+                    <tr>
+                        <td>{{ land.property_title }}</td>
+                        <td>{{ land.property_type }}</td>
+                        <td>{{ land.get_status_display }}</td>
+                        <td>
+                            {% if land.images.all %}
+                                <img src="{{ land.images.all.0.image.url }}" alt="Fashion Image" width="100">
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="view-btn" onclick="openPopup('land', {{ land.id }})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <p>No land records found.</p>
+        {% endif %}
+    </div>
+    
+    
+    <div id="farm-section" class="property-section" style="display: none;">
+        <h2>Farms</h2>
+        {% if farms %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Property Title</th>
+                        <th>Soil Type</th>
+                        <th>Status</th>
+                        <th>Media</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for farm in farms %}
+                    <tr>
+                        <td>{{ farm.property_title }}</td>
+                        <td>{{ farm.get_soil_type_display }}</td>
+                        <td>{{ farm.get_status_display }}</td>
+                        <td>
+                            {% if farm.images.all %}
+                                <img src="{{ farm.images.all.0.image.url }}" alt="Fashion Image" width="100">
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="view-btn" onclick="openPopup('farm', {{ farm.id }})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <p>No farms found.</p>
+        {% endif %}
+    </div>
+    
+
+    <div id="business-section" class="property-section" style="display: none;">
+        <h2>Business Listings</h2>
+        {% if businesses %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Condition</th>
+                        <th>Status</th>
+                        <th>Price (OMR)</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for business in businesses %}
+                    <tr>
+                        <td>{{ business.category }}</td>
+                        <td>{{ business.get_condition_display }}</td>
+                        <td>{{ business.get_status_display }}</td>
+                        <td>{{ business.price|floatformat:2 }}</td>
+                        <td>
+                         
+                                {% if business.images.all %}
+                                    <img src="{{ business.images.all.0.image.url }}" alt="business Image" width="100">
+                                {% endif %}
+                            
+                        </td>
+                        <td>
+                            <button class="view-btn" onclick="openPopup('business', {{ business.id }})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <p>No business listings found.</p>
+        {% endif %}
+    </div>
+    
+    <div id="education-section" class="property-section" style="display: none;">
+        <h2>Education Listings</h2>
+        {% if education %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Course</th>
+                        <th>Institution</th>
+                        <th>Price (OMR)</th>
+                        <th>Status</th>
+                        <th>Media</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for education in education %}
+                    <tr>
+                        <td>{{ education.course_type }}</td>
+                        <td>{{ education.institution }}</td>
+                        <td>{{ education.price|floatformat:2 }}</td>
+                        <td>{{ education.get_status_display }}</td>
+                        <td>
+                         
+                            {% if education.images.all %}
+                                <img src="{{ education.images.all.0.image.url }}" alt="business Image" width="100">
+                            {% endif %}
+                        
+                    </td>
+                        <td>
+                            <button class="view-btn" onclick="openPopup('education', {{ education.id }})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <p>No education items found.</p>
+        {% endif %}
+    </div>
+    
+    
+    <div id="services-section" class="property-section" style="display: none;">
+        <h2>Service Listings</h2>
+        {% if services %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Service Type</th>
+                        <th>Provider</th>
+                        <th>Price (OMR)</th>
+                        <th>Status</th>
+                        <th>Media</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for service in services %}
+                    <tr>
+                        <td>{{ service.type }}</td>
+                        <td>{{ service.provider_name }}</td>
+                        <td>{{ service.price|floatformat:2 }}</td>
+                        <td>{{ service.get_status_display }}</td>
+                        <td>
+                         
+                            {% if service.images.all %}
+                                <img src="{{ service.images.all.0.image.url }}" alt="business Image" width="100">
+                            {% endif %}
+                        
+                    </td>
+                        <td>
+                            <button class="view-btn" onclick="openPopup('service', {{ service.id }})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <p>No service items found.</p>
+        {% endif %}
+    </div>
+    
+<script>
+    function showSubButtons(menuId) {
+        // Hide all property sections
+        const sections = document.querySelectorAll('.property-section');
+        sections.forEach(section => section.style.display = 'none');
+    
+        // Hide all sub-menus
+        const subMenus = document.querySelectorAll('.sub-menu');
+        subMenus.forEach(menu => menu.style.display = 'none');
+    
+        // Get all main property buttons and remove the active class from all
+        const mainButtons = document.querySelectorAll('.filter-btn.main');
+        mainButtons.forEach(button => {
+            button.classList.remove('active');
+        });
+    
+        // Show the selected sub-menu
+        const selectedMenu = document.getElementById(menuId);
+        if (selectedMenu) {
+            selectedMenu.style.display = 'block'; // Keep the submenu visible
+            
+            // Highlight the clicked main button
+            const clickedButton = event.target;
+            clickedButton.classList.add('active');
+        }
+    }
+    
+    function showSection(sectionId) {
+        // Hide all property sections
+        const sections = document.querySelectorAll('.property-section');
+        sections.forEach(section => section.style.display = 'none');
+    
+        // Show the selected section
+        const selectedSection = document.getElementById(sectionId);
+        if (selectedSection) {
+            selectedSection.style.display = 'block'; // Show the selected section
+        }
+    
+        // Get all filter buttons and remove the active class from all
+        const buttons = document.querySelectorAll('.filter-btn');
+        buttons.forEach(button => {
+            button.classList.remove('active');
+        });
+    
+        // Add active class to the clicked button
+        const clickedButton = event.target;
+        clickedButton.classList.add('active');
+    }
+</script>
+    
+    
+<!-- Automobiles Section -->
+<div id="automobile-section-items" class="property-section" style="display: none;">
+    <h2>Automobiles</h2>
+    {% if automobiles %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Car Model</th>
+                        <th>Body Type</th>
+                        <th>Status</th>
+                        <th>Image</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for automobile in automobiles %}
+                        <tr>
+                            <td>{{ automobile.make }}</td>
+                            <td>{{ automobile.body_type }}</td>
+                            <td>{{ automobile.get_status_display }}</td>
+                            <td>
+                                {% if automobile.images.all %}
+                                    {% with automobile.images.all|first as image %}
+                                        <img src="{{ image.image.url }}" alt="Automobile Image" width="100">
+                                    {% endwith %}
+                                {% else %}
+                                    <span>No Image Available</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <button class="view-btn" onclick="openPopup('automobile', {{ automobile.id }})"><i class="fas fa-eye"></i></button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p>No automobiles found.</p>
+    {% endif %}
+</div>
+
+
+<!-- Motorcycles Section -->
+<div id="motorcycle-section-items" class="property-section" style="display: none;">
+    <h2>Motorcycles</h2>
+    {% if motorcycle %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Make</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th>Image</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for motorcycle in motorcycle %}
+                        <tr>
+                            <td>{{ motorcycle.make }}</td>
+                            <td>{{ motorcycle.body_type }}</td>
+                            <td>{{ motorcycle.get_status_display }}</td>
+                            <td>
+                                {% if motorcycle.images.all %}
+                                    <img src="{{ motorcycle.images.all.0.image.url }}" alt="Motorcycle Image" width="100">
+                                {% endif %}
+                            </td>
+                            <td>
+                                <button class="view-btn" onclick="openPopup('motorcycle', {{ motorcycle.id }})"><i class="fas fa-eye"></i></button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p>No motorcycles found.</p>
+    {% endif %}
+</div>
+<!-- Boats Section -->
+<div id="boats-section-items" class="property-section" style="display: none;">
+    <h2>Boats</h2>
+    {% if boat %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Manufacturer</th>
+                        <th>Status</th>
+                        <th>Image</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for boat in boat %}
+                        <tr>
+                            <td>{{ boat.name }}</td>
+                            <td>{{ boat.manufacturer }}</td>
+                            <td>{{ boat.get_status_display }}</td>
+                            <td>
+                                {% if boat.images.all %}
+                                    <img src="{{ boat.images.all.0.image.url }}" alt="Boat Image" width="100">
+                                {% endif %}
+                            </td>
+                            <td>
+                                <button class="view-btn" onclick="openPopup('boat', {{ boat.id }})"><i class="fas fa-eye"></i></button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p>No boats found.</p>
+    {% endif %}
+</div>
+<!-- Heavy Vehicles Section -->
+<div id="heavy-vehicles-section-items" class="property-section" style="display: none;">
+    <h2>Heavy Vehicles</h2>
+    {% if heavy_vehicle %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nmae</th>
+                        <th>Manufacturer</th>
+                        <th>Status</th>
+                        <th>Image</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for heavy_vehicle in heavy_vehicle %}
+                        <tr>
+                            <td>{{ heavy_vehicle.name }}</td>
+                            <td>{{ heavy_vehicle.manufacturer }}</td>
+                            <td>{{ heavy_vehicle.get_status_display }}</td>
+                            <td>
+                                {% if heavy_vehicle.images.all %}
+                                    <img src="{{ heavy_vehicle.images.all.0.image.url }}" alt="Heavy Vehicle Image" width="100">
+                                {% endif %}
+                            </td>
+                            <td>
+                                <button class="view-btn" onclick="openPopup('heavy_vehicle', {{ heavy_vehicle.id }})"><i class="fas fa-eye"></i></button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p>No heavy vehicles found.</p>
+    {% endif %}
+</div>
+<!-- Auto Accessories & Parts Section -->
+<div id="accessories-section-items" class="property-section" style="display: none;">
+    <h2>Auto Accessories & Parts</h2>
+    {% if accessories %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Price (OMR)</th>
+                        <th>Status</th>
+                        <th>Image</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for accessory in accessories %}
+                        <tr>
+                            <td>{{ accessory.name }}</td>
+                            <td>{{ accessory.price }}</td>
+                            <td>{{ accessory.get_status_display }}</td>
+                            <td>
+                                {% if accessory.images.all %}
+                                    <img src="{{ accessory.images.all.0.image.url }}" alt="Accessory Image" width="100">
+                                {% endif %}
+                            </td>
+                            <td>
+                                <button class="view-btn" onclick="openPopup('accessory', {{ accessory.id }})"><i class="fas fa-eye"></i></button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p>No accessories found.</p>
+    {% endif %}
+</div>
+<!-- Number Plates Section -->
+<div id="number-plate-section-items" class="property-section" style="display: none;">
+    <h2>Number Plates</h2>
+    {% if numberplate %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Plate Number</th>
+                        <th>Price (OMR)</th>
+                        <th>Status</th>
+                        <th>Image</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for number_plate in numberplate %}
+                        <tr>
+                            <td>{{ number_plate.number }}</td>
+                            <td>{{ number_plate.price }}</td>
+                            <td>{{ number_plate.get_status_display }}</td>
+                            <td>
+                                {% if number_plate.images.all %}
+                                    <img src="{{ number_plate.images.all.0.image.url }}" alt="Number Plate Image" width="100">
+                                {% endif %}
+                            </td>
+                            <td>
+                                <button class="view-btn" onclick="openPopup('number_plate', {{ number_plate.id }})"><i class="fas fa-eye"></i></button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p>No number plates found.</p>
+    {% endif %}
+</div>
+
+ 
+
+        <!-- Popup Modal -->
+        <div class="popup" id="popup-modal">
+            <div class="popup-content">
+                <!-- Close Button -->
+                <button class="close-btn" onclick="closePopup()">
+                    <i class="fa fa-times"></i>
+                </button>
+                
+                <!-- Popup Details Container -->
+                <div id="popup-details"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Function to open the popup and fetch the details dynamically
+        function openPopup(type, id) {
+            const popup = document.getElementById("popup-modal");
+            const popupDetails = document.getElementById("popup-details");
+    
+            // AJAX request to fetch the full details of the product
+            fetch(`/get_product_details/${type}/${id}/`)
+
+                .then(response => response.json())
+                .then(data => {
+                    let details = '';
+                    if (data) {
+                        // Handling for different types of products
+                        if (type === 'land') {
+    let imagesSection = '';
+    let videosSection = '';
+
+    // Check if images exist
+    if (data.images && data.images.length > 0) {
+        imagesSection = `
+            <p><strong>Images:</strong></p>
+            <div class="popup-images">
+                ${data.images.map(image => `<img src="${image.url}" width="200" height="200">`).join('')}
+            </div>
+        `;
+    }
+
+    // Check if videos exist
+    if (data.videos && data.videos.length > 0) {
+        videosSection = `
+            <p><strong>Videos:</strong></p>
+            <div class="popup-videos">
+                ${data.videos.map(video => `
+                    <video width="320" height="240" controls>
+                        <source src="${video.url}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    details = `
+    <h2>${data.property_title}</h2>
+    <p><strong>Price:</strong> ${data.price} OMR</p>
+    <p><strong>Plot Area:</strong> ${data.plot_area}</p>
+    <p><strong>Regions:</strong> ${data.regions}</p>
+    <p><strong>Cities:</strong> ${data.cities}</p>
+    <p><strong>Latitude:</strong> ${data.latitude}</p>
+    <p><strong>Longitude:</strong> ${data.longitude}</p>
+    <p><strong>Status:</strong> ${data.status}</p>
+    <p><strong>Listing Type:</strong> ${data.listing_type}</p>
+    ${data.rental_period ? `<p><strong>Rental Period:</strong> ${data.rental_period}</p>` : ''}
+    <p><strong>Lister Type:</strong> ${data.lister_type}</p>
+    <p><strong>Property Mortgage:</strong> ${data.property_mortgage}</p>
+    <p><strong>Facade:</strong> ${data.facade}</p>
+    <p><strong>Zoned For:</strong> ${data.zoned_for}</p>
+    ${data.nearby_locations.length > 0 ? `<p><strong>Nearby Locations:</strong> ${data.nearby_locations.join(', ')}</p>` : ''}
+    <p><strong>Description:</strong> ${data.description}</p>
+    ${imagesSection}
+    ${videosSection}
+`;
+
+}
+else if (type === 'villa') {
+    let imagesSection = '';
+    let videosSection = '';
+
+    // Check if images exist
+    if (data.images && data.images.length > 0) {
+        imagesSection = `
+            <p><strong>Images:</strong></p>
+            <div class="popup-images">
+                ${data.images.map(image => `<img src="${image.url}" width="200" height="200">`).join('')}
+            </div>
+        `;
+    }
+
+    // Check if videos exist
+    if (data.videos && data.videos.length > 0) {
+        videosSection = `
+            <p><strong>Videos:</strong></p>
+            <div class="popup-videos">
+                ${data.videos.map(video => `
+                    <video width="320" height="240" controls>
+                        <source src="${video.url}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    details = `
+    <h2>${data.property_title}</h2>
+    <p><strong>Price:</strong> ${data.price}</p>
+    <p><strong>Plot Area:</strong> ${data.plot_area}</p>
+    <p><strong>Surface Area:</strong> ${data.surface_area}</p>
+    <p><strong>Bedrooms:</strong> ${data.bedrooms}</p>
+    <p><strong>Bathrooms:</strong> ${data.bathrooms}</p>
+    <p><strong>Regions:</strong> ${data.regions}</p>
+    <p><strong>City:</strong> ${data.cities}</p>
+    <p><strong>Latitude:</strong> ${data.latitude}</p>
+    <p><strong>Longitude:</strong> ${data.longitude}</p>
+    <p><strong>Listing Type:</strong> ${data.listing_type}</p>
+    <p><strong>Rental Period:</strong> ${data.rental_period || 'N/A'}</p>
+    <p><strong>Status:</strong> ${data.status}</p>
+    <p><strong>Furnished:</strong> ${data.furnished}</p>
+    <p><strong>Building:</strong> ${data.building}</p>
+    <p><strong>Floors:</strong> ${data.floors}</p>
+    <p><strong>Property Mortgage:</strong> ${data.property_mortgage}</p>
+    <p><strong>Facade:</strong> ${data.facade}</p>
+    <p><strong>Created At:</strong> ${data.created_at}</p>
+    
+   
+
+    ${imagesSection}
+    ${videosSection}
+`;
+
+}
+
+else if (type === 'commercial') {
+    let imagesSection = '';
+    let videosSection = '';
+
+    // Check if images exist
+    if (data.images && data.images.length > 0) {
+        imagesSection = `
+            <p><strong>Images:</strong></p>
+            <div class="popup-images">
+                ${data.images.map(image => `<img src="${image.url}" width="200" height="200">`).join('')}
+            </div>
+        `;
+    }
+
+    // Check if videos exist
+    if (data.videos && data.videos.length > 0) {
+        videosSection = `
+            <p><strong>Videos:</strong></p>
+            <div class="popup-videos">
+                ${data.videos.map(video => `
+                    <video width="320" height="240" controls>
+                        <source src="${video.url}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    details = `
+    <h2>${data.property_title}</h2>
+    <p><strong>Price:</strong> ${data.price}</p>
+    <p><strong>Plot Area:</strong> ${data.plot_area}</p>
+    <p><strong>Region:</strong> ${data.regions}</p>
+    <p><strong>City:</strong> ${data.cities}</p>
+    <p><strong>Status:</strong> ${data.status}</p>
+    <p><strong>Listing Type:</strong> ${data.listing_type}</p>
+    <p><strong>Floors:</strong> ${data.floors}</p>
+    <p><strong>Furnished:</strong> ${data.furnished}</p>
+    <p><strong>Property Mortgage:</strong> ${data.property_mortgage}</p>
+    <p><strong>Property Status:</strong> ${data.property_status}</p>
+    <p><strong>Lister Type:</strong> ${data.lister_type}</p>
+    <p><strong>Main Amenities:</strong> ${data.main_amenities.join(", ")}</p>
+    <p><strong>Additional Amenities:</strong> ${data.additional_amenities.join(", ")}</p>
+    <p><strong>Nearby Locations:</strong> ${data.nearby_location.join(", ")}</p>
+    <p><strong>Description:</strong> ${data.description}</p>
+    <p><strong>Map Location:</strong> <a href="https://www.google.com/maps/search/?api=1&query=${data.latitude},${data.longitude}" target="_blank">View on Map</a></p>
+    ${imagesSection}
+    ${videosSection}
+`;
+
+}
+else if (type === 'farm') {
+    let imagesSection = '';
+    let videosSection = '';
+
+    // Check if images exist
+    if (data.images && data.images.length > 0) {
+        imagesSection = `
+            <p><strong>Images:</strong></p>
+            <div class="popup-images">
+                ${data.images.map(image => `<img src="${image.url}" width="200" height="200">`).join('')}
+            </div>
+        `;
+    }
+
+    // Check if videos exist
+    if (data.videos && data.videos.length > 0) {
+        videosSection = `
+            <p><strong>Videos:</strong></p>
+            <div class="popup-videos">
+                ${data.videos.map(video => `
+                    <video width="320" height="240" controls>
+                        <source src="${video.url}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    details = `
+       <h2>${data.property_title}</h2>
+    <p><strong>Price:</strong> ${data.price} OMR</p>
+    <p><strong>Surface Area:</strong> ${data.surface_area} sqm</p>
+    <p><strong>Plot Area:</strong> ${data.plot_area} sqm</p>
+    <p><strong>Region:</strong> ${data.regions}</p>
+    <p><strong>City:</strong> ${data.cities}</p>
+    <p><strong>Status:</strong> ${data.status}</p>
+    <p><strong>Listing Type:</strong> ${data.listing_type}</p>
+    <p><strong>Bedrooms:</strong> ${data.bedrooms}</p>
+    <p><strong>Bathrooms:</strong> ${data.bathrooms}</p>
+    <p><strong>Building Age:</strong> ${data.building}</p>
+    <p><strong>Furnished:</strong> ${data.furnished}</p>
+    <p><strong>Property Mortgage:</strong> ${data.property_mortgage}</p>
+    <p><strong>Facade:</strong> ${data.facade}</p>
+    <p><strong>Lister Type:</strong> ${data.lister_type}</p>
+    <p><strong>Description:</strong> ${data.description}</p>
+    <p><strong>Map Location:</strong> <a href="https://www.google.com/maps/search/?api=1&query=${data.latitude},${data.longitude}" target="_blank">View on Map</a></p>
+ ${imagesSection}
+    ${videosSection}
+    `;
+
+}
+else if (type === 'apartment') {
+    let imagesSection = '';
+    let videosSection = '';
+
+    // Check if images exist
+    if (data.images && data.images.length > 0) {
+        imagesSection = `
+            <p><strong>Images:</strong></p>
+            <div class="popup-images">
+                ${data.images.map(image => `<img src="${image.url}" width="200" height="200">`).join('')}
+            </div>
+        `;
+    }
+
+    // Check if videos exist
+    if (data.videos && data.videos.length > 0) {
+        videosSection = `
+            <p><strong>Videos:</strong></p>
+            <div class="popup-videos">
+                ${data.videos.map(video => `
+                    <video width="320" height="240" controls>
+                        <source src="${video.url}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    details = `
+        <h2>${data.property_title}</h2>
+<p><strong>Price:</strong> ${data.price} OMR</p>
+<p><strong>Plot Area:</strong> ${data.plot_area} sqm</p>
+<p><strong>Bedrooms:</strong> ${data.bedrooms}</p>
+<p><strong>Bathrooms:</strong> ${data.bathrooms}</p>
+<p><strong>Furnished:</strong> ${data.furnished}</p>
+<p><strong>Building Age:</strong> ${data.building}</p>
+<p><strong>Floors:</strong> ${data.floors}</p>
+<p><strong>Listing Type:</strong> ${data.listing_type}</p>
+<p><strong>Approval Status:</strong> ${data.status}</p>
+<p><strong>Property Mortgage:</strong> ${data.property_mortgage}</p>
+<p><strong>Region:</strong> ${data.get_region_display}</p>
+<p><strong>City:</strong> ${data.cities}</p>
+<p><strong>Facade:</strong> ${data.facade}</p>
+<p><strong>Lister Type:</strong> ${data.lister_type}</p>
+<p><strong>Amenities:</strong> ${data.main_amenities}</p>
+<p><strong>Additional Amenities:</strong> ${data.additional_amenities}</p>
+<p><strong>Nearby Locations:</strong> ${data.nearby_location}</p>
+<p><strong>Description:</strong> ${data.description}</p>
+<p><strong>Latitude:</strong> ${data.latitude}</p>
+<p><strong>Longitude:</strong> ${data.longitude}</p>
+<p><strong>Contact Details:</strong> ${data.contact_details}</p>
+<p><strong>Additional Information:</strong> ${data.additional_information}</p>
+${imagesSection}
+${videosSection}
+
+    `;
+}
+
+else if (type === 'factory') {
+    let imagesSection = '';
+    let videosSection = '';
+
+    // Check if images exist
+    if (data.images && data.images.length > 0) {
+        imagesSection = `
+            <p><strong>Images:</strong></p>
+            <div class="popup-images">
+                ${data.images.map(image => `<img src="${image.url}" width="200" height="200">`).join('')}
+            </div>
+        `;
+    }
+
+    // Check if videos exist
+    if (data.videos && data.videos.length > 0) {
+        videosSection = `
+            <p><strong>Videos:</strong></p>
+            <div class="popup-videos">
+                ${data.videos.map(video => `
+                    <video width="320" height="240" controls>
+                        <source src="${video.url}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    details = `
+       <h2>${data.property_title}</h2>
+<p><strong>Price:</strong> ${data.price}</p>
+<p><strong>Plot Area:</strong> ${data.plot_area}</p>
+<p><strong>Description:</strong> ${data.description}</p>
+<p><strong>Region:</strong> ${data.regions}</p>
+<p><strong>City:</strong> ${data.cities}</p>
+<p><strong>Latitude:</strong> ${data.latitude}</p>
+<p><strong>Longitude:</strong> ${data.longitude}</p>
+<p><strong>Listing Type:</strong> ${data.listing_type}</p>
+<p><strong>Status:</strong> ${data.status}</p>
+<p><strong>Property Mortgage:</strong> ${data.property_mortgage}</p>
+<p><strong>Lister Type:</strong> ${data.lister_type}</p>
+<p><strong>Main Amenities:</strong> ${data.main_amenities.join(", ")}</p>
+<p><strong>Additional Amenities:</strong> ${data.additional_amenities.join(", ")}</p>
+<p><strong>Nearby Locations:</strong> ${data.nearby_location.join(", ")}</p>
+${imagesSection}
+${videosSection}
+
+    `;
+}
+else if (type === 'complexes') {
+    let imagesSection = '';
+    let videosSection = '';
+
+    // Check if images exist
+    if (data.images && data.images.length > 0) {
+        imagesSection = `
+            <p><strong>Images:</strong></p>
+            <div class="popup-images">
+                ${data.images.map(image => `<img src="${image.url}" width="200" height="200">`).join('')}
+            </div>
+        `;
+    }
+
+    // Check if videos exist
+    if (data.videos && data.videos.length > 0) {
+        videosSection = `
+            <p><strong>Videos:</strong></p>
+            <div class="popup-videos">
+                ${data.videos.map(video => `
+                    <video width="320" height="240" controls>
+                        <source src="${video.url}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    details = `
+      <h2>${data.property_title}</h2>
+<p><strong>Price:</strong> ${data.price} OMR</p>
+<p><strong>Plot Area:</strong> ${data.plot_area} sqm</p>
+<p><strong>Description:</strong> ${data.description}</p>
+<p><strong>Region:</strong> ${data.regions}</p>
+<p><strong>City:</strong> ${data.cities}</p>
+<p><strong>Latitude:</strong> ${data.latitude}</p>
+<p><strong>Longitude:</strong> ${data.longitude}</p>
+<p><strong>Floors:</strong> ${data.floors}</p>
+<p><strong>Listing Type:</strong> ${data.listing_type}</p>
+<p><strong>Status:</strong> ${data.status}</p>
+<p><strong>Property Mortgage:</strong> ${data.property_mortgage}</p>
+<p><strong>Property Status:</strong> ${data.property}</p>
+<p><strong>Nearby Locations:</strong> ${data.nearby_location.join(", ")}</p>
+<p><strong>Main Amenities:</strong> ${data.main_amenities.join(", ")}</p>
+<p><strong>Additional Amenities:</strong> ${data.additional_amenities.join(", ")}</p>
+<p><strong>Lister Type:</strong> ${data.lister_type}</p>
+${imagesSection}
+${videosSection}
+
+    `;
+}
+else if (type === 'clinic') {
+    let imagesSection = '';
+    let videosSection = '';
+
+    // Check if images exist
+    if (data.images && data.images.length > 0) {
+        imagesSection = `
+            <p><strong>Images:</strong></p>
+            <div class="popup-images">
+                ${data.images.map(image => `<img src="${image.url}" width="200" height="200">`).join('')}
+            </div>
+        `;
+    }
+
+    // Check if videos exist
+    if (data.videos && data.videos.length > 0) {
+        videosSection = `
+            <p><strong>Videos:</strong></p>
+            <div class="popup-videos">
+                ${data.videos.map(video => `
+                    <video width="320" height="240" controls>
+                        <source src="${video.url}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    details = `
+   <h2>${data.property_title}</h2>
+<p><strong>Price:</strong> ${data.price} OMR</p>
+<p><strong>Plot Area:</strong> ${data.plot_area} sqm</p>
+<p><strong>Description:</strong> ${data.description}</p>
+<p><strong>Region:</strong> ${data.regions}</p>
+<p><strong>City:</strong> ${data.cities}</p>
+<p><strong>Latitude:</strong> ${data.latitude}</p>
+<p><strong>Longitude:</strong> ${data.longitude}</p>
+<p><strong>Floors:</strong> ${data.floors}</p>
+<p><strong>Listing Type:</strong> ${data.listing_type}</p>
+<p><strong>Status:</strong> ${data.status}</p>
+<p><strong>Property Mortgage:</strong> ${data.property_mortgage}</p>
+<p><strong>Property Status:</strong> ${data.property}</p>
+<p><strong>Nearby Locations:</strong> ${data.nearby_location.length ? data.nearby_location.join(", ") : "N/A"}</p>
+<p><strong>Main Amenities:</strong> ${data.main_amenities.length ? data.main_amenities.join(", ") : "N/A"}</p>
+<p><strong>Additional Amenities:</strong> ${data.additional_amenities.length ? data.additional_amenities.join(", ") : "N/A"}</p>
+<p><strong>Lister Type:</strong> ${data.lister_type}</p>
+${imagesSection}
+${videosSection}
+
+    `;
+}
+
+else if (type === 'hostel') {
+    let imagesSection = '';
+    let videosSection = '';
+
+    // Check if images exist
+    if (data.images && data.images.length > 0) {
+        imagesSection = `
+            <p><strong>Images:</strong></p>
+            <div class="popup-images">
+                ${data.images.map(image => `<img src="${image.url}" width="200" height="200">`).join('')}
+            </div>
+        `;
+    }
+
+    // Check if videos exist
+    if (data.videos && data.videos.length > 0) {
+        videosSection = `
+            <p><strong>Videos:</strong></p>
+            <div class="popup-videos">
+                ${data.videos.map(video => `
+                    <video width="320" height="240" controls>
+                        <source src="${video.url}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    details = `
+  
+
+<h2>${data.property_title}</h2>
+<p><strong>Price:</strong> ${data.price} OMR</p>
+<p><strong>Plot Area:</strong> ${data.plot_area} sqm</p>
+<p><strong>Description:</strong> ${data.description}</p>
+<p><strong>Region:</strong> ${data.regions}</p>
+<p><strong>City:</strong> ${data.cities}</p>
+<p><strong>Latitude:</strong> ${data.latitude}</p>
+<p><strong>Longitude:</strong> ${data.longitude}</p>
+<p><strong>Floors:</strong> ${data.floors}</p>
+<p><strong>Listing Type:</strong> ${data.listing_type}</p>
+<p><strong>Status:</strong> ${data.status}</p>
+<p><strong>Property Mortgage:</strong> ${data.property_mortgage}</p>
+<p><strong>Property Status:</strong> ${data.property}</p>
+<p><strong>Furnished:</strong> ${data.furnished}</p>
+<p><strong>Number of Bedrooms:</strong> ${data.bedrooms}</p>
+<p><strong>Lister Type:</strong> ${data.lister_type}</p>
+
+<p><strong>Nearby Locations:</strong> ${data.nearby_location.length ? data.nearby_location.join(", ") : "N/A"}</p>
+<p><strong>Main Amenities:</strong> ${data.main_amenities.length ? data.main_amenities.join(", ") : "N/A"}</p>
+<p><strong>Additional Amenities:</strong> ${data.additional_amenities.length ? data.additional_amenities.join(", ") : "N/A"}</p>
+
+${imagesSection}
+${videosSection}
+
+    `;
+}
+
+else if (type === 'office') {
+    let imagesSection = '';
+    let videosSection = '';
+
+    // Check if images exist
+    if (data.images && data.images.length > 0) {
+        imagesSection = `
+            <p><strong>Images:</strong></p>
+            <div class="popup-images">
+                ${data.images.map(image => `<img src="${image.url}" width="200" height="200">`).join('')}
+            </div>
+        `;
+    }
+
+    // Check if videos exist
+    if (data.videos && data.videos.length > 0) {
+        videosSection = `
+            <p><strong>Videos:</strong></p>
+            <div class="popup-videos">
+                ${data.videos.map(video => `
+                    <video width="320" height="240" controls>
+                        <source src="${video.url}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    details = `
+  
+<h2>${data.property_title}</h2>
+<p><strong>Price:</strong> ${data.price} OMR</p>
+<p><strong>Surface Area:</strong> ${data.plot_area} sqm</p>
+<p><strong>Description:</strong> ${data.description}</p>
+<p><strong>Region:</strong> ${data.regions}</p>
+<p><strong>Floors:</strong> ${data.floors}</p>
+<p><strong>Listing Type:</strong> ${data.listing_type}</p>
+<p><strong>Status:</strong> ${data.status}</p>
+<p><strong>Property Mortgage:</strong> ${data.property_mortgage}</p>
+<p><strong>Property Status:</strong> ${data.property}</p>
+<p><strong>Furnished:</strong> ${data.furnished}</p>
+<p><strong>Lister Type:</strong> ${data.lister_type}</p>
+
+
+<p><strong>Nearby Locations:</strong> ${data.nearby_location.length ? data.nearby_location.join(", ") : "N/A"}</p>
+<p><strong>Main Amenities:</strong> ${data.main_amenities.length ? data.main_amenities.join(", ") : "N/A"}</p>
+<p><strong>Additional Amenities:</strong> ${data.additional_amenities.length ? data.additional_amenities.join(", ") : "N/A"}</p>
+
+${imagesSection}
+${videosSection}
+
+
+
+    `;
+}
+
+else if (type === 'shop') {
+    let imagesSection = '';
+    let videosSection = '';
+
+    // Check if images exist
+    if (data.images && data.images.length > 0) {
+        imagesSection = `
+            <p><strong>Images:</strong></p>
+            <div class="popup-images">
+                ${data.images.map(image => `<img src="${image.url}" width="200" height="200">`).join('')}
+            </div>
+        `;
+    }
+
+    // Check if videos exist
+    if (data.videos && data.videos.length > 0) {
+        videosSection = `
+            <p><strong>Videos:</strong></p>
+            <div class="popup-videos">
+                ${data.videos.map(video => `
+                    <video width="320" height="240" controls>
+                        <source src="${video.url}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    details = `
+  
+
+<h2>${data.property_title}</h2>
+<p><strong>Price:</strong> ${data.price} OMR</p>
+<p><strong>Plot Area:</strong> ${data.plot_area} sqm</p>
+<p><strong>Description:</strong> ${data.description}</p>
+<p><strong>Region:</strong> ${data.regions}</p>
+<p><strong>City:</strong> ${data.cities}</p>
+<p><strong>Latitude:</strong> ${data.latitude}</p>
+<p><strong>Longitude:</strong> ${data.longitude}</p>
+<p><strong>Floors:</strong> ${data.floors}</p>
+<p><strong>Listing Type:</strong> ${data.listing_type}</p>
+<p><strong>Status:</strong> ${data.status}</p>
+<p><strong>Property Mortgage:</strong> ${data.property_mortgage}</p>
+<p><strong>Property Status:</strong> ${data.property}</p>
+<p><strong>Furnished:</strong> ${data.furnished}</p>
+<p><strong>Number of Bedrooms:</strong> ${data.bedrooms}</p>
+<p><strong>Lister Type:</strong> ${data.lister_type}</p>
+
+<p><strong>Nearby Locations:</strong> ${data.nearby_location.length ? data.nearby_location.join(", ") : "N/A"}</p>
+<p><strong>Main Amenities:</strong> ${data.main_amenities.length ? data.main_amenities.join(", ") : "N/A"}</p>
+<p><strong>Additional Amenities:</strong> ${data.additional_amenities.length ? data.additional_amenities.join(", ") : "N/A"}</p>
+
+${imagesSection}
+${videosSection}
+
+    `;
+}
+else if (type === 'cafe') {
+    let imagesSection = '';
+    let videosSection = '';
+
+    // Check if images exist
+    if (data.images && data.images.length > 0) {
+        imagesSection = `
+            <p><strong>Images:</strong></p>
+            <div class="popup-images">
+                ${data.images.map(image => `<img src="${image.url}" width="200" height="200">`).join('')}
+            </div>
+        `;
+    }
+
+    // Check if videos exist
+    if (data.videos && data.videos.length > 0) {
+        videosSection = `
+            <p><strong>Videos:</strong></p>
+            <div class="popup-videos">
+                ${data.videos.map(video => `
+                    <video width="320" height="240" controls>
+                        <source src="${video.url}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    details = `
+  
+
+<h2>${data.property_title}</h2>
+<p><strong>Price:</strong> ${data.price} OMR</p>
+<p><strong>Plot Area:</strong> ${data.plot_area} sqm</p>
+<p><strong>Description:</strong> ${data.description}</p>
+<p><strong>Region:</strong> ${data.regions}</p>
+<p><strong>City:</strong> ${data.cities}</p>
+<p><strong>Latitude:</strong> ${data.latitude}</p>
+<p><strong>Longitude:</strong> ${data.longitude}</p>
+<p><strong>Floors:</strong> ${data.floors}</p>
+<p><strong>Listing Type:</strong> ${data.listing_type}</p>
+<p><strong>Status:</strong> ${data.status}</p>
+<p><strong>Property Mortgage:</strong> ${data.property_mortgage}</p>
+<p><strong>Property Status:</strong> ${data.property}</p>
+<p><strong>Furnished:</strong> ${data.furnished}</p>
+<p><strong>Number of Bedrooms:</strong> ${data.bedrooms}</p>
+<p><strong>Lister Type:</strong> ${data.lister_type}</p>
+
+<p><strong>Nearby Locations:</strong> ${data.nearby_location.length ? data.nearby_location.join(", ") : "N/A"}</p>
+<p><strong>Main Amenities:</strong> ${data.main_amenities.length ? data.main_amenities.join(", ") : "N/A"}</p>
+<p><strong>Additional Amenities:</strong> ${data.additional_amenities.length ? data.additional_amenities.join(", ") : "N/A"}</p>
+
+${imagesSection}
+${videosSection}
+
+    `;
+}
+else if (type === 'staff') {
+    let imagesSection = '';
+    let videosSection = '';
+
+    // Check if images exist
+    if (data.images && data.images.length > 0) {
+        imagesSection = `
+            <p><strong>Images:</strong></p>
+            <div class="popup-images">
+                ${data.images.map(image => `<img src="${image.url}" width="200" height="200">`).join('')}
+            </div>
+        `;
+    }
+
+    // Check if videos exist
+    if (data.videos && data.videos.length > 0) {
+        videosSection = `
+            <p><strong>Videos:</strong></p>
+            <div class="popup-videos">
+                ${data.videos.map(video => `
+                    <video width="320" height="240" controls>
+                        <source src="${video.url}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    details = `
+  
+
+<h2>${data.property_title}</h2>
+<p><strong>Price:</strong> ${data.price} OMR</p>
+<p><strong>Plot Area:</strong> ${data.plot_area} sqm</p>
+<p><strong>Description:</strong> ${data.description}</p>
+<p><strong>Region:</strong> ${data.regions}</p>
+<p><strong>City:</strong> ${data.cities}</p>
+<p><strong>Latitude:</strong> ${data.latitude}</p>
+<p><strong>Longitude:</strong> ${data.longitude}</p>
+<p><strong>Floors:</strong> ${data.floors}</p>
+<p><strong>Listing Type:</strong> ${data.listing_type}</p>
+<p><strong>Status:</strong> ${data.status}</p>
+<p><strong>Property Mortgage:</strong> ${data.property_mortgage}</p>
+<p><strong>Property Status:</strong> ${data.property}</p>
+<p><strong>Furnished:</strong> ${data.furnished}</p>
+<p><strong>Number of Bedrooms:</strong> ${data.bedrooms}</p>
+<p><strong>Lister Type:</strong> ${data.lister_type}</p>
+
+<p><strong>Nearby Locations:</strong> ${data.nearby_location.length ? data.nearby_location.join(", ") : "N/A"}</p>
+<p><strong>Main Amenities:</strong> ${data.main_amenities.length ? data.main_amenities.join(", ") : "N/A"}</p>
+<p><strong>Additional Amenities:</strong> ${data.additional_amenities.length ? data.additional_amenities.join(", ") : "N/A"}</p>
+
+${imagesSection}
+${videosSection}
+
+    `;
+}
+
+else if (type === 'warehouse') {
+    let imagesSection = '';
+    let videosSection = '';
+
+    // Check if images exist
+    if (data.images && data.images.length > 0) {
+        imagesSection = `
+            <p><strong>Images:</strong></p>
+            <div class="popup-images">
+                ${data.images.map(image => `<img src="${image.url}" width="200" height="200">`).join('')}
+            </div>
+        `;
+    }
+
+    // Check if videos exist
+    if (data.videos && data.videos.length > 0) {
+        videosSection = `
+            <p><strong>Videos:</strong></p>
+            <div class="popup-videos">
+                ${data.videos.map(video => `
+                    <video width="320" height="240" controls>
+                        <source src="${video.url}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    details = `
+  
+
+<h2>${data.property_title}</h2>
+<p><strong>Price:</strong> ${data.price} OMR</p>
+<p><strong>Plot Area:</strong> ${data.plot_area} sqm</p>
+<p><strong>Description:</strong> ${data.description}</p>
+<p><strong>Region:</strong> ${data.regions}</p>
+<p><strong>City:</strong> ${data.cities}</p>
+<p><strong>Latitude:</strong> ${data.latitude}</p>
+<p><strong>Longitude:</strong> ${data.longitude}</p>
+<p><strong>Floors:</strong> ${data.floors}</p>
+<p><strong>Listing Type:</strong> ${data.listing_type}</p>
+<p><strong>Status:</strong> ${data.status}</p>
+<p><strong>Property Mortgage:</strong> ${data.property_mortgage}</p>
+<p><strong>Property Status:</strong> ${data.property}</p>
+<p><strong>Furnished:</strong> ${data.furnished}</p>
+<p><strong>Number of Bedrooms:</strong> ${data.bedrooms}</p>
+<p><strong>Lister Type:</strong> ${data.lister_type}</p>
+
+<p><strong>Nearby Locations:</strong> ${data.nearby_location.length ? data.nearby_location.join(", ") : "N/A"}</p>
+<p><strong>Main Amenities:</strong> ${data.main_amenities.length ? data.main_amenities.join(", ") : "N/A"}</p>
+<p><strong>Additional Amenities:</strong> ${data.additional_amenities.length ? data.additional_amenities.join(", ") : "N/A"}</p>
+
+${imagesSection}
+${videosSection}
+
+    `;
+}
+else if (type === 'townhouse') {
+    let imagesSection = '';
+    let videosSection = '';
+
+    // Check if images exist
+    if (data.images && data.images.length > 0) {
+        imagesSection = `
+            <p><strong>Images:</strong></p>
+            <div class="popup-images">
+                ${data.images.map(image => `<img src="${image.url}" width="200" height="200">`).join('')}
+            </div>
+        `;
+    }
+
+    // Check if videos exist
+    if (data.videos && data.videos.length > 0) {
+        videosSection = `
+            <p><strong>Videos:</strong></p>
+            <div class="popup-videos">
+                ${data.videos.map(video => `
+                    <video width="320" height="240" controls>
+                        <source src="${video.url}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    details = `
+  
+
+<h2>${data.property_title}</h2>
+<p><strong>Price:</strong> ${data.price} OMR</p>
+<p><strong>Plot Area:</strong> ${data.plot_area} sqm</p>
+<p><strong>Description:</strong> ${data.description}</p>
+<p><strong>Region:</strong> ${data.regions}</p>
+<p><strong>City:</strong> ${data.cities}</p>
+<p><strong>Latitude:</strong> ${data.latitude}</p>
+<p><strong>Longitude:</strong> ${data.longitude}</p>
+<p><strong>Floors:</strong> ${data.floors}</p>
+<p><strong>Listing Type:</strong> ${data.listing_type}</p>
+<p><strong>Status:</strong> ${data.status}</p>
+<p><strong>Property Mortgage:</strong> ${data.property_mortgage}</p>
+<p><strong>Property Status:</strong> ${data.property}</p>
+<p><strong>Furnished:</strong> ${data.furnished}</p>
+<p><strong>Number of Bedrooms:</strong> ${data.bedrooms}</p>
+<p><strong>Lister Type:</strong> ${data.lister_type}</p>
+
+<p><strong>Nearby Locations:</strong> ${data.nearby_location.length ? data.nearby_location.join(", ") : "N/A"}</p>
+<p><strong>Main Amenities:</strong> ${data.main_amenities.length ? data.main_amenities.join(", ") : "N/A"}</p>
+<p><strong>Additional Amenities:</strong> ${data.additional_amenities.length ? data.additional_amenities.join(", ") : "N/A"}</p>
+
+${imagesSection}
+${videosSection}
+
+    `;
+}
+else if (type === 'fullfloors') {
+    let imagesSection = '';
+    let videosSection = '';
+
+    // Check if images exist
+    if (data.images && data.images.length > 0) {
+        imagesSection = `
+            <p><strong>Images:</strong></p>
+            <div class="popup-images">
+                ${data.images.map(image => `<img src="${image.url}" width="200" height="200">`).join('')}
+            </div>
+        `;
+    }
+
+    // Check if videos exist
+    if (data.videos && data.videos.length > 0) {
+        videosSection = `
+            <p><strong>Videos:</strong></p>
+            <div class="popup-videos">
+                ${data.videos.map(video => `
+                    <video width="320" height="240" controls>
+                        <source src="${video.url}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    details = `
+  
+
+<h2>${data.property_title}</h2>
+<p><strong>Price:</strong> ${data.price} OMR</p>
+<p><strong>Plot Area:</strong> ${data.plot_area} sqm</p>
+<p><strong>Description:</strong> ${data.description}</p>
+<p><strong>Region:</strong> ${data.regions}</p>
+<p><strong>City:</strong> ${data.cities}</p>
+<p><strong>Latitude:</strong> ${data.latitude}</p>
+<p><strong>Longitude:</strong> ${data.longitude}</p>
+<p><strong>Floors:</strong> ${data.floors}</p>
+<p><strong>Listing Type:</strong> ${data.listing_type}</p>
+<p><strong>Status:</strong> ${data.status}</p>
+<p><strong>Property Mortgage:</strong> ${data.property_mortgage}</p>
+<p><strong>Property Status:</strong> ${data.property}</p>
+<p><strong>Furnished:</strong> ${data.furnished}</p>
+<p><strong>Number of Bedrooms:</strong> ${data.bedrooms}</p>
+<p><strong>Lister Type:</strong> ${data.lister_type}</p>
+
+<p><strong>Nearby Locations:</strong> ${data.nearby_location.length ? data.nearby_location.join(", ") : "N/A"}</p>
+<p><strong>Main Amenities:</strong> ${data.main_amenities.length ? data.main_amenities.join(", ") : "N/A"}</p>
+<p><strong>Additional Amenities:</strong> ${data.additional_amenities.length ? data.additional_amenities.join(", ") : "N/A"}</p>
+
+${imagesSection}
+${videosSection}
+
+    `;
+}
+else if (type === 'showrooms') {
+    let imagesSection = '';
+    let videosSection = '';
+
+    // Check if images exist
+    if (data.images && data.images.length > 0) {
+        imagesSection = `
+            <p><strong>Images:</strong></p>
+            <div class="popup-images">
+                ${data.images.map(image => `<img src="${image.url}" width="200" height="200">`).join('')}
+            </div>
+        `;
+    }
+
+    // Check if videos exist
+    if (data.videos && data.videos.length > 0) {
+        videosSection = `
+            <p><strong>Videos:</strong></p>
+            <div class="popup-videos">
+                ${data.videos.map(video => `
+                    <video width="320" height="240" controls>
+                        <source src="${video.url}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    details = `
+  
+
+<h2>${data.property_title}</h2>
+<p><strong>Price:</strong> ${data.price} OMR</p>
+<p><strong>Plot Area:</strong> ${data.plot_area} sqm</p>
+<p><strong>Description:</strong> ${data.description}</p>
+<p><strong>Region:</strong> ${data.regions}</p>
+<p><strong>City:</strong> ${data.cities}</p>
+<p><strong>Latitude:</strong> ${data.latitude}</p>
+<p><strong>Longitude:</strong> ${data.longitude}</p>
+<p><strong>Floors:</strong> ${data.floors}</p>
+<p><strong>Listing Type:</strong> ${data.listing_type}</p>
+<p><strong>Status:</strong> ${data.status}</p>
+<p><strong>Property Mortgage:</strong> ${data.property_mortgage}</p>
+<p><strong>Property Status:</strong> ${data.property}</p>
+<p><strong>Furnished:</strong> ${data.furnished}</p>
+<p><strong>Number of Bedrooms:</strong> ${data.bedrooms}</p>
+<p><strong>Lister Type:</strong> ${data.lister_type}</p>
+
+<p><strong>Nearby Locations:</strong> ${data.nearby_location.length ? data.nearby_location.join(", ") : "N/A"}</p>
+<p><strong>Main Amenities:</strong> ${data.main_amenities.length ? data.main_amenities.join(", ") : "N/A"}</p>
+<p><strong>Additional Amenities:</strong> ${data.additional_amenities.length ? data.additional_amenities.join(", ") : "N/A"}</p>
+
+${imagesSection}
+${videosSection}
+
+    `;
+}
+else if (type === 'wholebuilding') {
+    let imagesSection = '';
+    let videosSection = '';
+
+    // Check if images exist
+    if (data.images && data.images.length > 0) {
+        imagesSection = `
+            <p><strong>Images:</strong></p>
+            <div class="popup-images">
+                ${data.images.map(image => `<img src="${image.url}" width="200" height="200">`).join('')}
+            </div>
+        `;
+    }
+
+    // Check if videos exist
+    if (data.videos && data.videos.length > 0) {
+        videosSection = `
+            <p><strong>Videos:</strong></p>
+            <div class="popup-videos">
+                ${data.videos.map(video => `
+                    <video width="320" height="240" controls>
+                        <source src="${video.url}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    details = `
+  
+
+<h2>${data.property_title}</h2>
+<p><strong>Price:</strong> ${data.price} OMR</p>
+<p><strong>Plot Area:</strong> ${data.plot_area} sqm</p>
+<p><strong>Description:</strong> ${data.description}</p>
+<p><strong>Region:</strong> ${data.regions}</p>
+<p><strong>City:</strong> ${data.cities}</p>
+<p><strong>Latitude:</strong> ${data.latitude}</p>
+<p><strong>Longitude:</strong> ${data.longitude}</p>
+<p><strong>Floors:</strong> ${data.floors}</p>
+<p><strong>Listing Type:</strong> ${data.listing_type}</p>
+<p><strong>Status:</strong> ${data.status}</p>
+<p><strong>Property Mortgage:</strong> ${data.property_mortgage}</p>
+<p><strong>Property Status:</strong> ${data.property}</p>
+<p><strong>Furnished:</strong> ${data.furnished}</p>
+<p><strong>Number of Bedrooms:</strong> ${data.bedrooms}</p>
+<p><strong>Lister Type:</strong> ${data.lister_type}</p>
+
+<p><strong>Nearby Locations:</strong> ${data.nearby_location.length ? data.nearby_location.join(", ") : "N/A"}</p>
+
+${imagesSection}
+${videosSection}
+
+    `;
+}
+else if (type === 'supermarket') {
+    let imagesSection = '';
+    let videosSection = '';
+
+    // Check if images exist
+    if (data.images && data.images.length > 0) {
+        imagesSection = `
+            <p><strong>Images:</strong></p>
+            <div class="popup-images">
+                ${data.images.map(image => `<img src="${image.url}" width="200" height="200">`).join('')}
+            </div>
+        `;
+    }
+
+    // Check if videos exist
+    if (data.videos && data.videos.length > 0) {
+        videosSection = `
+            <p><strong>Videos:</strong></p>
+            <div class="popup-videos">
+                ${data.videos.map(video => `
+                    <video width="320" height="240" controls>
+                        <source src="${video.url}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    details = `
+  
+
+<h2>${data.property_title}</h2>
+<p><strong>Price:</strong> ${data.price} OMR</p>
+<p><strong>Plot Area:</strong> ${data.plot_area} sqm</p>
+<p><strong>Description:</strong> ${data.description}</p>
+<p><strong>Region:</strong> ${data.regions}</p>
+<p><strong>City:</strong> ${data.cities}</p>
+<p><strong>Latitude:</strong> ${data.latitude}</p>
+<p><strong>Longitude:</strong> ${data.longitude}</p>
+<p><strong>Floors:</strong> ${data.floors}</p>
+<p><strong>Listing Type:</strong> ${data.listing_type}</p>
+<p><strong>Status:</strong> ${data.status}</p>
+<p><strong>Property Mortgage:</strong> ${data.property_mortgage}</p>
+<p><strong>Property Status:</strong> ${data.property}</p>
+<p><strong>Furnished:</strong> ${data.furnished}</p>
+<p><strong>Number of Bedrooms:</strong> ${data.bedrooms}</p>
+<p><strong>Lister Type:</strong> ${data.lister_type}</p>
+
+<p><strong>Nearby Locations:</strong> ${data.nearby_location.length ? data.nearby_location.join(", ") : "N/A"}</p>
+<p><strong>Main Amenities:</strong> ${data.main_amenities.length ? data.main_amenities.join(", ") : "N/A"}</p>
+<p><strong>Additional Amenities:</strong> ${data.additional_amenities.length ? data.additional_amenities.join(", ") : "N/A"}</p>
+
+${imagesSection}
+${videosSection}
+
+    `;
+}
+else if (type === 'foreign') {
+    let imagesSection = '';
+    let videosSection = '';
+
+    // Check if images exist
+    if (data.images && data.images.length > 0) {
+        imagesSection = `
+            <p><strong>Images:</strong></p>
+            <div class="popup-images">
+                ${data.images.map(image => `<img src="${image.url}" width="200" height="200">`).join('')}
+            </div>
+        `;
+    }
+
+    // Check if videos exist
+    if (data.videos && data.videos.length > 0) {
+        videosSection = `
+            <p><strong>Videos:</strong></p>
+            <div class="popup-videos">
+                ${data.videos.map(video => `
+                    <video width="320" height="240" controls>
+                        <source src="${video.url}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    details = `
+  
+
+<h2>${data.property_title}</h2>
+<p><strong>Price:</strong> ${data.price} OMR</p>
+<p><strong>Description:</strong> ${data.description}</p>
+<p><strong>Region:</strong> ${data.regions}</p>
+<p><strong>City:</strong> ${data.cities}</p>
+<p><strong>Country:</strong> ${data.country}</p>
+<p><strong>Latitude:</strong> ${data.latitude}</p>
+<p><strong>Longitude:</strong> ${data.longitude}</p>
+<p><strong>Estate Type:</strong> ${data.estate_type}</p>
+<p><strong>Listing Type:</strong> ${data.listing_type}</p>
+<p><strong>Status:</strong> ${data.status}</p>
+<p><strong>Property Mortgage:</strong> ${data.property_mortgage}</p>
+<p><strong>Lister Type:</strong> ${data.lister_type}</p>
+
+
+${imagesSection}
+${videosSection}
+
+    `;
+}
+
+else if (type === 'automobile') {
+   
+
+    let imagesSection = '';
+    let videosSection = '';
+
+    // Check if images exist and build the section
+    if (data.images?.length > 0) {
+        imagesSection = `
+            <p><strong>Images:</strong></p>
+            <div class="popup-images">
+                ${data.images.map(image => `<img src="${image.url}" alt="Car Image" width="200" height="200">`).join('')}
+            </div>
+        `;
+    } else {
+        imagesSection = '<p><strong>Images:</strong> No images available.</p>';
+    }
+
+    // Check if videos exist and build the section
+    if (data.videos?.length > 0) {
+        videosSection = `
+            <p><strong>Videos:</strong></p>
+            <div class="popup-videos">
+                ${data.videos.map(video => `
+                    <video width="320" height="240" controls>
+                        <source src="${video.url}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                `).join('')}
+            </div>
+        `;
+    } else {
+        videosSection = '<p><strong>Videos:</strong> No videos available.</p>';
+    }
+
+    // Build the details section
+     details = `
+        <h2>${data.make || 'Unknown Make'}</h2>
+        <p><strong>Name:</strong> ${data.name || 'N/A'}</p>
+        <p><strong>Year of Manufacture:</strong> ${data.year || 'N/A'}</p>
+        <p><strong>Car Body Type:</strong> ${data.body_type || 'N/A'}</p>
+        <p><strong>Fuel Type:</strong> ${data.fuel_type || 'N/A'}</p>
+        <p><strong>Engine Capacity:</strong> ${data.engine_capacity ? data.engine_capacity + ' cc' : 'N/A'}</p>
+        <p><strong>Transmission:</strong> ${data.transmission || 'N/A'}</p>
+        <p><strong>Exterior Color:</strong> ${data.exterior_color || 'N/A'}</p>
+        <p><strong>Price:</strong> ${data.price ? data.price + ' OMR' : 'N/A'}</p>
+        <p><strong>Region:</strong> ${data.regions || 'N/A'}</p>
+        <p><strong>Listing Type:</strong> ${data.listing_type || 'N/A'}</p>
+        <p><strong>Cities:</strong> ${data.cities || 'N/A'}</p>
+        <p><strong>Latitude:</strong> ${data.latitude || 'N/A'}</p>
+        <p><strong>Longitude:</strong> ${data.longitude || 'N/A'}</p>
+        <p><strong>Location:</strong> ${data.location || 'N/A'}</p>
+        <p><strong>Description:</strong> ${data.description || 'N/A'}</p>
+        <p><strong>Warranty Status:</strong> ${data.warranty_status || 'N/A'}</p>
+        <p><strong>Condition:</strong> ${data.condition || 'N/A'}</p>
+        <p><strong>Approval Status:</strong> ${data.status || 'N/A'}</p>
+        ${imagesSection}
+        ${videosSection}
+    `;
+
+}
+
+
+
+else if (type === 'motorcycle') {
+    // Assuming `data` contains all the motorcycle fields and related images/videos
+
+let imagesSection = '';
+let videosSection = '';
+
+// Generate images section if images are available
+if (data.images && data.images.length > 0) {
+    imagesSection = `
+        <p><strong>Images:</strong></p>
+        <div class="popup-images">
+            ${data.images.map(image => `<img src="${image.url}" alt="Motorcycle Image" width="200" height="200">`).join('')}
+        </div>
+    `;
+}
+
+// Generate videos section if videos are available
+if (data.videos && data.videos.length > 0) {
+    videosSection = `
+        <p><strong>Videos:</strong></p>
+        <div class="popup-videos">
+            ${data.videos.map(video => `
+                <video width="320" height="240" controls>
+                    <source src="${video.url}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            `).join('')}
+        </div>
+    `;
+}
+
+// Build motorcycle details dynamically
+ details = `
+    <h2>${data.make} - ${data.name}</h2>
+    <p><strong>Model:</strong> ${data.model}</p>
+    <p><strong>Year of Manufacture:</strong> ${data.year}</p>
+    <p><strong>Description:</strong> ${data.description}</p>
+    <p><strong>Region:</strong> ${data.regions}</p>
+    <p><strong>Cities:</strong> ${data.cities}</p>
+    <p><strong>Latitude:</strong> ${data.latitude}</p>
+    <p><strong>Longitude:</strong> ${data.longitude}</p>
+    <p><strong>Location:</strong> ${data.location}</p>
+    <p><strong>Motorcycle Type:</strong> ${data.body_type}</p>
+    <p><strong>Listing Type:</strong> ${data.listing_type}</p>
+    <p><strong>Engine Capacity:</strong> ${data.engine_capacity} cc</p>
+    <p><strong>Price:</strong> ${data.price} OMR</p>
+    <p><strong>Condition:</strong> ${data.condition}</p>
+    <p><strong>Approval Status:</strong> ${data.status}</p>
+    ${imagesSection}
+    ${videosSection}
+`;
+}  
+    else if (type === 'accessory') {
+    // Assuming `data` contains all the accessory fields and related images/videos
+
+    let imagesSection = '';
+    let videosSection = '';
+
+    // Generate images section if images are available
+    if (data.images && data.images.length > 0) {
+        imagesSection = `
+            <p><strong>Images:</strong></p>
+            <div class="popup-images">
+                ${data.images.map(image => `<img src="${image.url}" alt="Accessory Image" width="200" height="200">`).join('')}
+            </div>
+        `;
+    }
+
+    // Generate videos section if videos are available
+    if (data.videos && data.videos.length > 0) {
+        videosSection = `
+            <p><strong>Videos:</strong></p>
+            <div class="popup-videos">
+                ${data.videos.map(video => `
+                    <video width="320" height="240" controls>
+                        <source src="${video.url}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    // Build accessory details dynamically
+     details = `
+        <h2>${data.name}</h2>
+        <p><strong>Description:</strong> ${data.description}</p>
+        <p><strong>Price:</strong> ${data.price} OMR</p>
+        <p><strong>Region:</strong> ${data.regions}</p>
+        <p><strong>Cities:</strong> ${data.cities}</p>
+        <p><strong>Latitude:</strong> ${data.latitude}</p>
+        <p><strong>Longitude:</strong> ${data.longitude}</p>
+        <p><strong>Location:</strong> ${data.location}</p>
+        <p><strong>Listing Type:</strong> ${data.listing_type}</p>
+        <p><strong>Status:</strong> ${data.status}</p>
+        ${imagesSection}
+        ${videosSection}
+    `;
+}
+else if (type === 'heavy_vehicle') {
+    let imagesSection = '';
+    let videosSection = '';
+                    // Same structure as 'land' but for heavy vehicle properties
+                    if (data.images && data.images.length > 0) {
+                        imagesSection = `
+                            <p><strong>Images:</strong></p>
+                            <div class="popup-images">
+                                ${data.images.map(image => `<img src="${image.url}" width="200" height="200">`).join('')}
+                            </div>
+                        `;
+                    }
+
+                    if (data.videos && data.videos.length > 0) {
+                        videosSection = `
+                            <p><strong>Videos:</strong></p>
+                            <div class="popup-videos">
+                                ${data.videos.map(video => `
+                                    <video width="320" height="240" controls>
+                                        <source src="${video.url}" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                `).join('')}
+                            </div>
+                        `;
+                    }
+
+                    details = `
+                        <h2>${data.name}</h2>
+                        <p><strong>Description:</strong> ${data.description}</p>
+                        <p><strong>Manufacturer:</strong> ${data.manufacturer}</p>
+                        <p><strong>Year:</strong> ${data.year}</p>
+                        <p><strong>Fuel Type:</strong> ${data.fuel_type}</p>
+                        <p><strong>Engine Capacity:</strong> ${data.engine_capacity} cc</p>
+                        <p><strong>Transmission:</strong> ${data.transmission}</p>
+                        <p><strong>Price:</strong> ${data.price} OMR</p>
+                        <p><strong>Mileage:</strong> ${data.mileage} km</p>
+                        <p><strong>Load Capacity:</strong> ${data.load_capacity} kg</p>
+                        <p><strong>Condition:</strong> ${data.condition}</p>
+                        <p><strong>Status:</strong> ${data.status}</p>
+                        <p><strong>Region:</strong> ${data.regions}</p>
+                        <p><strong>Cities:</strong> ${data.cities}</p>
+                        <p><strong>Latitude:</strong> ${data.latitude}</p>
+                        <p><strong>Longitude:</strong> ${data.longitude}</p>
+                        <p><strong>Location:</strong> ${data.location}</p>
+                        <p><strong>Listing Type:</strong> ${data.listing_type}</p>
+                        ${imagesSection}
+                        ${videosSection}
+                    `;
+                }
+
+else if (type === 'boat') {
+    let imagesSection = '';
+    let videosSection = '';
+                    // Same structure as 'land' but for heavy vehicle properties
+                    if (data.images && data.images.length > 0) {
+                        imagesSection = `
+                            <p><strong>Images:</strong></p>
+                            <div class="popup-images">
+                                ${data.images.map(image => `<img src="${image.url}" width="200" height="200">`).join('')}
+                            </div>
+                        `;
+                    }
+
+                    if (data.videos && data.videos.length > 0) {
+                        videosSection = `
+                            <p><strong>Videos:</strong></p>
+                            <div class="popup-videos">
+                                ${data.videos.map(video => `
+                                    <video width="320" height="240" controls>
+                                        <source src="${video.url}" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                `).join('')}
+                            </div>
+                        `;
+                    }
+
+                    details = `
+        <h2>${data.name}</h2>
+        <p><strong>Description:</strong> ${data.description}</p>
+        <p><strong>Manufacturer:</strong> ${data.manufacturer}</p>
+        <p><strong>Year:</strong> ${data.year}</p>
+        <p><strong>Length:</strong> ${data.length} meters</p>
+        <p><strong>Engine Type:</strong> ${data.engine_type}</p>
+        <p><strong>Engine Power:</strong> ${data.engine_power} HP</p>
+        <p><strong>Fuel Type:</strong> ${data.fuel_type}</p>
+        <p><strong>Price:</strong> ${data.price} OMR</p>
+        <p><strong>Condition:</strong> ${data.condition}</p>
+        <p><strong>Status:</strong> ${data.status}</p>
+        <p><strong>Region:</strong> ${data.regions}</p>
+        <p><strong>Cities:</strong> ${data.cities}</p>
+        <p><strong>Latitude:</strong> ${data.latitude}</p>
+        <p><strong>Longitude:</strong> ${data.longitude}</p>
+        <p><strong>Location:</strong> ${data.location}</p>
+        <p><strong>Listing Type:</strong> ${data.listing_type}</p>
+        ${imagesSection}
+        ${videosSection}
+    `;
+                }
+
+else if (type === 'number_plate') {
+    // Assuming `data` contains all the number plate fields and related images/videos
+
+    let imagesSection = '';
+    let videosSection = '';
+
+    // Generate images section if images are available
+    if (data.images && data.images.length > 0) {
+        imagesSection = `
+            <p><strong>Images:</strong></p>
+            <div class="popup-images">
+                ${data.images.map(image => `<img src="${image.url}" alt="Number Plate Image" width="200" height="200">`).join('')}
+            </div>
+        `;
+    }
+
+    // Generate videos section if videos are available
+    if (data.videos && data.videos.length > 0) {
+        videosSection = `
+            <p><strong>Videos:</strong></p>
+            <div class="popup-videos">
+                ${data.videos.map(video => `
+                    <video width="320" height="240" controls>
+                        <source src="${video.url}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    // Build number plate details dynamically
+     details = `
+        <h2>${data.number}</h2>
+        <p><strong>Price:</strong> ${data.price} OMR</p>
+        <p><strong>Description:</strong> ${data.description}</p>
+        <p><strong>Region:</strong> ${data.regions}</p>
+        <p><strong>Cities:</strong> ${data.cities}</p>
+        <p><strong>Latitude:</strong> ${data.latitude}</p>
+        <p><strong>Longitude:</strong> ${data.longitude}</p>
+        <p><strong>Location:</strong> ${data.location}</p>
+        <p><strong>Status:</strong> ${data.status}</p>
+        <p><strong>Listing Type:</strong> ${data.listing_type}</p>
+        ${imagesSection}
+        ${videosSection}
+    `;
+}
+
+    
+    else if (type === 'fashion') {
+    let imagesSection = '';
+    let videosSection = '';
+
+    // Check if images exist
+    if (data.images && data.images.length > 0) {
+        imagesSection = `
+            <p><strong>Images:</strong></p>
+            <div class="popup-images">
+                ${data.images.map(image => `<img src="${image.url}" width="200" height="200">`).join('')}
+            </div>
+        `;
+    }
+
+    // Check if videos exist
+    if (data.videos && data.videos.length > 0) {
+        videosSection = `
+            <p><strong>Videos:</strong></p>
+            <div class="popup-videos">
+                ${data.videos.map(video => `
+                    <video width="320" height="240" controls>
+                        <source src="${video.url}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    details = `
+        <h2>${data.brand}</h2>
+        <p><strong>Category:</strong> ${data.category}</p>
+        <p><strong>Size:</strong> ${data.size}</p>
+        <p><strong>Gender:</strong> ${data.gender}</p>
+        <p><strong>Color:</strong> ${data.color}</p>
+        <p><strong>Material:</strong> ${data.material}</p>
+        <p><strong>Condition:</strong> ${data.condition}</p>
+        <p><strong>Price:</strong> ${data.price} OMR</p>
+        <p><strong>Location:</strong> <a href="${data.location}" target="_blank">View Map</a></p>
+        <p><strong>Contact Details:</strong> ${data.contact_details}</p>
+        <p><strong>Status:</strong> ${data.status}</p>
+        ${imagesSection}
+        ${videosSection}
+    `;
+}
+else if (type === 'toys') {
+    let imagesSection = '';
+    let videosSection = '';
+
+    // Check if images exist
+    if (data.images && data.images.length > 0) {
+        imagesSection = `
+            <p><strong>Images:</strong></p>
+            <div class="popup-images">
+                ${data.images.map(image => `<img src="${image.url}" width="200" height="200">`).join('')}
+            </div>
+        `;
+    }
+
+    // Check if videos exist
+    if (data.videos && data.videos.length > 0) {
+        videosSection = `
+            <p><strong>Videos:</strong></p>
+            <div class="popup-videos">
+                ${data.videos.map(video => `
+                    <video width="320" height="240" controls>
+                        <source src="${video.url}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    details = `
+        <h2>${data.brand}</h2>
+        <p><strong>Category:</strong> ${data.category}</p>
+        <p><strong>Platform:</strong> ${data.platform}</p>
+        <p><strong>Age Group:</strong> ${data.age_group}</p>
+        <p><strong>Condition:</strong> ${data.condition}</p>
+        <p><strong>Price:</strong> ${data.price} OMR</p>
+        <p><strong>Location:</strong> <a href="${data.location}" target="_blank">View Map</a></p>
+        <p><strong>Status:</strong> ${data.status}</p>
+        ${imagesSection}
+        ${videosSection}
+    `;
+} else if (type === 'food') {
+    let imagesSection = '';
+    let videosSection = '';
+
+    // Check if images exist
+    if (data.images && data.images.length > 0) {
+        imagesSection = `
+            <p><strong>Images:</strong></p>
+            <div class="popup-images">
+                ${data.images.map(image => `<img src="${image.url}" width="200" height="200">`).join('')}
+            </div>
+        `;
+    }
+
+    // Check if videos exist
+    if (data.videos && data.videos.length > 0) {
+        videosSection = `
+            <p><strong>Videos:</strong></p>
+            <div class="popup-videos">
+                ${data.videos.map(video => `
+                    <video width="320" height="240" controls>
+                        <source src="${video.url}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    details = `
+        <h2>${data.brand}</h2>
+        <p><strong>Product Type:</strong> ${data.product_type}</p>
+        <p><strong>Quantity:</strong> ${data.quantity}</p>
+        <p><strong>Expiration Date:</strong> ${data.expiration_date}</p>
+        <p><strong>Price:</strong> ${data.price} OMR</p>
+        <p><strong>Location:</strong> <a href="${data.location}" target="_blank">View Map</a></p>
+        <p><strong>Dietary Information:</strong> ${data.dietary_info}</p>
+        <p><strong>Status:</strong> ${data.status}</p>
+        ${imagesSection}
+        ${videosSection}
+    `;
+}
+else if (type === 'fitness') {
+    let imagesSection = '';
+    let videosSection = '';
+
+    // Check if images exist
+    if (data.images && data.images.length > 0) {
+        imagesSection = `
+            <p><strong>Images:</strong></p>
+            <div class="popup-images">
+                ${data.images.map(image => `<img src="${image.url}" width="200" height="200">`).join('')}
+            </div>
+        `;
+    }
+
+    // Check if videos exist
+    if (data.videos && data.videos.length > 0) {
+        videosSection = `
+            <p><strong>Videos:</strong></p>
+            <div class="popup-videos">
+                ${data.videos.map(video => `
+                    <video width="320" height="240" controls>
+                        <source src="${video.url}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    details = `
+        <h2>${data.brand}</h2>
+        <p><strong>Category:</strong> ${data.category}</p>
+        <p><strong>Condition:</strong> ${data.condition}</p>
+        <p><strong>Warranty Status:</strong> ${data.warranty_status}</p>
+        <p><strong>Price:</strong> ${data.price} OMR</p>
+        <p><strong>Location:</strong> <a href="${data.location}" target="_blank">View Map</a></p>
+        <p><strong>Status:</strong> ${data.status}</p>
+        ${imagesSection}
+        ${videosSection}
+    `;
+} else if (type === 'pet') {
+    let imagesSection = '';
+    let videosSection = '';
+
+    // Check if images exist
+    if (data.images && data.images.length > 0) {
+        imagesSection = `
+            <p><strong>Images:</strong></p>
+            <div class="popup-images">
+                ${data.images.map(image => `<img src="${image.url}" width="200" height="200">`).join('')}
+            </div>
+        `;
+    }
+
+    // Check if videos exist
+    if (data.videos && data.videos.length > 0) {
+        videosSection = `
+            <p><strong>Videos:</strong></p>
+            <div class="popup-videos">
+                ${data.videos.map(video => `
+                    <video width="320" height="240" controls>
+                        <source src="${video.url}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    details = `
+        <h2>${data.breed}</h2>
+        <p><strong>Pet Type:</strong> ${data.pet_type}</p>
+        <p><strong>Age:</strong> ${data.age} months/years</p>
+        <p><strong>Vaccination Status:</strong> ${data.vaccinated}</p>
+        <p><strong>Price:</strong> ${data.price} OMR</p>
+        <p><strong>Location:</strong> <a href="${data.location}" target="_blank">View Map</a></p>
+        <p><strong>Status:</strong> ${data.status}</p>
+        ${imagesSection}
+        ${videosSection}
+    `;
+}
+ else if (type === 'book') {
+    let imagesSection = '';
+    let videosSection = '';
+
+    if (data.images && data.images.length > 0) {
+        imagesSection = `
+            <p><strong>Images:</strong></p>
+            <div class="popup-images">
+                ${data.images.map(image => `<img src="${image.url}" width="200" height="200">`).join('')}
+            </div>
+        `;
+    }
+
+    if (data.videos && data.videos.length > 0) {
+        videosSection = `
+            <p><strong>Videos:</strong></p>
+            <div class="popup-videos">
+                ${data.videos.map(video => `
+                    <video width="320" height="240" controls>
+                        <source src="${video.url}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    details = `
+        <h2>${data.genre}</h2>
+        <p><strong>Category:</strong> ${data.category}</p>
+        <p><strong>Condition:</strong> ${data.condition}</p>
+        <p><strong>Price:</strong> ${data.price} OMR</p>
+        <p><strong>Location:</strong> <a href="${data.location}" target="_blank">View Map</a></p>
+        <p><strong>Status:</strong> ${data.status}</p>
+        ${imagesSection}
+        ${videosSection}
+    `;
+}
+
+
+else if (type === 'appliance') {
+    let imagesSection = '';
+    let videosSection = '';
+
+    // Check if images exist
+    if (data.images && data.images.length > 0) {
+        imagesSection = `
+            <p><strong>Images:</strong></p>
+            <div class="popup-images">
+                ${data.images.map(image => `<img src="${image.url}" width="200" height="200">`).join('')}
+            </div>
+        `;
+    }
+
+    // Check if videos exist
+    if (data.videos && data.videos.length > 0) {
+        videosSection = `
+            <p><strong>Videos:</strong></p>
+            <div class="popup-videos">
+                ${data.videos.map(video => `
+                    <video width="320" height="240" controls>
+                        <source src="${video.url}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    details = `
+        <h2>${data.brand} (${data.model_number})</h2>
+        <p><strong>Appliance Type:</strong> ${data.appliance_type}</p>
+        <p><strong>Condition:</strong> ${data.condition}</p>
+        <p><strong>Warranty Status:</strong> ${data.warranty_status}</p>
+        <p><strong>Price:</strong> ${data.price} OMR</p>
+        <p><strong>Location:</strong> <a href="${data.location}" target="_blank">View Map</a></p>
+        <p><strong>Status:</strong> ${data.status}</p>
+        ${imagesSection}
+        ${videosSection}
+    `;
+}
+else if (type === 'business') {
+    let imagesSection = '';
+    let videosSection = '';
+
+    // Check if images exist
+    if (data.images && data.images.length > 0) {
+        imagesSection = `
+            <p><strong>Images:</strong></p>
+            <div class="popup-images">
+                ${data.images.map(image => `<img src="${image.url}" width="200" height="200">`).join('')}
+            </div>
+        `;
+    }
+
+    // Check if videos exist
+    if (data.videos && data.videos.length > 0) {
+        videosSection = `
+            <p><strong>Videos:</strong></p>
+            <div class="popup-videos">
+                ${data.videos.map(video => `
+                    <video width="320" height="240" controls>
+                        <source src="${video.url}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    details = `
+        <h2>${data.company_name}</h2>
+        <p><strong>Business Type:</strong> ${data.business_type}</p>
+        <p><strong>Contact Info:</strong> ${data.contact_info}</p>
+        <p><strong>Location:</strong> <a href="${data.location}" target="_blank">View Map</a></p>
+        <p><strong>Status:</strong> ${data.status}</p>
+        ${imagesSection}
+        ${videosSection}
+    `;
+}
+else if (type === 'education') {
+    let imagesSection = '';
+    let videosSection = '';
+
+    // Check if images exist
+    if (data.images && data.images.length > 0) {
+        imagesSection = `
+            <p><strong>Images:</strong></p>
+            <div class="popup-images">
+                ${data.images.map(image => `<img src="${image.url}" width="200" height="200">`).join('')}
+            </div>
+        `;
+    }
+
+    // Check if videos exist
+    if (data.videos && data.videos.length > 0) {
+        videosSection = `
+            <p><strong>Videos:</strong></p>
+            <div class="popup-videos">
+                ${data.videos.map(video => `
+                    <video width="320" height="240" controls>
+                        <source src="${video.url}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    details = `
+        <h2>${data.subject} (${data.course_type})</h2>
+        <p><strong>Duration:</strong> ${data.duration} weeks/months</p>
+        <p><strong>Price:</strong> ${data.price} OMR</p>
+        <p><strong>Location:</strong> <a href="${data.location}" target="_blank">View Map</a></p>
+        <p><strong>Instructor Name:</strong> ${data.instructor_name}</p>
+        <p><strong>Qualification:</strong> ${data.qualification}</p>
+        <p><strong>Experience:</strong> ${data.experience} years</p>
+        <p><strong>Status:</strong> ${data.status}</p>
+        ${imagesSection}
+        ${videosSection}
+    `;
+}
+else if (type === 'service') {
+    let imagesSection = '';
+    let videosSection = '';
+
+    // Check if images exist
+    if (data.images && data.images.length > 0) {
+        imagesSection = `
+            <p><strong>Images:</strong></p>
+            <div class="popup-images">
+                ${data.images.map(image => `<img src="${image.url}" width="200" height="200">`).join('')}
+            </div>
+        `;
+    }
+
+    // Check if videos exist
+    if (data.videos && data.videos.length > 0) {
+        videosSection = `
+            <p><strong>Videos:</strong></p>
+            <div class="popup-videos">
+                ${data.videos.map(video => `
+                    <video width="320" height="240" controls>
+                        <source src="${video.url}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    details = `
+        <h2>${data.provider_name}</h2>
+        <p><strong>Price Range:</strong> ${data.price_range}</p>
+        <p><strong>Contact Info:</strong> ${data.contact_info}</p>
+        <p><strong>Location:</strong> <a href="${data.location}" target="_blank">View Map</a></p>
+        <p><strong>Status:</strong> ${data.status}</p>
+        ${imagesSection}
+        ${videosSection}
+    `;
+}
+else if (type === 'mobile') {
+    let imagesSection = '';
+    let videosSection = '';
+
+    // Check if images exist
+    if (data.images && data.images.length > 0) {
+        imagesSection = `
+            <p><strong>Images:</strong></p>
+            <div class="popup-images">
+                ${data.images.map(image => `<img src="${image.url}" width="200" height="200">`).join('')}
+            </div>
+        `;
+    }
+
+    // Check if videos exist
+    if (data.videos && data.videos.length > 0) {
+        videosSection = `
+            <p><strong>Videos:</strong></p>
+            <div class="popup-videos">
+                ${data.videos.map(video => `
+                    <video width="320" height="240" controls>
+                        <source src="${video.url}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    details = `
+        <h2>${data.brand} ${data.model_number} - ${data.operating_system}</h2>
+        <p><strong>Screen Size:</strong> ${data.screen_size} inches</p>
+        <p><strong>Storage Capacity:</strong> ${data.storage_capacity} GB</p>
+        <p><strong>RAM Size:</strong> ${data.ram_size} GB</p>
+        <p><strong>Battery Capacity:</strong> ${data.battery_capacity} mAh</p>
+        <p><strong>Price:</strong> ${data.price}</p>
+        <p><strong>Condition:</strong> ${data.condition}</p>
+        <p><strong>Location:</strong> <a href="${data.location}" target="_blank">View Map</a></p>
+        <p><strong>Status:</strong> ${data.status}</p>
+        ${imagesSection}
+        ${videosSection}
+    `;
+}
+
+else if (type === 'computer') {
+    let imagesSection = '';
+    let videosSection = '';
+
+    // Check if images exist
+    if (data.images && data.images.length > 0) {
+        imagesSection = `
+            <p><strong>Images:</strong></p>
+            <div class="popup-images">
+                ${data.images.map(image => `<img src="${image.url}" width="200" height="200">`).join('')}
+            </div>
+        `;
+    }
+
+    // Check if videos exist
+    if (data.videos && data.videos.length > 0) {
+        videosSection = `
+            <p><strong>Videos:</strong></p>
+            <div class="popup-videos">
+                ${data.videos.map(video => `
+                    <video width="320" height="240" controls>
+                        <source src="${video.url}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    details = `
+        <h2>${data.brand} ${data.model_number} - ${data.operating_system}</h2>
+        <p><strong>Screen Size:</strong> ${data.screen_size} inches</p>
+        <p><strong>Storage Capacity:</strong> ${data.storage_capacity} GB</p>
+        <p><strong>RAM Size:</strong> ${data.ram_size} GB</p>
+        <p><strong>Processor:</strong> ${data.processor}</p>
+        <p><strong>Graphics Card:</strong> ${data.graphics_card}</p>
+        <p><strong>Battery Life:</strong> ${data.battery_life} hours</p>
+        <p><strong>Price:</strong> ${data.price}</p>
+        <p><strong>Condition:</strong> ${data.condition}</p>
+        <p><strong>Location:</strong> <a href="${data.location}" target="_blank">View Map</a></p>
+        <p><strong>Status:</strong> ${data.status}</p>
+        ${imagesSection}
+        ${videosSection}
+    `;
+}
+
+
+
+else if (type === 'sound') {
+    let imagesSection = '';
+    let videosSection = '';
+
+    // Check if images exist
+    if (data.images && data.images.length > 0) {
+        imagesSection = `
+            <p><strong>Images:</strong></p>
+            <div class="popup-images">
+                ${data.images.map(image => `<img src="${image.url}" width="200" height="200">`).join('')}
+            </div>
+        `;
+    }
+
+    // Check if videos exist
+    if (data.videos && data.videos.length > 0) {
+        videosSection = `
+            <p><strong>Videos:</strong></p>
+            <div class="popup-videos">
+                ${data.videos.map(video => `
+                    <video width="320" height="240" controls>
+                        <source src="${video.url}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    details = `
+        <h2>${data.brand} ${data.model_number} - ${data.connectivity}</h2>
+        <p><strong>Output Power:</strong> ${data.output_power}</p>
+        <p><strong>Channels:</strong> ${data.channels}</p>
+        <p><strong>Smart Assistant Support:</strong> ${data.has_smart_assistant ? 'Yes' : 'No'}</p>
+        <p><strong>Price:</strong> ${data.price}</p>
+        <p><strong>Condition:</strong> ${data.condition}</p>
+        <p><strong>Location:</strong> <a href="${data.location}" target="_blank">View Map</a></p>
+        <p><strong>Status:</strong> ${data.status}</p>
+        ${imagesSection}
+        ${videosSection}
+    `;
+}
+
+
+
+                   }
+                    // Insert the fetched details into the popup container
+                    popupDetails.innerHTML = details;
+    
+                    // Show the popup
+                    popup.style.display = 'flex';
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+    
+        // Function to close the popup
+        function closePopup() {
+            const popup = document.getElementById("popup-modal");
+            popup.style.display = 'none';
+        }
+    </script>
+    
+    {% include 'admin1/footeradmin.html' %}
+    </body>
+    </html>

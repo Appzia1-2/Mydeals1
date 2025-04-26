@@ -1,0 +1,108 @@
+{% load static %}
+{% include 'header.html' %}
+
+<!-- Page Title -->
+<section class="page-title style-two" style="background-image: url(assets/images/banner/sign.jpg);">
+    <div class="auto-container">
+        <div class="content-box centred mr-0">
+            <div class="title">
+                <h1>Sign up</h1>
+            </div>
+            <ul class="bread-crumb clearfix">
+                <li><a href="index.html">Home</a></li>
+                <li>Sign up</li>
+            </ul>
+        </div>
+    </div>
+</section>
+<!-- End Page Title -->
+
+<!-- Signup Section -->
+<section class="login-section signup-section bg-color-2">
+    <div class="auto-container">
+        <div class="inner-container">
+            <div class="inner-box">
+                <h2>Sign up</h2>
+
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+
+                {% if not show_otp and not show_password_form %}
+                <!-- Email Entry Form -->
+                <form action="{% url 'signup' %}" method="post" id="emailForm">
+                    {% csrf_token %}
+                    
+                    <!-- Email -->
+                    <div class="form-group">
+                        <label for="id_email">Email</label>
+                        <input type="email" name="email" id="id_email" required class="form-control">
+                    </div>
+
+                    <div class="form-group message-btn">
+                        <button type="submit" class="theme-btn-one">Send OTP</button>
+                    </div>
+                </form>
+                {% endif %}
+
+                {% if show_otp %}
+                <!-- OTP Verification Form -->
+                <form action="{% url 'signup' %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="verify_otp" value="1">
+                    <input type="hidden" name="email" value="{{ email }}">
+
+                    <div class="form-group">
+                        <label for="otp">Enter OTP</label>
+                        <input type="text" name="otp" id="otp" required class="form-control">
+                    </div>
+
+                    <div class="form-group message-btn">
+                        <button type="submit" class="theme-btn-one">Verify OTP</button>
+                    </div>
+                </form>
+                {% endif %}
+
+                {% if show_password_form %}
+                <!-- Password Setup Form -->
+                <form action="{% url 'signup' %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="final_register" value="1">
+                    <input type="hidden" name="email" value="{{ email }}">
+
+                    <!-- Username -->
+                    <div class="form-group">
+                        <label for="id_username">Username</label>
+                        <input type="text" name="username" id="id_username" required class="form-control">
+                    </div>
+
+                    <!-- Password -->
+                    <div class="form-group">
+                        <label for="id_password">Password</label>
+                        <input type="password" name="password1" id="id_password" required class="form-control">
+                    </div>
+
+                    <!-- Confirm Password -->
+                    <div class="form-group">
+                        <label for="id_cpassword">Confirm Password</label>
+                        <input type="password" name="password2" id="id_cpassword" required class="form-control">
+                    </div>
+
+                    <div class="form-group message-btn">
+                        <button type="submit" class="theme-btn-one">Complete Registration</button>
+                    </div>
+                </form>
+                {% endif %}
+
+                <div class="othre-text centred">
+                    <p>Already have an account? <a href="{% url 'login' %}">Sign in</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Signup Section End -->
+
+{% include 'footer.html' %}

@@ -1,0 +1,809 @@
+{% load static %}
+{% include 'header.html' %}
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <style>
+        /* General Body Styling */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+    
+        /* Header Styling */
+        .header {
+            text-align: center;
+            margin: 30px 0;
+        }
+    
+        .header img {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 15px;
+        }
+    
+        .header h1 {
+            font-size: 2.5rem;
+            margin: 0;
+            color: #333;
+            letter-spacing: 2px;
+            font-weight: 600;
+        }
+
+        .home-icon-container {
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    align-items: center;    /* Center vertically */
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+    color: #333;
+    cursor: pointer;
+    border-radius: 8px;
+    padding: 10px;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    text-align: center;
+    width: 100%; /* Ensures it spans full width for centering */
+}
+
+/* .home-icon-container:hover {
+    background-color: #f1f1f1;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+} */
+
+    .home-icon-container i {
+        font-size: 1rem;
+        margin-right: 8px;
+    }
+
+    .home-icon-container span {
+        margin-right: 5px;
+    }
+
+    .home-icon-container .fa-arrow-right {
+        margin-left: 5px;
+        font-size: 0.8rem;
+        color: #888;
+    }
+
+
+        /* Category List */
+        .category-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px; /* Space between items */
+        }
+    
+        /* Category List Item Styling */
+        .category-list li {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            width: 90%;
+            max-width: 700px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+        }
+    
+        /* Hover Effect for List Items */
+        .category-list li:hover {
+            background-color: #f9f9f9;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Slightly stronger shadow */
+            transform: translateY(-5px); /* Lift effect */
+        }
+    
+        /* Icon Styling */
+        .category-list li i {
+            font-size: 2rem;
+            margin-right: 15px;
+            color: #e96d15; /* Maintain color consistency */
+            transition: color 0.3s ease;
+        }
+    
+        /* Hover Effect for Icon */
+        .category-list li:hover i {
+            color: #c05a10; /* Darker shade on hover */
+        }
+    
+        /* Category Text Styling */
+        .category-list li span {
+            font-size: 1.3rem;
+            font-weight: 500;
+            color: #333;
+            letter-spacing: 1px;
+        }
+    
+        /* Arrow Icon Styling */
+        .category-list li i.fa-arrow-right {
+            font-size: 1.5rem;
+            color: #999;
+            transition: color 0.3s ease;
+        }
+    
+        /* Hover Effect for Arrow Icon */
+        .category-list li:hover i.fa-arrow-right {
+            color: #333;
+        }
+
+        /* Modal Content */
+        .modal-content {
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            background-color: #fff;
+            transition: transform 0.3s ease;
+        }
+
+        /* Modal Header */
+        .modal-header {
+            padding: 20px;
+            background-color: #e96d15;
+            color: #fff;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .modal-title {
+            font-size: 1.7rem;
+            font-weight: bold;
+        }
+
+        /* Modal Body */
+        .modal-body {
+            padding: 30px;
+        }
+
+        /* Input Field Styling */
+        .form-control {
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            padding: 12px;
+            font-size: 1rem;
+            margin-bottom: 20px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #e96d15;
+            box-shadow: 0 0 8px rgba(227, 143, 6, 0.5);
+        }
+
+        /* Button Styling */
+        .btn-primary {
+            background-color: #e96d15;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 25px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #c05a10;
+            transform: translateY(-2px); /* Subtle lift effect */
+        }
+
+        /* Modal Footer */
+        .modal-footer {
+            border-top: 1px solid #ddd;
+            padding: 15px;
+            background-color: #f8f9fa;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .category-list li {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+    
+            .category-list li i {
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+    
+            .category-list li span {
+                font-size: 1.1rem;
+            }
+    
+            .modal-body {
+                padding: 20px;
+            }
+    
+            .btn-primary {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Home Icon Section -->
+        
+
+        <!-- Header Section -->
+        <div class="header">
+            <img src="/mnt/data/logo.png" alt="Logo">
+            <h3>Choose the right category for your ad</h3>
+        </div>
+
+        <div class="home-icon-container" onclick="window.location.href='/'">
+            <i class="fa-solid fa-house"></i>
+            <span>Home</span>
+            <i class="fa-solid fa-arrow-right">Electronics</i>
+        </div>
+
+        <!-- Category List -->
+        <ul class="category-list">
+            <li data-bs-toggle="modal" data-bs-target="#mobileModal">
+                <i class="fa-solid fa-mobile"></i>
+                <span>Mobile</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </li>
+            <li data-bs-toggle="modal" data-bs-target="#computerModal">
+                <i class="fa-solid fa-laptop"></i>
+                <span>Computer</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </li>
+            <li data-bs-toggle="modal" data-bs-target="#soundModal">
+                <i class="fa-solid fa-sound"></i>
+                <span> Audio connectivity</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </li>
+            
+        </ul>
+    </div>
+
+
+     
+        <div class="modal fade" id="mobileModal" tabindex="-1" aria-labelledby="mobileModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="mobileModalLabel">Register Mobile</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="POST" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input type="hidden" name="product_type" value="mobile">
+                            <input type="text" name="product_name" placeholder="Product Name" class="form-control mb-3" required>
+
+                            <!-- Brand -->
+                            <div class="form-group">
+                                <label for="mobile-brand-dropdown">Select Mobile Brand</label>
+                                <select id="mobile-brand-dropdown" name="brand" class="form-control mb-3" required>
+                                    <option value="" disabled selected>Select a brand</option>
+                                    <option value="Samsung">Samsung</option>
+                                    <option value="Oppo">Oppo</option>
+                                    <option value="iPhone">iPhone</option>
+                                    <option value="Xiaomi">Xiaomi</option>
+                                    <option value="OnePlus">OnePlus</option>
+                                    <option value="Huawei">Huawei</option>
+                                    <option value="Realme">Realme</option>
+                                    <option value="Vivo">Vivo</option>
+                                    <option value="Sony">Sony</option>
+                                    <option value="LG">LG</option>
+                                    <option value="Nokia">Nokia</option>
+                                    <option value="Google">Google</option>
+                                </select>
+                            </div>
+                            
+        
+                            <!-- Model Number -->
+                            <input type="text" name="model_number" placeholder="Model Number" class="form-control mb-3" required>
+        
+                            <!-- Operating System -->
+                            <select name="operating_system" class="form-control mb-3" required>
+                                <option value="">-- Select Operating System --</option>
+                                <option value="android">Android</option>
+                                <option value="iOS">iOS</option>
+                                <option value="windows">Windows</option>
+                                <option value="other">Other</option>
+                            </select>
+                            
+                            <!-- Screen Size -->
+                            <input type="number" step="0.01" name="screen_size" placeholder="Screen Size (inches)" class="form-control mb-3" required>
+        
+                            <!-- Storage Capacity -->
+                            <input type="number" name="storage_capacity" placeholder="Storage Capacity (GB)" class="form-control mb-3" required>
+                            
+                            <!-- RAM Size -->
+                            <input type="number" name="ram_size" placeholder="RAM Size (GB)" class="form-control mb-3" required>
+                            
+                            <!-- Battery Capacity -->
+                            <input type="number" name="battery_capacity" placeholder="Battery Capacity (mAh)" class="form-control mb-3">
+        
+                            <!-- Price -->
+                            <input type="number" step="0.01" name="price" placeholder="Price (OMR)" class="form-control mb-3" required>
+                            
+                            <!-- Condition -->
+                            <select name="condition" class="form-control mb-3" required>
+                                <option value="">-- Select Condition --</option>
+                                <option value="new">New</option>
+                                <option value="used">Used</option>
+                                <option value="refurbished">Refurbished</option>
+                            </select>
+                            
+                            <!-- Location -->
+                            <textarea name="description" placeholder="Property Description" class="form-control mb-3" rows="3" required></textarea>
+                            <select name="regions" class="form-control mb-3" required>
+                                <option value="MS">Muscat</option>
+                                <option value="DH">Dhofar</option>
+                                <option value="BT">Batinah</option>
+                                <option value="DA">Dakhiliyah</option>
+                                <option value="SH">Sharqiyah</option>
+                                <option value="BR">Buraimi</option>
+                                <option value="ZU">Zufar</option>
+                                <option value="MW">Musandam</option>
+                                <option value="WR">Wusta</option>
+                            </select>
+                            <input type="text" name="cities" placeholder="City" class="form-control mb-3" required>
+                            <input type="number" step="0.000001" name="latitude" placeholder="Latitude" class="form-control mb-3" required>
+                            <input type="number" step="0.000001" name="longitude" placeholder="Longitude" class="form-control mb-3" required>
+                            <input type="text" name="location" placeholder="Location Address" class="form-control mb-3" required>
+                            <div id="map-mobile" style="height: 300px; width:300px; margin-bottom: 20px;"></div>
+        
+                            
+                            <!-- Images -->
+                            <label for="mobile-images" class="form-label">Upload Images (at least one required):</label>
+                            <input type="file" id="mobile-images" name="images" class="form-control mb-3" multiple required>
+
+                            <!-- Upload Videos -->
+                    <label for="mobile-videos">Upload Videos (optional):</label>
+                    <input type="file" id="mobile-videos" name="videos" accept="video/*" multiple>
+                            
+                            <!-- Submit Button -->
+                            <button type="submit" class="btn btn-primary w-100">Submit Mobile</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        
+        <div class="modal fade" id="computerModal" tabindex="-1" aria-labelledby="computerModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="computerModalLabel">Register Computer</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="POST" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input type="hidden" name="product_type" value="computer">
+                            <input type="text" name="product_name" placeholder="Product Name" class="form-control mb-3" required>
+
+                            <!-- Brand -->
+                            <div class="form-group">
+                                <label for="brand-dropdown">Select Computer Brand</label>
+                                <select id="brand-dropdown" name="brand" class="form-control mb-3" required>
+                                    <option value="" disabled selected>Select a brand</option>
+                                    <option value="Dell">Dell</option>
+                                    <option value="HP">HP</option>
+                                    <option value="Apple">Apple</option>
+                                    <option value="Lenovo">Lenovo</option>
+                                    <option value="Asus">Asus</option>
+                                    <option value="Acer">Acer</option>
+                                    <option value="Microsoft">Microsoft</option>
+                                    <option value="Samsung">Samsung</option>
+                                    <option value="MSI">MSI</option>
+                                    <option value="Razer">Razer</option>
+                                </select>
+                            </div>
+                            
+                            
+                            <!-- Model Number -->
+                            <input type="text" name="model_number" placeholder="Model Number" class="form-control mb-3" required>
+                            
+                            <!-- Operating System -->
+                            <select name="operating_system" class="form-control mb-3" required>
+                                <option value="">-- Select Operating System --</option>
+                                <option value="windows">Windows</option>
+                                <option value="macOS">macOS</option>
+                                <option value="linux">Linux</option>
+                                <option value="other">Other</option>
+                            </select>
+                            
+                            <!-- Screen Size -->
+                            <input type="number" step="0.01" name="screen_size" placeholder="Screen Size (inches)" class="form-control mb-3" required>
+                            
+                            <!-- Storage Capacity -->
+                            <input type="number" name="storage_capacity" placeholder="Storage Capacity (GB)" class="form-control mb-3" required>
+                            
+                            <!-- RAM Size -->
+                            <input type="number" name="ram_size" placeholder="RAM Size (GB)" class="form-control mb-3" required>
+                            
+                            <!-- Processor -->
+                            <input type="text" name="processor" placeholder="Processor Type" class="form-control mb-3" required>
+                            
+                            <!-- Graphics Card -->
+                            <input type="text" name="graphics_card" placeholder="Graphics Card" class="form-control mb-3">
+                            
+                            <!-- Battery Life -->
+                            <input type="text" name="battery_life" placeholder="Battery Life (hours)" class="form-control mb-3">
+                            
+                            <!-- Price -->
+                            <input type="number" step="0.01" name="price" placeholder="Price (OMR)" class="form-control mb-3" required>
+                            
+                            <!-- Condition -->
+                            <select name="condition" class="form-control mb-3" required>
+                                <option value="">-- Select Condition --</option>
+                                <option value="new">New</option>
+                                <option value="used">Used</option>
+                                <option value="refurbished">Refurbished</option>
+                            </select>
+                            
+                            <!-- Location -->
+                            <textarea name="description" placeholder="Property Description" class="form-control mb-3" rows="3" required></textarea>
+                            <select name="regions" class="form-control mb-3" required>
+                                <option value="MS">Muscat</option>
+                                <option value="DH">Dhofar</option>
+                                <option value="BT">Batinah</option>
+                                <option value="DA">Dakhiliyah</option>
+                                <option value="SH">Sharqiyah</option>
+                                <option value="BR">Buraimi</option>
+                                <option value="ZU">Zufar</option>
+                                <option value="MW">Musandam</option>
+                                <option value="WR">Wusta</option>
+                            </select>
+                            <input type="text" name="cities" placeholder="City" class="form-control mb-3" required>
+                            <input type="number" step="0.000001" name="latitude" placeholder="Latitude" class="form-control mb-3" required>
+                            <input type="number" step="0.000001" name="longitude" placeholder="Longitude" class="form-control mb-3" required>
+                            <input type="text" name="location" placeholder="Location Address" class="form-control mb-3" required>
+                            <div id="map-computer" style="height: 300px; width:300px; margin-bottom: 20px;"></div>
+        
+                            
+                            <!-- Images -->
+                            <label for="computer-images">Upload Images (at least one required):</label>
+                            <input type="file" id="computer-images" name="images" class="form-control mb-3" multiple required>
+
+                            <!-- Upload Videos -->
+                    <label for="computer-videos">Upload Videos (optional):</label>
+                    <input type="file" id="computer-videos" name="videos" accept="video/*" multiple>
+                            <!-- Submit Button -->
+                            <button type="submit" class="btn btn-primary w-100">Submit Computer</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+
+        <div class="modal fade" id="soundModal" tabindex="-1" aria-labelledby="soundModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="soundModalLabel">Register Audio Device</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="POST" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input type="hidden" name="product_type" value="sound">
+                            <input type="text" name="product_name" placeholder="Product Name" class="form-control mb-3" required>
+
+                            <!-- Brand -->
+                            <div class="form-group">
+                                <label for="sound-brand-dropdown">Select Sound Brand</label>
+                                <select id="sound-brand-dropdown" name="brand" class="form-control mb-3" required>
+                                    <option value="" disabled selected>Select a brand</option>
+                                    <option value="Sony">Sony</option>
+                                    <option value="Bose">Bose</option>
+                                    <option value="JBL">JBL</option>
+                                    <option value="Sennheiser">Sennheiser</option>
+                                    <option value="Beats">Beats</option>
+                                    <option value="AKG">AKG</option>
+                                    <option value="Pioneer">Pioneer</option>
+                                    <option value="Yamaha">Yamaha</option>
+                                    <option value="Marshall">Marshall</option>
+                                    <option value="Harman Kardon">Harman Kardon</option>
+                                    <option value="Bang & Olufsen">Bang & Olufsen</option>
+                                    <option value="Klipsch">Klipsch</option>
+                                </select>
+                            </div>
+                            
+                            
+                            <!-- Model Number -->
+                            <input type="text" name="model_number" placeholder="Model Number" class="form-control mb-3" required>
+                            
+                            <!-- Connectivity -->
+                            <label for="connectivity" class="form-label">Connectivity</label>
+                            <select name="connectivity" id="connectivity" class="form-control mb-3" required>
+                                <option value="">-- Select Connectivity --</option>
+                                <option value="bluetooth">Bluetooth</option>
+                                <option value="wifi">Wi-Fi</option>
+                                <option value="aux">AUX</option>
+                                <option value="usb">USB</option>
+                                <option value="other">Other</option>
+                            </select>
+                            
+                            <!-- Output Power -->
+                            <input type="text" name="output_power" placeholder="Output Power (e.g., 20W)" class="form-control mb-3" required>
+                            
+                            <!-- Audio Channels -->
+                            <input type="text" name="channels" placeholder="Audio Channels (e.g., 2.1, 5.1)" class="form-control mb-3">
+                            
+                            <!-- Smart Assistant Support -->
+                            <label for="has_smart_assistant" class="form-label">Smart Assistant Support</label>
+                            <select name="has_smart_assistant" id="has_smart_assistant" class="form-control mb-3" required>
+                                <option value="false">No</option>
+                                <option value="true">Yes</option>
+                            </select>
+                            
+                            <!-- Price -->
+                            <input type="number" step="0.01" name="price" placeholder="Price (OMR)" class="form-control mb-3" required>
+                            
+                            <!-- Condition -->
+                            <label for="condition" class="form-label">Condition</label>
+                            <select name="condition" id="condition" class="form-control mb-3" required>
+                                <option value="">-- Select Condition --</option>
+                                <option value="new">New</option>
+                                <option value="used">Used</option>
+                                <option value="refurbished">Refurbished</option>
+                            </select>
+                            
+                            <textarea name="description" placeholder="Property Description" class="form-control mb-3" rows="3" required></textarea>
+                            <select name="regions" class="form-control mb-3" required>
+                                <option value="MS">Muscat</option>
+                                <option value="DH">Dhofar</option>
+                                <option value="BT">Batinah</option>
+                                <option value="DA">Dakhiliyah</option>
+                                <option value="SH">Sharqiyah</option>
+                                <option value="BR">Buraimi</option>
+                                <option value="ZU">Zufar</option>
+                                <option value="MW">Musandam</option>
+                                <option value="WR">Wusta</option>
+                            </select>
+                            <input type="text" name="cities" placeholder="City" class="form-control mb-3" required>
+                            <input type="number" step="0.000001" name="latitude" placeholder="Latitude" class="form-control mb-3" required>
+                            <input type="number" step="0.000001" name="longitude" placeholder="Longitude" class="form-control mb-3" required>
+                            <input type="text" name="location" placeholder="Location Address" class="form-control mb-3" required>
+                            <div id="map-sound" style="height: 300px; width:300px; margin-bottom: 20px;"></div>
+        
+                            
+                            <!-- Images -->
+                            <label for="sound-images" class="form-label">Upload Images (at least one required):</label>
+                            <input type="file" id="sound-images" name="images" class="form-control mb-3" multiple required>
+
+                            <!-- Upload Videos -->
+                            <label for="sound-videos">Upload Videos (optional):</label>
+                            <input type="file" id="sound-videos" name="videos" accept="video/*" multiple>
+
+                            
+                            <!-- Submit Button -->
+                            <button type="submit" class="btn btn-primary w-100">Submit Audio Device</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+
+
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // Function to initialize the map
+   // Function to initialize the map
+   function initializeMap(mapId, modal) {
+       var map = L.map(mapId).setView([23.5880, 58.3829], 5); // Centered on Oman
+   
+       // Add OpenStreetMap tile layer
+       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+           maxZoom: 19,
+           attribution: '© OpenStreetMap'
+       }).addTo(map);
+   
+       // Define regions with their coordinates
+       var regions = {
+           'MS': [23.5880, 58.3829], // Muscat
+           'DH': [17.0079, 54.0927], // Dhofar
+           'BT': [24.6342, 56.0525], // Batinah
+           'DA': [22.5000, 57.0000], // Dakhiliyah
+           'SH': [22.0000, 59.0000], // Sharqiyah
+           'BR': [23.0000, 55.0000], // Buraimi
+           'ZU': [17.0000, 54.0000], // Zufar
+           'MW': [26.0000, 56.0000], // Musandam
+           'WR': [20.0000, 58.0000]  // Wusta
+       };
+   
+       // Update map view based on selected region
+       modal.querySelector('select[name="regions"]').addEventListener('change', function() {
+           var region = this.value;
+           if (regions[region]) {
+               map.setView(regions[region], 7); // Zoom in on the selected region
+           }
+       });
+   
+       // Add a marker on click and get latitude and longitude
+       map.on('click', function(e) {
+           var lat = e.latlng.lat;
+           var lng = e.latlng.lng;
+   
+           // Check if latitude and longitude are within valid ranges
+           if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+               alert("Invalid latitude or longitude values.");
+               return;
+           }
+   
+           // Set latitude and longitude input values within the current modal context
+           modal.querySelector('input[name="latitude"]').value = lat.toFixed(6); // Limit to 6 decimal places
+           modal.querySelector('input[name="longitude"]').value = lng.toFixed(6); // Limit to 6 decimal places
+   
+           // Add a marker to the map
+           L.marker([lat, lng]).addTo(map).bindPopup("Location: " + lat + ", " + lng).openPopup();
+       });
+   }
+   
+   // Initialize map for each modal when it is shown
+   document.querySelectorAll('.modal').forEach(modal => {
+       modal.addEventListener('show.bs.modal', function () {
+           const mapId = this.querySelector('div[id^="map-"]').id; // Get the unique map ID
+           initializeMap(mapId, this); // Pass the modal context to the initializeMap function
+       });
+   });
+   </script>
+
+
+ <!-- main-footer -->
+ <footer class="main-footer">
+    <div class="footer-top" style="background-image: url(assets/images/banner/banner-1.jpg);">
+        <div class="auto-container">
+            <div class="widget-section">
+                <div class="row clearfix">
+                    <div class="col-lg-3 col-md-6 col-sm-12 footer-column">
+                        <div class="footer-widget logo-widget">
+                            <figure class="footer-logo"><a href="index.html"><img src="assets/images/" alt="oman"></a></figure>
+                            <div class="text">
+                                <p>Lorem ipsum dolor amet consetetur adi pisicing elit sed eiusm tempor in cididunt ut labore dolore magna aliqua enim ad minim venitam</p>
+                            </div>
+                            <ul class="social-links clearfix">
+                                <li><a href=""><i class="fab fa-facebook-f"></i></a></li>
+                                <li><a href="l"><i class="fab fa-twitter"></i></a></li>
+                                <li><a href=""><i class="fab fa-instagram"></i></a></li>
+                                <li><a href="i"><i class="fab fa-google-plus-g"></i></a></li>
+                                <li><a href=""><i class="fab fa-linkedin-in"></i></a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 col-sm-12 footer-column">
+                        <div class="footer-widget links-widget ml-70">
+                            <div class="widget-title">
+                                <h3>Services</h3>
+                            </div>
+                            <div class="widget-content">
+                                <ul class="links-list clearfix">
+                                    <li><a href="about.html">About Us</a></li>
+                                    <li><a href="">Listing</a></li>
+                                    <li><a href="">How It Works</a></li>
+                                    <li><a href="">Our Services</a></li>
+                                    <li><a href="">Our Blog</a></li>
+                                    
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6 col-sm-12 footer-column">
+                        <div class="footer-widget links-widget ml-70">
+                            <div class="widget-title">
+                                <h3>Get in Touch</h3>
+                            </div>
+                            <div class="widget-content">
+                                <ul class="links-list clearfix">
+                                    <li><a href="">Email us</a></li>
+                                    <li><a href="">Contact</a></li>
+                                    
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- <div class="col-lg-3 col-md-6 col-sm-12 footer-column">
+                        <div class="footer-widget post-widget">
+                            <div class="widget-title">
+                                <h3>Top News</h3>
+                            </div>
+                            <div class="post-inner">
+                                <div class="post">
+                                    <figure class="post-thumb">
+                                        <img src="assets/images/resource/footer-post-1.jpg" alt="">
+                                        <a href="blog-details.html"><i class="fas fa-link"></i></a>
+                                    </figure>
+                                    <h5><a href="blog-details.html">The Added Value Social Worker</a></h5>
+                                    <p>Mar 25, 2020</p>
+                                </div>
+                                <div class="post">
+                                    <figure class="post-thumb">
+                                        <img src="assets/images/resource/footer-post-2.jpg" alt="">
+                                        <a href="blog-details.html"><i class="fas fa-link"></i></a>
+                                    </figure>
+                                    <h5><a href="blog-details.html">Ways to Increase Trust</a></h5>
+                                    <p>Mar 24, 2020</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div> -->
+                    <div class="col-lg-3 col-md-6 col-sm-12 footer-column">
+                        <div class="footer-widget contact-widget">
+                            <div class="widget-title">
+                                <h3>Contacts</h3>
+                            </div>
+                            <div class="widget-content">
+                                <ul class="info-list clearfix">
+                                    <li>
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        Flat 20, Reynolds Neck, North Helenaville, FV77 8WS
+                                    </li>
+                                    <li>
+                                        <i class="fas fa-microphone"></i>
+                                        <a href="tel:23055873407">+2(305) 587-3407</a>
+                                    </li>
+                                    <li>
+                                        <i class="fas fa-envelope"></i>
+                                        <a href="mailto:info@example.com">info@example.com</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <div class="auto-container">
+            <div class="footer-inner clearfix">
+                <!-- <div class="copyright pull-left"><p><a href="index.html">Oman</a> </p></div> -->
+                <ul class="footer-nav pull-right clearfix">
+                    <li><a href="">Terms of Service</a></li>
+                    <li><a href="">Privacy Policy</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- main-footer end -->
+
+
+
+
+
+
+<!--Scroll to top-->
+<button class="scroll-top scroll-to-target" data-target="html">
+    <span class="far fa-long-arrow-up"></span>
+</button>
+</div>
+
+
+<!-- jequery plugins -->
+<script src="{% static 'assets/js/jquery.js' %}"></script>
+<script src="{% static 'assets/js/popper.min.js' %}"></script>
+<script src="{% static 'assets/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'assets/js/owl.js' %}"></script>
+<script src="{% static 'assets/js/wow.js' %}"></script>
+<script src="{% static 'assets/js/validation.js' %}"></script>
+<script src="{% static 'assets/js/jquery.fancybox.js' %}"></script>
+<script src="{% static 'assets/js/appear.js' %}"></script>
+<script src="{% static 'assets/js/scrollbar.js' %}"></script>
+
+
+<!-- main-js -->
+<script src="{% static 'assets/js/script.js' %}"></script>
+
+</body><!-- End of .page_wrapper -->
+</html>
